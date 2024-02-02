@@ -1,8 +1,9 @@
 package com.emtech.ushurusmart.etrModule.service;
+
 import org.springframework.stereotype.Service;
 
 @Service
-public class TaxCalculator {
+public class TaxCalculator implements TaxCalculatortInt {
     public double calculateTax(String productType, double price) {
         return getTaxPentage(productType) * price;
     }
@@ -10,7 +11,6 @@ public class TaxCalculator {
     private double getTaxPentage(String productType) {
         double taxPercentage = 0.0;
         switch (productType.toLowerCase()) {
-
             case "vatible":
                 taxPercentage = 0.16;
                 break;
