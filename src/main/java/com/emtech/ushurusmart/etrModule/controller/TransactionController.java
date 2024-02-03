@@ -24,6 +24,6 @@ public class TransactionController {
                 "Transaction of type '" + request.getType() + "' with price " + request.getPrice() + " processed.");
 
         return ResponseEntity.ok(response);
-        return "error"
+        
     }
 }
