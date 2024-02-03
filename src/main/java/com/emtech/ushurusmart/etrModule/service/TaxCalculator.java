@@ -5,10 +5,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class TaxCalculator implements TaxCalculatortInt {
     public double calculateTax(String productType, double price) {
-        return getTaxPentage(productType) * price;
+        return getTaxPercentage(productType) * price;
     }
 
-    private double getTaxPentage(String productType) {
+    private double getTaxPercentage(String productType) {
         double taxPercentage = 0.0;
         switch (productType.toLowerCase()) {
             case "vatible":

@@ -16,6 +16,7 @@ public class TransactionController {
 
     @PostMapping("/make-transaction")
     public ResponseEntity<EntityResponse<String>> makeTransaction(@RequestBody TransactionRequest request) {
+        
         EntityResponse<String> response = new EntityResponse<String>();
         response.setStatusCode(HttpStatus.OK.value());
         response.setMessage("Transaction successful");
@@ -23,5 +24,6 @@ public class TransactionController {
                 "Transaction of type '" + request.getType() + "' with price " + request.getPrice() + " processed.");
 
         return ResponseEntity.ok(response);
+        return "error"
     }
 }
