@@ -42,3 +42,4 @@
 .DS_Store
 
 #ignore more things
+src/main/resources/application.properties
