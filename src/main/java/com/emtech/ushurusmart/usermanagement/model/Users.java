@@ -11,18 +11,14 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Users {
     @Id
-    @SequenceGenerator(
-            name="user_sequence",
-            allocationSize = 1
-    )
-    @GeneratedValue(
-        strategy = GenerationType.SEQUENCE,
-            generator = "user_sequence"
-    )
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_sequence")
     @Column(
-            nullable = false
+            name = "user_id",
+            nullable = false,
+            insertable = false,
+            updatable = false
     )
-    private Long id;
+    private Long user_id;
     @Column(
             nullable = false
     )
@@ -31,13 +27,13 @@ public class Users {
             nullable = false
     )
     private String password;
+    @Column(
+            nullable = false
+    )
 
-    public Users(String username, String password) {
-        this.username = username;
-        this.password = password;
-    }
+    private boolean verified;
     @ManyToOne
-    @JoinColumn(name="admin_id")
+    @JoinColumn(name="admin_id", nullable = false)
     private Admin admin;
 
 }
