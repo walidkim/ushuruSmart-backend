@@ -1,7 +1,9 @@
 package com.emtech.ushurusmart.etrModule.entity;
 
-
 import org.junit.jupiter.api.Test;
+
+import com.emtech.ushurusmart.utils.model.EntityResponse;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class EntityResponseTest {
