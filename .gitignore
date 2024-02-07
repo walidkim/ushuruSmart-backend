@@ -40,5 +40,6 @@
 
 # Ignore Mac specific files
 .DS_Store
+# Ignore application.properties file
+application.properties
 
-#ignore more things
