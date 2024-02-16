@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 public class DatabaseInserter {
     public static void main(String[] args) {
         // parsed JSON data
-        etr myetr = new etr ();
+        Transaction myInserter = new Transaction ();
 
         // Database connection details
         double invoiceNumber;
@@ -24,10 +24,10 @@ public class DatabaseInserter {
              PreparedStatement pstmt = connect.prepareStatement(query)) {
             
             // Setting parameters
-            pstmt.setDouble(1, myetr.getInvoiceNumber());
-            pstmt.setDouble(2, myetr.getAmount());
-            pstmt.setDate(parameterIndex:3, myetr.getDate());
-            pstmt.setString(4, myetr.getBuyerPin());
+            pstmt.setDouble(1, myInserter.getInvoiceNumber());
+            pstmt.setDouble(2, myInserter.getAmount());
+            pstmt.setDate(parameterIndex:3, myInserter.getDate());
+            pstmt.setString(4, myInserter.getBuyerPin());
 
             // Execute the insert
             pstmt.executeUpdate();
