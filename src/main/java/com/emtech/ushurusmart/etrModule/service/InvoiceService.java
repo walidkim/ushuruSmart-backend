@@ -9,6 +9,7 @@ import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Paragraph;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.StyleConstants;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -16,7 +17,7 @@ import java.util.List;
 @Service
 public class InvoiceService {
 
-    public byte[] generateInvoice(String buyerName, List<TransactionRequest> products) throws IOException {
+    public byte[] generateInvoice(String buyerPin, List<TransactionRequest> products) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
         PdfWriter writer = new PdfWriter(outputStream);
@@ -26,7 +27,7 @@ public class InvoiceService {
         PdfFont font = PdfFontFactory.createFont();
 
         // Adding buyer name
-        Paragraph buyerParagraph = new Paragraph("Buyer: " + buyerName).setFont(font);
+        Paragraph buyerParagraph = new Paragraph("Buyer: " + buyerPin).setFont(font);
         document.add(buyerParagraph);
 
         // Adding product details

@@ -31,7 +31,8 @@ public class TransactionController {
         try {
             double tax = taxCalculatorService.calculateTax(request.getType(), request.getPrice());
             return ResponseEntity.ok()
-                    .body("Transaction of type '" + request.getType() + "' with tax " + tax + " processed.");
+                    .body("Transaction of type '" + request.getType() + " with tax "
+                            + tax + " of value" + request.getPrice() + " processed.");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest()
                     .body("Transaction of type '" + request.getType() + "' is not supported.");
@@ -42,14 +43,14 @@ public class TransactionController {
     private InvoiceService pdfService;
 
     @GetMapping("/generate-invoice")
-    public ResponseEntity<byte[]> generateInvoice(@RequestParam String buyerName) {
+    public ResponseEntity<byte[]> generateInvoice(@RequestParam String buyerPin) {
         List<TransactionRequest> requests = Arrays.asList(
                 new TransactionRequest("TransactionRequest 1", 10.0),
                 new TransactionRequest("TransactionRequest 2", 20.0),
                 new TransactionRequest("TransactionRequest 3", 15.0));
 
         try {
-            byte[] invoice = pdfService.generateInvoice(buyerName, requests);
+            byte[] invoice = pdfService.generateInvoice(buyerPin, requests);
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
