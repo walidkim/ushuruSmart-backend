@@ -9,10 +9,10 @@ public class EtrJackson {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             Transaction myetr= objectMapper.readValue(json, Transaction.class);
-            // System.out.println("invoiceNumber: " + myetr.getInvoiceNumber());
-            // System.out.println("amount: " + myetr.getAmount());
-            // System.out.println("date: " + myetr.getDate());
-            // System.out.println("buyerPin: " + myetr.getBuyerPin());
+            myetr.getInvoiceNumber();
+            myetr.getAmount();
+            myetr.getDate();
+            myetr.getBuyerPin();
 
             return myetr;
 

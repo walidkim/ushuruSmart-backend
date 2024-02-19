@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.emtech.ushurusmart.etrModule.entity.Transaction;
 import com.emtech.ushurusmart.etrModule.entity.TransactionRequest;
 import com.emtech.ushurusmart.etrModule.service.InvoiceService;
 import com.emtech.ushurusmart.etrModule.service.TaxCalculator;
@@ -41,13 +42,15 @@ public class TransactionController {
 
     @Autowired
     private InvoiceService pdfService;
+    @Autowired
+    private Transaction transaction;
 
     @GetMapping("/generate-invoice")
     public ResponseEntity<byte[]> generateInvoice(@RequestParam String buyerPin) {
         List<TransactionRequest> requests = Arrays.asList(
-                new TransactionRequest("TransactionRequest 1", 10.0),
-                new TransactionRequest("TransactionRequest 2", 20.0),
-                new TransactionRequest("TransactionRequest 3", 15.0));
+                new TransactionRequest("taxable", 10.0),
+                new TransactionRequest("free", 20.0),
+                new TransactionRequest("taxable", 15.0));
 
         try {
             byte[] invoice = pdfService.generateInvoice(buyerPin, requests);
