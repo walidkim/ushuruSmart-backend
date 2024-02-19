@@ -6,39 +6,39 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.emtech.ushurusmart.etrModule.Repository.ProductRepository;
+import com.emtech.ushurusmart.etrModule.Repository.ProductsRepository;
 import com.emtech.ushurusmart.etrModule.entity.Product;
 
 
 @Service
 
 
-public class ProductService {
+public class ProductsService {
 
     @Autowired
-    private ProductRepository pRepo;
+    private ProductsRepository pRepository;
 
     public List<Product> listAll() {
         List<Product> list = new ArrayList<>();
-        pRepo.findAll().forEach(list::add);
+        pRepository.findAll().forEach(list::add);
         return list;
     }
 
     @SuppressWarnings("null")
     public void save(Product product){
-        pRepo.save(product);
+        pRepository.save(product);
     }
     @SuppressWarnings("null")
     public Product getById(Integer id) {
-		return pRepo.findById(id).get();       
+		return pRepository.findById(id).get();       
 	}
 
     public Product getByName(String name){
-        return pRepo.findByName(name);
+        return pRepository.findByName(name);
     }
     @SuppressWarnings("null")
     public void delete(Integer id){
-        pRepo.deleteById(id);
+        pRepository.deleteById(id);
     }
 	
 }

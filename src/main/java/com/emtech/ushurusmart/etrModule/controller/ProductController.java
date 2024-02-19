@@ -15,14 +15,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.emtech.ushurusmart.etrModule.entity.Product;
-import com.emtech.ushurusmart.etrModule.service.ProductService;
+import com.emtech.ushurusmart.etrModule.service.ProductsService;
 
 @RestController
 @RequestMapping("/api/tax/Product")
 
 public class ProductController {
     @Autowired
-    private ProductService service;
+    private ProductsService service;
 
     @GetMapping
     public List<Product> getAllProduct(){
