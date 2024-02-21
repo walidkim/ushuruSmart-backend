@@ -11,7 +11,7 @@ public class TaxCalculator implements TaxCalculatortInt {
     private double getTaxPercentage(String productType) {
         double taxPercentage = 0.0;
         switch (productType.toLowerCase()) {
-            case "vatible":
+            case "taxable":
                 taxPercentage = 0.16;
                 break;
             case "free":

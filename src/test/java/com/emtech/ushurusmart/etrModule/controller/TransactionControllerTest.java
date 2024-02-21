@@ -30,16 +30,16 @@ public class TransactionControllerTest {
 
     @Test
     public void testGenerateInvoiceSuccess() throws Exception {
-        String buyerName = "John Doe";
+        String buyerPin = "John Doe";
         List<TransactionRequest> requests = Arrays.asList(
                 new TransactionRequest("TransactionRequest 1", 10.0),
                 new TransactionRequest("TransactionRequest 2", 20.0),
                 new TransactionRequest("TransactionRequest 3", 15.0));
 
         byte[] expectedInvoice = new byte[100]; // Replace with actual expected content
-        when(pdfService.generateInvoice(buyerName, requests)).thenReturn(expectedInvoice);
+        when(pdfService.generateInvoice(buyerPin, requests)).thenReturn(expectedInvoice);
 
-        ResponseEntity<byte[]> response = invoiceController.generateInvoice(buyerName);
+        ResponseEntity<byte[]> response = invoiceController.generateInvoice(buyerPin);
 
         assertEquals(response.getStatusCode(), HttpStatus.OK);
         assertEquals(response.getHeaders().getContentType(), MediaType.APPLICATION_PDF);
