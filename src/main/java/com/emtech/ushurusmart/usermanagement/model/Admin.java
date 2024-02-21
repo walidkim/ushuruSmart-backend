@@ -29,6 +29,8 @@ public class Admin {
         @Column(nullable = false)
         private String password;
 
+        private String testbranch;
+
         @OneToMany(mappedBy = "admin", cascade = CascadeType.ALL)
         private List<Users> usersList;
 
