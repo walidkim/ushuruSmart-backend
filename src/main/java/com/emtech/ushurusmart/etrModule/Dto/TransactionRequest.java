@@ -1,4 +1,4 @@
-package com.emtech.ushurusmart.etrModule.entity;
+package com.emtech.ushurusmart.etrModule.Dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

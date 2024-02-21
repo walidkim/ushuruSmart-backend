@@ -17,7 +17,7 @@ class TaxCalculatorTests {
 
     @Test
     void calculateTaxForVatibleProduct() {
-        double price = 100.0;
+        double price = 119.0;
         String productType = "vatible";
 
         double result = taxCalculator.calculateTax(productType, price);

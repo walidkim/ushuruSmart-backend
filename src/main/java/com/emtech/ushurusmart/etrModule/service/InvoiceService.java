@@ -1,6 +1,6 @@
 package com.emtech.ushurusmart.etrModule.service;
 
-import com.emtech.ushurusmart.etrModule.entity.TransactionRequest;
+import com.emtech.ushurusmart.etrModule.Dto.TransactionRequest;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.pdf.PdfDocument;

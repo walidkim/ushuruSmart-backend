@@ -15,7 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 
 import com.emtech.ushurusmart.UshuruSmartApplication;
-import com.emtech.ushurusmart.etrModule.entity.TransactionRequest;
+import com.emtech.ushurusmart.etrModule.Dto.TransactionRequest;
 import com.emtech.ushurusmart.etrModule.service.InvoiceService;
 
 @SpringBootTest
