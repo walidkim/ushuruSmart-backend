@@ -2,9 +2,12 @@ package com.emtech.ushurusmart.etrModule.controller;
 
 import java.util.List;
 
+import com.emtech.ushurusmart.usermanagement.model.Admin;
+import com.emtech.ushurusmart.usermanagement.repository.AdminRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,9 +27,14 @@ public class ProductController {
     @Autowired
     private ProductsService service;
 
+    @Autowired
+    private AdminRepository adminRepository;
+    @Autowired
+    private Admin admin;
+
     @GetMapping
-    public List<Product> getAllProduct(){
-        return service.listAll();
+    public ResponseEntity<List<Product>> getAllProduct(){
+        return new ResponseEntity<>(service.listAll(), HttpStatus.OK);
     }
 
     @GetMapping("/id")
@@ -48,11 +56,20 @@ public class ProductController {
         return new ResponseEntity<Product>(product, HttpStatus.OK);
     }
     @PostMapping("/save")
-    public void addProduct(@RequestBody Product product){
+    public ResponseEntity<Product> addProduct(@RequestBody Product product){
+        Admin admin = (Admin) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(!adminRepository.findById(admin.getId()).isPresent() || !admin.getUsername().equals("admin")){
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
         service.save(product);
+        return new ResponseEntity<>(product, HttpStatus.CREATED);
     }
     @PutMapping("/update/{id}")
     public ResponseEntity<Product> updateProduct(@PathVariable Integer id, @RequestBody Product product){
+        Admin admin = (Admin)  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(!adminRepository.findById(admin.getId()).isPresent() || !admin.getUsername().equals("admin")) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
         Product currentProduct = service.getById(id);
         if (currentProduct == null){
             return new ResponseEntity<Product>(HttpStatus.NOT_FOUND);
@@ -61,7 +78,12 @@ public class ProductController {
         return new ResponseEntity<Product>(product, HttpStatus.OK);
     }
     @DeleteMapping("/delete/{id}")
-    public void deleteProduct(@PathVariable int id){
+    public ResponseEntity<Void> deleteProduct(@PathVariable int id) {
+        Admin admin = (Admin) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!adminRepository.findById(admin.getId()).isPresent() || !admin.getUsername().equals("admin")) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
         service.delete(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
