@@ -26,7 +26,7 @@ import com.emtech.ushurusmart.etrModule.service.TaxCalculator;
 public class TransactionController {
     @Autowired
     private TaxCalculator taxCalculatorService;
-
+    
     @PostMapping("/make-transaction")
     public ResponseEntity makeTransaction(@RequestBody TransactionRequest request) {
         try {
@@ -54,7 +54,6 @@ public class TransactionController {
 
         try {
             byte[] invoice = pdfService.generateInvoice(buyerPin, requests);
-
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
             headers.setContentDispositionFormData("filename", "invoice.pdf");

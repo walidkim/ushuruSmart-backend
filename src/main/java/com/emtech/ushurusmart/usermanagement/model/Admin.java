@@ -28,6 +28,8 @@ public class Admin {
         private String username;
         @Column(nullable = false)
         private String password;
+        @Column(nullable =false)
+        private Integer phonenumber;
 
         private String testbranch;
 
