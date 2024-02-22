@@ -18,7 +18,10 @@ public class Users {
         private String username;
         @Column(nullable = false)
         private String password;
+        @Column(nullable =false)
+        private Integer phonenumber;
         @Column(nullable = false)
+        private String branch;
 
         private boolean verified;
         @ManyToOne
