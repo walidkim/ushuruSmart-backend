@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.emtech.ushurusmart.etrModule.Dto.Transaction;
 import com.emtech.ushurusmart.etrModule.Dto.TransactionRequest;
 import com.emtech.ushurusmart.etrModule.service.InvoiceService;
 import com.emtech.ushurusmart.etrModule.service.TaxCalculator;

@@ -23,5 +23,6 @@ public class Product {
     private Integer unitPrice;
     private String unitofMeasure;
     private Boolean taxExempted;
-    
+    private int quantity;
+    private String description;
 }

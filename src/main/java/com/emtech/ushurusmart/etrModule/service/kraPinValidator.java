@@ -1,12 +1,13 @@
 package com.emtech.ushurusmart.etrModule.service;
 
-import com.emtech.ushurusmart.etrModule.Repository.KraPinHolder;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import com.emtech.ushurusmart.etrModule.repository.KraPinHolder;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class kraPinValidator  implements KraPinHolder{
+public class kraPinValidator implements KraPinHolder {
     private String kraPin;
     private static final String KRA_PIN_REGEX = "^[A-Za-z]{1}[0-9]{9}[A-Za-z]{1}$";
     private static final String API_URL = "https://etims-api-sbx.kra.go.ke/validateKraPin?kraPin=";
@@ -46,4 +47,3 @@ public class kraPinValidator  implements KraPinHolder{
         }
     }
 }
-

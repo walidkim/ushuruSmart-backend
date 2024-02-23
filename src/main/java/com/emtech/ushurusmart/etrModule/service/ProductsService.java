@@ -6,12 +6,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.emtech.ushurusmart.etrModule.Repository.ProductsRepository;
 import com.emtech.ushurusmart.etrModule.entity.Product;
-
+import com.emtech.ushurusmart.etrModule.repository.ProductsRepository;
 
 @Service
-
 
 public class ProductsService {
 
@@ -25,20 +23,22 @@ public class ProductsService {
     }
 
     @SuppressWarnings("null")
-    public void save(Product product){
+    public void save(Product product) {
         pRepository.save(product);
     }
+
     @SuppressWarnings("null")
     public Product getById(Integer id) {
-		return pRepository.findById(id).get();       
-	}
+        return pRepository.findById(id).get();
+    }
 
-    public Product getByName(String name){
+    public Product getByName(String name) {
         return pRepository.findByName(name);
     }
+
     @SuppressWarnings("null")
-    public void delete(Integer id){
+    public void delete(Integer id) {
         pRepository.deleteById(id);
     }
-	
+
 }

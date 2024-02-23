@@ -1,7 +1,7 @@
-package com.emtech.ushurusmart.etrModule.Repository;
+package com.emtech.ushurusmart.etrModule.repository;
 
 public interface KraPinHolder {
-      String getKraPin();
-        void setKraPin(String kraPin);
-    }
+  String getKraPin();
 
+  void setKraPin(String kraPin);
+}

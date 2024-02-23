@@ -1,5 +1,4 @@
-package com.emtech.ushurusmart.etrModule.entity;
-
+package com.emtech.ushurusmart.etrModule.Dto;
 
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
@@ -7,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-
 
 @Data
 @AllArgsConstructor
