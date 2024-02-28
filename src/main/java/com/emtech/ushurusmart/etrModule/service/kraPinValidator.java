@@ -2,7 +2,7 @@ package com.emtech.ushurusmart.etrModule.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.emtech.ushurusmart.etrModule.repository.KraPinHolder;
+import com.emtech.ushurusmart.etrModule.Repository.KraPinHolder;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

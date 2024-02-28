@@ -1,4 +1,4 @@
-package com.emtech.ushurusmart.etrModule.repository;
+package com.emtech.ushurusmart.etrModule.Repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
