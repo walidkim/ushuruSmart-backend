@@ -9,16 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Users {
-        @Id
-        @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_sequence")
-        @Column(name = "user_id", nullable = false, insertable = false, updatable = false)
-        private Long user_id;
+public class User extends BaseAuth {
         @Column(nullable = false)
-        private String username;
-        @Column(nullable = false)
-        private String password;
-        @Column(nullable =false)
         private Integer phonenumber;
         @Column(nullable = false)
         private String branch;
@@ -27,5 +19,4 @@ public class Users {
         @ManyToOne
         @JoinColumn(name = "admin_id", nullable = false)
         private Admin admin;
-
 }

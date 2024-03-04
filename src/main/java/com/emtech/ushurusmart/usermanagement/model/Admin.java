@@ -12,29 +12,19 @@ import com.emtech.ushurusmart.payment.model.PaymentDetails;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-
 @Entity
 @Table(uniqueConstraints = {
                 @UniqueConstraint(name = "kra_unique", columnNames = "KRAPin")
 })
-public class Admin {
-        @Id
-        @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "admin_sequence")
-        @Column(nullable = false)
-        private Long id;
+public class Admin extends BaseAuth {
         @Column(nullable = false)
         private String KRAPin;
+
         @Column(nullable = false)
-        private String username;
-        @Column(nullable = false)
-        private String password;
-        @Column(nullable =false)
         private Integer phonenumber;
 
-        private String testbranch;
-
         @OneToMany(mappedBy = "admin", cascade = CascadeType.ALL)
-        private List<Users> usersList;
+        private List<User> usersList;
 
         @OneToMany(mappedBy = "admin", cascade = CascadeType.ALL)
         private List<PaymentDetails> payments;

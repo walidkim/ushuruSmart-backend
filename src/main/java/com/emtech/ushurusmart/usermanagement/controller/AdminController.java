@@ -1,97 +1,100 @@
-package com.emtech.ushurusmart.usermanagement.controller;
 
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+import com.emtech.ushurusmart.usermanagement.Dtos.SignUpReq;
 import com.emtech.ushurusmart.usermanagement.model.Admin;
-import com.emtech.ushurusmart.usermanagement.model.Users;
-import com.emtech.ushurusmart.usermanagement.repository.AdminRepository;
-import com.emtech.ushurusmart.usermanagement.repository.UserRepository;
 import com.emtech.ushurusmart.usermanagement.service.AdminService;
-import com.emtech.ushurusmart.usermanagement.service.CreateUSerService;
+import com.emtech.ushurusmart.usermanagement.service.UserService;
+import com.emtech.ushurusmart.usermanagement.service.jwtServices.JwtTokenUtil;
+
+import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(path = "/admin")
+@RequestMapping("/api/v1/auth")
 public class AdminController {
+
     @Autowired
-    public AdminService adminService;
+    private AdminService landlordService;
+
     @Autowired
-    public CreateUSerService createUser;
+    private UserService tenantService;
+
     @Autowired
-    public AdminRepository adminRepository;
+    private AuthenticationManager authenticationManager;
     @Autowired
-    public UserRepository userRepository;
+    private JwtTokenUtil jwtUtil;
 
-    public ResponseEn t ity<?> signUp(@RequestBody Admin admin, BindingResult result) {
-        if (result.hasErrors()) {
-            return ResponseEntity.badRequest().body(result.getAllErrors());
-        }
-        String message = adminService.adminLogin(admin,admin.getUsername(), admin.getPassword());
-        return ResponseEntity.ok(message); 
-    }
+    @PostMapping(value = "/sign-up")
+    public ResponseEntity<?> signUp(@RequestParam(name = "type", required = true) String type,
+            @RequestBody SignUpReq data) {
+        switch (type) {
+            case ("landlord"): {
 
+                if (landlordService.findByEmail(data.getEmail()) != null) {
+                    return ResponseEntity.badRequest().body(HelperUtil.capitalizeFirst(type)+ " with that email exists!");
+                }
+                Admin landlord = new Admin();
+                landlord.setName(data.getName());
+                landlord.setEmail(data.getEmail());
+                landlord.setPassword(data.getPassword());
+                landlordService.save(landlord);
+                return ResponseEntity.status(HttpStatus.CREATED).body(HelperUtil.capitalizeFirst(type)+ " created successfully!");
 
-    @PostMapping(path="/login")
-    public ResponseEntity<?> loginAdmin(@ReqestBody Admin admin, BindingResult result) { 
-        if (result.hasErrors())  {
-            return ResponseEntity.badRequest().body(result.getAllErrors());
-                    
-        String message = adminService.adminLogin(admin,admin.getUsername(), admin.getPassword());
-        return ResponseEntity.ok(message); 
-    }
-    @PostMapping("/createUser")
-    public ResponseEntity<String> createUser (@RequestBody Users user, BindingResult result){
-        if (result.hasErrors()){
-     
-
-                .map(ObjectError::getDefaultMessage).collect(Collectors.joining(", ")));
-        } 
-        if (userRepository.find ByUsername(user.getUsername()) != null){
-            return ResponseEntity.badRequest().body("Username already exists!");
-                    
-        createUser.saveUser(user);
-        return ResponseEntity.ok("User created Successfully"); 
-    }
-    @PutMapping("/updateUser")
-    public ResponseEntity<String> u pdateUser (@RequestBody Users user, BindingResult result){
-        if (result.hasErrors()){
-     
-
-                .map(ObjectError::getDefaultMessage).collect(Collectors.joining(", ")));
-        } 
-        if (userRepository.findByUsername(user.getUsername()) == null){
-     
+            }
+            default: {
+                return ResponseEntity.badRequest().body(HelperUtil.capitalizeFirst(type)+ " is invalid.");
+            }
 
         }
-        createUser.updateUser(null,user); 
-        return ResponseEntity.ok("User updated successfully");
+
+
     }
 
-    @GetMapping("/allUsers")
-    public ResponseEntity<Iterable<Users>> getAllUsers(){ 
-        return ResponseEntity.ok(c
-        
+    @PostMapping(value = "/login")
+    public ResponseEntity<?> login(@NotNull @RequestParam(name = "type", required = true) String type,@RequestBody LoginRequest loginReq) {
 
-    p
+        try {
+            switch (type){
+                case "landlord":{
+                    Landlord landLord = landlordService.findByEmail(loginReq.getEmail());
+                    if (landLord == null) {
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No landlord by that email exists.");
+                    }
+                    break;
+                }
+                case "tenant":{
+                    Tenant tenant = tenantService.findByEmail(loginReq.getEmail());
+                    if (tenant == null) {
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No tenant by that email exists.");
+                    }
+                    break;
+                }
+                default:
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("");
+//
+            }
+//            System.out.println("logging in");
+//            mongoDBService.createGroceryItems();
 
-    public ResponseEntity<String> deleteUser(@PathVariable Long id){
-        createUser.deleteUser(id);
-            return ResponseEntity.ok("User deleted successfully");
-       
+
+            Authentication authentication = authenticationManager
+                    .authenticate(new UsernamePasswordAuthenticationToken(loginReq.getEmail(), loginReq.getPassword()));
+            String token = jwtUtil.createToken(authentication.getName());
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(token);
+
+        } catch (BadCredentialsException e) {
+            System.out.println(e);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password.");
+        } catch (Exception e) {
+            ErrorRes errorResponse = new ErrorRes(HttpStatus.BAD_REQUEST, e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
     }
-
-
-    
 }

@@ -1,6 +1,6 @@
 package com.emtech.ushurusmart.usermanagement.repository;
 
-import com.emtech.ushurusmart.usermanagement.model.Users;
+import com.emtech.ushurusmart.usermanagement.model.User;
 
 import java.util.Collection;
 
@@ -8,9 +8,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface UserRepository extends JpaRepository<Users,Long> {
+public interface UserRepository extends JpaRepository<User, Long> {
 
-    Users findByUsername(String username);
+    User findByUsername(String username);
 
-    Collection<Users> findByBranch(String branch);
+    Collection<User> findByBranch(String branch);
+
+    User findByEmail(String email);
 }
