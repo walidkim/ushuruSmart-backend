@@ -23,7 +23,7 @@ import com.emtech.ushurusmart.usermanagement.service.AdminService;
 import com.emtech.ushurusmart.usermanagement.service.CreateUSerService;
 
 @RestController
-@RequestMapping(path="/admin")
+@RequestMapping(path = "/admin")
 public class AdminController {
     @Autowired
     public AdminService adminService;
@@ -34,47 +34,58 @@ public class AdminController {
     @Autowired
     public UserRepository userRepository;
 
-    @PostMapping(path="/login")
-    public ResponseEntity<?> loginAdmin(@RequestBody Admin admin, BindingResult result) {
+    public ResponseEn t ity<?> signUp(@RequestBody Admin admin, BindingResult result) {
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(result.getAllErrors());
         }
         String message = adminService.adminLogin(admin,admin.getUsername(), admin.getPassword());
-        return ResponseEntity.ok(message);
+        return ResponseEntity.ok(message); 
+    }
+
+
+    @PostMapping(path="/login")
+    public ResponseEntity<?> loginAdmin(@ReqestBody Admin admin, BindingResult result) { 
+        if (result.hasErrors())  {
+            return ResponseEntity.badRequest().body(result.getAllErrors());
+                    
+        String message = adminService.adminLogin(admin,admin.getUsername(), admin.getPassword());
+        return ResponseEntity.ok(message); 
     }
     @PostMapping("/createUser")
     public ResponseEntity<String> createUser (@RequestBody Users user, BindingResult result){
         if (result.hasErrors()){
-            return ResponseEntity.badRequest().body(result.getAllErrors().stream()
+     
+
                 .map(ObjectError::getDefaultMessage).collect(Collectors.joining(", ")));
-        }
-        if (userRepository.findByUsername(user.getUsername()) != null){
+        } 
+        if (userRepository.find ByUsername(user.getUsername()) != null){
             return ResponseEntity.badRequest().body("Username already exists!");
-        }
+                    
         createUser.saveUser(user);
-        return ResponseEntity.ok("User created Successfully");
+        return ResponseEntity.ok("User created Successfully"); 
     }
     @PutMapping("/updateUser")
-    public ResponseEntity<String> updateUser (@RequestBody Users user, BindingResult result){
+    public ResponseEntity<String> u pdateUser (@RequestBody Users user, BindingResult result){
         if (result.hasErrors()){
-            return ResponseEntity.badRequest().body(result.getAllErrors().stream()
+     
+
                 .map(ObjectError::getDefaultMessage).collect(Collectors.joining(", ")));
-        }
+        } 
         if (userRepository.findByUsername(user.getUsername()) == null){
-            return ResponseEntity.badRequest().body("User not found");
+     
+
         }
-        createUser.updateUser(null,user);
+        createUser.updateUser(null,user); 
         return ResponseEntity.ok("User updated successfully");
     }
+
     @GetMapping("/allUsers")
-    public ResponseEntity<Iterable<Users>> getAllUsers(){
-        return ResponseEntity.ok(createUser.getAllUsers());
-    }
-    @GetMapping("/users/branch/{branch}")
-    public ResponseEntity<Iterable<String>> getUsersByBranch(@PathVariable String branch){
-        return ResponseEntity.ok(createUser.getUserByBranch(branch));
-    }
-    @DeleteMapping("/users/{id}")
+    public ResponseEntity<Iterable<Users>> getAllUsers(){ 
+        return ResponseEntity.ok(c
+        
+
+    p
+
     public ResponseEntity<String> deleteUser(@PathVariable Long id){
         createUser.deleteUser(id);
             return ResponseEntity.ok("User deleted successfully");
