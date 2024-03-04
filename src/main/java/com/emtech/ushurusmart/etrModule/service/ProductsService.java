@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.emtech.ushurusmart.etrModule.entity.Product;
-import com.emtech.ushurusmart.etrModule.repository.ProductsRepository;
+import com.emtech.ushurusmart.etrModule.Repository.ProductsRepository;
 
 @Service
 
