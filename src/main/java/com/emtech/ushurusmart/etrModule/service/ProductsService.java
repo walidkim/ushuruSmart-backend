@@ -1,44 +1,32 @@
 package com.emtech.ushurusmart.etrModule.service;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import com.emtech.ushurusmart.etrModule.entity.Product;
+import com.emtech.ushurusmart.etrModule.repository.ProductsRepository;
 import org.springframework.stereotype.Service;
 
-import com.emtech.ushurusmart.etrModule.entity.Product;
-import com.emtech.ushurusmart.etrModule.Repository.ProductsRepository;
+import java.util.List;
 
 @Service
-
 public class ProductsService {
+    private ProductsRepository productsRepository;
 
-    @Autowired
-    private ProductsRepository pRepository;
-
-    public List<Product> listAll() {
-        List<Product> list = new ArrayList<>();
-        pRepository.findAll().forEach(list::add);
-        return list;
+    public List<Product> findAll() {
+        return productsRepository.findAll();
     }
 
-    @SuppressWarnings("null")
-    public void save(Product product) {
-        pRepository.save(product);
-    }
-
-    @SuppressWarnings("null")
-    public Product getById(Integer id) {
-        return pRepository.findById(id).get();
+    public Product getById(long id) {
+        return productsRepository.getById(id);
     }
 
     public Product getByName(String name) {
-        return pRepository.findByName(name);
+        return productsRepository.findByName(name);
     }
 
-    @SuppressWarnings("null")
-    public void delete(Integer id) {
-        pRepository.deleteById(id);
+    public Product save(Product product) {
+        return productsRepository.save(product);
     }
 
+    public void delete(long id) {
+         productsRepository.deleteById(id);
+    }
 }

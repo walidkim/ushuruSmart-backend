@@ -1,6 +1,9 @@
+package com.emtech.ushurusmart.usermanagement.controller;
 
+import com.emtech.ushurusmart.usermanagement.Dtos.LoginRequest;
 import com.emtech.ushurusmart.usermanagement.Dtos.SignUpReq;
 import com.emtech.ushurusmart.usermanagement.model.Admin;
+import com.emtech.ushurusmart.usermanagement.model.User;
 import com.emtech.ushurusmart.usermanagement.service.AdminService;
 import com.emtech.ushurusmart.usermanagement.service.UserService;
 import com.emtech.ushurusmart.usermanagement.service.jwtServices.JwtTokenUtil;
@@ -20,10 +23,10 @@ import org.springframework.web.bind.annotation.*;
 public class AdminController {
 
     @Autowired
-    private AdminService landlordService;
+    private AdminService adminService;
 
     @Autowired
-    private UserService tenantService;
+    private UserService userService;
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -34,24 +37,26 @@ public class AdminController {
     public ResponseEntity<?> signUp(@RequestParam(name = "type", required = true) String type,
             @RequestBody SignUpReq data) {
         switch (type) {
-            case ("landlord"): {
+            case ("admin"): {
 
-                if (landlordService.findByEmail(data.getEmail()) != null) {
+                if (adminService.findByEmail(data.getEmail()) != null) {
                     return ResponseEntity.badRequest().body(HelperUtil.capitalizeFirst(type)+ " with that email exists!");
                 }
                 Admin landlord = new Admin();
                 landlord.setName(data.getName());
                 landlord.setEmail(data.getEmail());
                 landlord.setPassword(data.getPassword());
-                landlordService.save(landlord);
-                return ResponseEntity.status(HttpStatus.CREATED).body(HelperUtil.capitalizeFirst(type)+ " created successfully!");
 
+                adminService.save(landlord);
+                System.out.println("Done of writing");
+                return ResponseEntity.status(HttpStatus.CREATED).body(HelperUtil.capitalizeFirst(type)+ " created successfully!");
             }
             default: {
                 return ResponseEntity.badRequest().body(HelperUtil.capitalizeFirst(type)+ " is invalid.");
             }
 
         }
+
 
 
     }
@@ -61,15 +66,15 @@ public class AdminController {
 
         try {
             switch (type){
-                case "landlord":{
-                    Landlord landLord = landlordService.findByEmail(loginReq.getEmail());
+                case "admin":{
+                    Admin landLord = adminService.findByEmail(loginReq.getEmail());
                     if (landLord == null) {
-                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No landlord by that email exists.");
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No admin by that email exists.");
                     }
                     break;
                 }
                 case "tenant":{
-                    Tenant tenant = tenantService.findByEmail(loginReq.getEmail());
+                    User tenant = userService.findByEmail(loginReq.getEmail());
                     if (tenant == null) {
                         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No tenant by that email exists.");
                     }
@@ -93,8 +98,7 @@ public class AdminController {
             System.out.println(e);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password.");
         } catch (Exception e) {
-            ErrorRes errorResponse = new ErrorRes(HttpStatus.BAD_REQUEST, e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error "+ e.getLocalizedMessage());
         }
     }
 }

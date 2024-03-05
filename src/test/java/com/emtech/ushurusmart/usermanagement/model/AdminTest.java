@@ -36,8 +36,8 @@ public class AdminTest {
     @Test
     public void testSetAndGetUsername() {
         Admin admin = new Admin();
-        admin.setUsername("admin");
-        assertEquals("admin", admin.getUsername());
+        admin.setEmail("admin");
+        assertEquals("admin", admin.getEmail());
     }
 
     @Test
@@ -50,8 +50,8 @@ public class AdminTest {
     @Test
     public void testSetAndGetUsersList() {
         Admin admin = new Admin();
-        List<Users> usersList = new ArrayList<>();
-        usersList.add(new Users());
+        List<User> usersList = new ArrayList<>();
+        usersList.add(new User());
         admin.setUsersList(usersList);
         assertEquals(usersList, admin.getUsersList());
     }

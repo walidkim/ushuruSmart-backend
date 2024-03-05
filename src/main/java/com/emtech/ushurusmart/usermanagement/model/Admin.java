@@ -29,4 +29,5 @@ public class Admin extends BaseAuth {
         @OneToMany(mappedBy = "admin", cascade = CascadeType.ALL)
         private List<PaymentDetails> payments;
 
+
 }
