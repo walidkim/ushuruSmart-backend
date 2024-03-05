@@ -42,9 +42,6 @@ public class TransactionController {
 
     @Autowired
     private InvoiceService pdfService;
-    @Autowired
-    private Transaction transaction;
-
     @GetMapping("/generate-invoice")
     public ResponseEntity<byte[]> generateInvoice(@RequestParam String buyerPin) {
         List<TransactionRequest> requests = Arrays.asList(

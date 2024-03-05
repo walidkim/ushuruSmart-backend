@@ -6,8 +6,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 
 @SpringBootApplication
 @EnableMongoRepositories
-public class
-UshuruSmartApplication {
+public class  UshuruSmartApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(UshuruSmartApplication.class, args);
 	}

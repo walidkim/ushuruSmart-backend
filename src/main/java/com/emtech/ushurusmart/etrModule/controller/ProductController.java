@@ -28,8 +28,6 @@ public class ProductController {
 
     @Autowired
     private AdminRepository adminRepository;
-    @Autowired
-    private Admin admin;
 
     @GetMapping
     public ResponseEntity<List<Product>> getAllProduct(){
