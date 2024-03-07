@@ -1,6 +1,5 @@
 package com.emtech.ushurusmart.usermanagement.service.jwtServices;
 
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,16 +37,15 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(@NotNull HttpSecurity http) throws Exception {
-
-        http.csrf().disable()
-                .authorizeRequests()
-                .requestMatchers("/api/v1/auth/**", "/payment/stk-transaction-result").permitAll()
-                .anyRequest().authenticated()
-                .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        // http.csrf().disable()
+        //         .authorizeRequests()
+        //         .requestMatchers("/api/v1/auth/**","/swagger-ui/**","/payment/stk-transaction-result").permitAll()
+        //         .anyRequest().authenticated()
+        //         .and()
+        //         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        //         .and()
+        //         .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
