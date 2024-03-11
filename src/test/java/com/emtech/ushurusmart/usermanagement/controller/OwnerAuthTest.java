@@ -81,7 +81,7 @@ public class OwnerAuthTest{
                 .post(signUpUrl)
                 .then()
                 .statusCode(is(400))
-                .body(containsString("Landlord with that email exists!"));
+                .body(containsString("Owner with that email exists!"));
     }
 
     @Test
@@ -105,7 +105,7 @@ public class OwnerAuthTest{
                 .post(loginUrl)
                 .then()
                 .statusCode(is(404))
-                .body(containsString("No landlord by that email exists."));
+                .body(containsString("No Owner by that email exists."));
 
     }
 
