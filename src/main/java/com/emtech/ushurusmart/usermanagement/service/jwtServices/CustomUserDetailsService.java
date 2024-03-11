@@ -1,45 +1,41 @@
 package com.emtech.ushurusmart.usermanagement.service.jwtServices;
 
+import com.emtech.ushurusmart.usermanagement.model.Assistant;
+import com.emtech.ushurusmart.usermanagement.model.Owner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.emtech.ushurusmart.usermanagement.model.*;
-import com.emtech.ushurusmart.usermanagement.repository.AdminRepository;
-import com.emtech.ushurusmart.usermanagement.repository.UserRepository;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.emtech.ushurusmart.usermanagement.repository.OwnerRepository;
+import com.emtech.ushurusmart.usermanagement.repository.AssistantRepository;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
     @Autowired
-    private AdminRepository adminRepository;
+    private OwnerRepository ownerRepository;
     @Autowired
-    private UserRepository userRepository;
+    private AssistantRepository assistantRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
-        Admin landlord = adminRepository.findByEmail(email);
+        Owner landlord = ownerRepository.findByEmail(email);
         if (landlord != null) {
-            UserDetails userDetails = org.springframework.security.core.userdetails.User.builder()
+            return org.springframework.security.core.userdetails.User.builder()
                     .username(landlord.getEmail())
                     .password(landlord.getPassword())
                     .build();
-            return userDetails;
         }
 
-        User tenant = userRepository.findByEmail(email);
-        if (tenant != null) {
-            UserDetails userDetails = org.springframework.security.core.userdetails.User.builder()
-                    .username(tenant.getEmail())
-                    .password(tenant.getPassword())
+        Assistant assistant = assistantRepository.findByEmail(email);
+        if (assistant != null) {
+            return org.springframework.security.core.userdetails.User.builder()
+                    .username(assistant.getEmail())
+                    .password(assistant.getPassword())
                     .build();
-            return userDetails;
         }
         return null;
 

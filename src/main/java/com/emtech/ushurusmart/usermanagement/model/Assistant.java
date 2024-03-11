@@ -9,7 +9,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class User extends BaseAuth {
+@Table(name = "assistants")
+
+public class Assistant extends BaseAuth {
         @Column(nullable = false)
         private Integer phonenumber;
         @Column(nullable = false)
@@ -17,6 +19,6 @@ public class User extends BaseAuth {
 
         private boolean verified;
         @ManyToOne
-        @JoinColumn(name = "admin_id", nullable = false)
-        private Admin admin;
+        @JoinColumn(name = "owner_id", nullable = false)
+        private Owner owner;
 }

@@ -15,7 +15,7 @@ public abstract class BaseAuth {
     private long id;
 
     @Column(nullable = false)
-    private String name = "avd";
+    private String name;
 
     @Column(nullable = false)
     private String password;

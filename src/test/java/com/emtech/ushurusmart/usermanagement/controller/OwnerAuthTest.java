@@ -1,8 +1,8 @@
 package com.emtech.ushurusmart.usermanagement.controller;
 
 
-import com.emtech.ushurusmart.usermanagement.model.Admin;
-import com.emtech.ushurusmart.usermanagement.repository.AdminRepository;
+import com.emtech.ushurusmart.usermanagement.model.Owner;
+import com.emtech.ushurusmart.usermanagement.repository.OwnerRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,10 +18,10 @@ import static org.hamcrest.core.Is.is;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestConfiguration(value = "application-test.properties")
-public class AdminAuthControllerTest {
+public class OwnerAuthTest{
 
     @Autowired
-    private AdminRepository adminRepository;
+    private OwnerRepository ownerRepository;
 
 
     @LocalServerPort
@@ -33,30 +33,29 @@ public class AdminAuthControllerTest {
 
     @BeforeEach
     public void setUp() {
-        adminRepository.deleteAll();
-        signUpUrl = "http://localhost:" + port + "/api/v1/auth/sign-up?type=admin";
-        loginUrl = "http://localhost:" + port + "/api/v1/auth/login?type=admin";
+        ownerRepository.deleteAll();
+        signUpUrl = "http://localhost:" + port + "/api/v1/auth/sign-up?type=owner";
+        loginUrl = "http://localhost:" + port + "/api/v1/auth/login?type=owner";
 
     }
 
     @AfterEach
     public void tearDown() {
-        adminRepository.deleteAll();
+        ownerRepository.deleteAll();
     }
 
 
     @Test
     public void shouldSignUp() {
-        System.out.println(signUpUrl);
         String signupRequestJson = "{\"name\":\"John Doe\",\"password\":\"strongpassword123\",\"email\":\"johndoe@example.com\"}";
         given().header("Content-Type",
                         "application/json").body(signupRequestJson).when()
                 .post(signUpUrl)
                 .then()
-                .statusCode(is(400))
-                .body(containsString("Landlord created successfully!"));
+                .statusCode(is(201))
+                .body(containsString("Owner created successfully!"));
 
-        Admin auth= adminRepository.findByEmail("johndoe@example.com");
+        Owner auth= ownerRepository.findByEmail("johndoe@example.com");
         Assertions.assertNotNull(auth);
         Assertions.assertTrue(auth.getPassword().length()>30);
     }

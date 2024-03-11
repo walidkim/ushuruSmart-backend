@@ -2,8 +2,9 @@ package com.emtech.ushurusmart.etrModule.controller;
 
 import java.util.List;
 
-import com.emtech.ushurusmart.usermanagement.model.Admin;
-import com.emtech.ushurusmart.usermanagement.repository.AdminRepository;
+
+import com.emtech.ushurusmart.usermanagement.model.Owner;
+import com.emtech.ushurusmart.usermanagement.repository.OwnerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,7 @@ public class ProductController {
     private ProductsService productsService;
 
     @Autowired
-    private AdminRepository adminRepository;
+    private OwnerRepository ownerRepository;
 
     @GetMapping
     public ResponseEntity<List<Product>> getAllProduct(){
@@ -54,8 +55,8 @@ public class ProductController {
     }
     @PostMapping("/save")
     public ResponseEntity<Product> addProduct(@RequestBody Product product){
-        Admin admin = (Admin) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if(adminRepository.findById(admin.getId()).isEmpty()){
+        Owner owner = (Owner) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(ownerRepository.findById(owner.getId()).isEmpty()){
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         productsService.save(product);
@@ -63,8 +64,8 @@ public class ProductController {
     }
     @PutMapping("/update/{id}")
     public ResponseEntity<Product> updateProduct(@PathVariable Integer id, @RequestBody Product product){
-        Admin admin = (Admin)  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if(!adminRepository.findById(admin.getId()).isPresent()) {
+        Owner owner = (Owner)  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(!ownerRepository.findById(owner.getId()).isPresent()) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         Product currentProduct = productsService.getById(id);
@@ -76,8 +77,8 @@ public class ProductController {
     }
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable int id) {
-        Admin admin = (Admin) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!adminRepository.findById(admin.getId()).isPresent()) {
+        Owner owner = (Owner) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!ownerRepository.findById(owner.getId()).isPresent()) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         productsService.delete(id);

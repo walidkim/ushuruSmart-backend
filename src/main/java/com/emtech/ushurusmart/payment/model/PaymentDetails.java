@@ -1,7 +1,6 @@
 package com.emtech.ushurusmart.payment.model;
 
-import com.emtech.ushurusmart.usermanagement.model.Admin;
-
+import com.emtech.ushurusmart.usermanagement.model.Owner;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -25,8 +24,8 @@ public class PaymentDetails {
     private double amount;
 
     @ManyToOne
-    @JoinColumn(name = "admin_id", nullable = false)
-    private Admin admin;
+    @JoinColumn(name = "owner_id", nullable = false)
+    private Owner owner;
 
     private String method;
 

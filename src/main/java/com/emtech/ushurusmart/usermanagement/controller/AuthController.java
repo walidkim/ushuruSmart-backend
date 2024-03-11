@@ -2,12 +2,11 @@ package com.emtech.ushurusmart.usermanagement.controller;
 
 import com.emtech.ushurusmart.usermanagement.Dtos.LoginRequest;
 import com.emtech.ushurusmart.usermanagement.Dtos.SignUpReq;
-import com.emtech.ushurusmart.usermanagement.model.Admin;
-import com.emtech.ushurusmart.usermanagement.model.User;
-import com.emtech.ushurusmart.usermanagement.service.AdminService;
-import com.emtech.ushurusmart.usermanagement.service.UserService;
+import com.emtech.ushurusmart.usermanagement.model.Assistant;
+import com.emtech.ushurusmart.usermanagement.model.Owner;
+import com.emtech.ushurusmart.usermanagement.service.AssistantService;
+import com.emtech.ushurusmart.usermanagement.service.OwnerService;
 import com.emtech.ushurusmart.usermanagement.service.jwtServices.JwtTokenUtil;
-
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,13 +19,13 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/auth")
-public class AdminController {
+public class AuthController {
 
     @Autowired
-    private AdminService adminService;
+    private OwnerService ownerService;
 
     @Autowired
-    private UserService userService;
+    private AssistantService assistantService;
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -37,18 +36,17 @@ public class AdminController {
     public ResponseEntity<?> signUp(@RequestParam(name = "type", required = true) String type,
             @RequestBody SignUpReq data) {
         switch (type) {
-            case ("admin"): {
+            case ("owner"): {
 
-                if (adminService.findByEmail(data.getEmail()) != null) {
+                if (ownerService.findByEmail(data.getEmail()) != null) {
                     return ResponseEntity.badRequest().body(HelperUtil.capitalizeFirst(type)+ " with that email exists!");
                 }
-                Admin landlord = new Admin();
-                landlord.setName(data.getName());
-                landlord.setEmail(data.getEmail());
-                landlord.setPassword(data.getPassword());
+                Owner owner = new Owner();
+                owner.setName(data.getName());
+                owner.setEmail(data.getEmail());
+                owner.setPassword(data.getPassword());
 
-                adminService.save(landlord);
-                System.out.println("Done of writing");
+                ownerService.save(owner);
                 return ResponseEntity.status(HttpStatus.CREATED).body(HelperUtil.capitalizeFirst(type)+ " created successfully!");
             }
             default: {
@@ -66,17 +64,17 @@ public class AdminController {
 
         try {
             switch (type){
-                case "admin":{
-                    Admin landLord = adminService.findByEmail(loginReq.getEmail());
-                    if (landLord == null) {
-                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No admin by that email exists.");
+                case "owner":{
+                    Owner owner = ownerService.findByEmail(loginReq.getEmail());
+                    if (owner == null) {
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No " + HelperUtil.capitalizeFirst(type) +" by that email exists.");
                     }
                     break;
                 }
-                case "tenant":{
-                    User tenant = userService.findByEmail(loginReq.getEmail());
-                    if (tenant == null) {
-                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No tenant by that email exists.");
+                case "assistant":{
+                     Assistant assistant = assistantService.findByEmail(loginReq.getEmail());
+                    if (assistant == null) {
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No " + HelperUtil.capitalizeFirst(type) + " by that email exists.");
                     }
                     break;
                 }
