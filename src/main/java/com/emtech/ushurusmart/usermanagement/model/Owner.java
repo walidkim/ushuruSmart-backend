@@ -17,10 +17,10 @@ import com.emtech.ushurusmart.payment.model.PaymentDetails;
 public class Owner extends BaseAuth {
         private String KRAPin;
         
-        private Integer phoneNumber;
+        private String phoneNumber;
 
         @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
-        private List<Assistant> usersList;
+        private List<Assistant> assistants;
 
         @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
         private List<PaymentDetails> payments;

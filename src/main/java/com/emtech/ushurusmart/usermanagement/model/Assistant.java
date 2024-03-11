@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 
 public class Assistant extends BaseAuth {
         @Column(nullable = false)
-        private Integer phonenumber;
+        private String phoneNumber;
         @Column(nullable = false)
         private String branch;
 
