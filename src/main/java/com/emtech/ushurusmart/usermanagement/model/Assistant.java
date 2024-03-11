@@ -12,9 +12,8 @@ import lombok.NoArgsConstructor;
 @Table(name = "assistants")
 
 public class Assistant extends BaseAuth {
-        @Column(nullable = false)
         private String phoneNumber;
-        @Column(nullable = false)
+
         private String branch;
 
         private boolean verified;

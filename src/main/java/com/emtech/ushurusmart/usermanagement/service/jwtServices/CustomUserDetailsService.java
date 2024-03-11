@@ -22,11 +22,11 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
-        Owner landlord = ownerRepository.findByEmail(email);
-        if (landlord != null) {
+        Owner owner = ownerRepository.findByEmail(email);
+        if (owner != null) {
             return org.springframework.security.core.userdetails.User.builder()
-                    .username(landlord.getEmail())
-                    .password(landlord.getPassword())
+                    .username(owner.getEmail())
+                    .password(owner.getPassword())
                     .build();
         }
 

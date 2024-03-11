@@ -93,7 +93,7 @@ public class AuthController {
                     return ResponseEntity.status(HttpStatus.CREATED).body(res);
                 }
                 case "assistant":{
-                     Assistant assistant = assistantService.findByEmail(loginReq.getEmail());
+                    Assistant assistant = assistantService.findByEmail(loginReq.getEmail());
                     if (assistant == null) {
                         res.setMessage("No " + HelperUtil.capitalizeFirst(type) + " by that email exists.");
                         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
@@ -104,7 +104,7 @@ public class AuthController {
                     res.setMessage("Login successful.");
 
                     Map<String, Object> responseData = new HashMap<>();
-                    responseData.put(type+ "_details", assistant);
+                    responseData.put(type, assistant);
                     responseData.put("token", token);
                     res.setData(responseData);
 
@@ -120,6 +120,7 @@ public class AuthController {
 
 
         } catch (BadCredentialsException e) {
+            System.out.println(e.getLocalizedMessage());
             res.setMessage("Invalid email or password.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
         } catch (Exception e) {
