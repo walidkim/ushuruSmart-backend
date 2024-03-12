@@ -41,7 +41,7 @@ public class OwnerActionsController {
     }
 
     @PostMapping(value = "/add-assistant")
-    public ResponseEntity<?> createTenant(@RequestBody Assistant assistant) {
+    public ResponseEntity<?> createAssistant(@RequestBody Assistant assistant) {
         String ownerEmail = AuthUtils.getCurrentlyLoggedInPerson();
         Owner owner= ownerService.findByEmail(ownerEmail);
         assistant.setOwner(owner);
@@ -55,7 +55,7 @@ public class OwnerActionsController {
     }
 
     @DeleteMapping(value = "/delete-assistant")
-    public ResponseEntity<?> createAssistant(@NotNull @RequestParam(name = "assistant_id", required = true) long assistantId) {
+    public ResponseEntity<?> deleteAssistant(@NotNull @RequestParam(name = "assistant_id", required = true) long assistantId) {
         String ownerEmail = AuthUtils.getCurrentlyLoggedInPerson();
         Owner owner= ownerService.findByEmail(ownerEmail);
 
@@ -66,7 +66,7 @@ public class OwnerActionsController {
             res.setMessage("You are not authorized to delete this assistant ");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
         }
-
+        assistantService.deleteById(assistantId);
         res.setMessage("Assistant added successfully!");
 
         return ResponseEntity.status(HttpStatus.CREATED).body(res);
