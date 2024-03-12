@@ -24,7 +24,7 @@ public class OwnerActionsController {
     private AssistantService assistantService;
 
     @PostMapping(value = "/update-details")
-    public ResponseEntity<?> updatedDetails(@NotNull @RequestParam(name = "unit_id", required = true) long unitId, @RequestBody Owner newOwner) {
+    public ResponseEntity<?> updatedDetails(@RequestBody Owner newOwner) {
         String ownerEmail = AuthUtils.getCurrentlyLoggedInPerson();
         Owner owner= ownerService.findByEmail(ownerEmail);
 
