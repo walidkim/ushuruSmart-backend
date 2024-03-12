@@ -67,7 +67,7 @@ public class OwnerActionsController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
         }
         assistantService.deleteById(assistantId);
-        res.setMessage("Assistant added successfully!");
+        res.setMessage("Assistant deleted successfully!");
 
         return ResponseEntity.status(HttpStatus.CREATED).body(res);
     }
