@@ -41,7 +41,7 @@ public class OwnerActionsController {
     }
 
     @PostMapping(value = "/add-assistant")
-    public ResponseEntity<?> createTenant(@NotNull @RequestParam(name = "unit_id", required = true) long unitId, @RequestBody Assistant assistant) {
+    public ResponseEntity<?> createTenant(@RequestBody Assistant assistant) {
         String ownerEmail = AuthUtils.getCurrentlyLoggedInPerson();
         Owner owner= ownerService.findByEmail(ownerEmail);
         assistant.setOwner(owner);
