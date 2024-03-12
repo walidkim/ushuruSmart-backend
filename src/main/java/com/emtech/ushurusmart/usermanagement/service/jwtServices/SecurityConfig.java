@@ -1,5 +1,6 @@
 package com.emtech.ushurusmart.usermanagement.service.jwtServices;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,7 +38,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(@NotNull HttpSecurity http) throws Exception {
+
         http.csrf().disable()
                 .authorizeRequests()
                 .requestMatchers("/api/v1/auth/**", "/payment/stk-transaction-result").permitAll()

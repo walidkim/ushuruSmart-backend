@@ -23,7 +23,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/auth")
-public class AuthController {
+public class OwnerAndAssistantAuthController {
 
     @Autowired
     private OwnerService ownerService;
@@ -94,10 +94,11 @@ public class AuthController {
                 }
                 case "assistant":{
                     Assistant assistant = assistantService.findByEmail(loginReq.getEmail());
-                    if (assistant == null) {
+                  if (assistant == null) {
                         res.setMessage("No " + HelperUtil.capitalizeFirst(type) + " by that email exists.");
                         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
                     }
+                    System.out.println(assistant.toString());
                     Authentication authentication = authenticationManager
                             .authenticate(new UsernamePasswordAuthenticationToken(loginReq.getEmail(), loginReq.getPassword()));
                     String token = jwtUtil.createToken(authentication.getName());

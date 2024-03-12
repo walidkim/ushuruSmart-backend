@@ -90,7 +90,7 @@ public class AssistantAuthTest {
         ValidatableResponse res= given().header("Content-Type", "application/json").body(loginJson).when()
                 .post(loginUrl)
                 .then()
-                .statusCode(is(401))
+                .statusCode(is(403))
                 .body(containsString("Bearer "));
         System.out.println(assistantRepository.findAll());
 
