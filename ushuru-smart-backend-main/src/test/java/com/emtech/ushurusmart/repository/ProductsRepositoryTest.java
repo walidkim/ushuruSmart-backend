@@ -1,2 +1,3 @@
-package com.emtech.ushurusmart.repository;public class ProductsRepositoryTest {
+package com.emtech.ushurusmart.repository;
+public class ProductsRepositoryTest {
 }

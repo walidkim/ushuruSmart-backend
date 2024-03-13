@@ -1,4 +1,4 @@
-package com.emtech.ushurusmart.etrModule.Dto;
+package com.emtech.ushurusmart.Transaction.Dto;
 
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
@@ -12,9 +12,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class TransactionDTO {
     @Id
-    private Long id ;
+    private Long id;
     private double amount;
+    private String buyerPin;
     @CreationTimestamp
     private LocalDateTime dateCreated;
-    private String buyerPin;
+
 }
