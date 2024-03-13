@@ -15,9 +15,16 @@ import com.emtech.ushurusmart.payment.model.PaymentDetails;
 @Entity
 @Table(name = "owners")
 public class Owner extends BaseAuth {
-        private String KRAPin;
-        
-        private String phoneNumber;
+
+        @Column(name = "BusinessKRAPin")
+        private String BusinessKRAPin;
+
+        @Column(name = "BusinessOwnerKRAPin")
+        private String BusinessOwnerKRAPin;
+
+        @Column(name = "PhoneNumber")
+        private Integer PhoneNumber;
+
 
         @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
         private List<Assistant> assistants;

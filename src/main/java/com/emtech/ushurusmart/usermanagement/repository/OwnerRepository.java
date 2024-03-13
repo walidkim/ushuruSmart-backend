@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 public interface OwnerRepository extends JpaRepository<Owner, Long> {
     Owner findByEmail(String email);
 
+    Owner deleteByEmail(String email);
+
 }

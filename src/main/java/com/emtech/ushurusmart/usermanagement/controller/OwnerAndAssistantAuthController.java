@@ -19,6 +19,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -38,7 +39,7 @@ public class OwnerAndAssistantAuthController {
 
     @PostMapping(value = "/sign-up")
     public ResponseEntity<?> signUp(@RequestParam(name = "type", required = true) String type,
-            @RequestBody SignUpReq data) {
+            @RequestBody Owner data) {
         ResContructor res= new ResContructor();
 
         switch (type) {
@@ -52,6 +53,8 @@ public class OwnerAndAssistantAuthController {
                 owner.setName(data.getName());
                 owner.setEmail(data.getEmail());
                 owner.setPassword(data.getPassword());
+                owner.setBusinessOwnerKRAPin(data.getBusinessOwnerKRAPin());
+                owner.setBusinessKRAPin(data.getBusinessKRAPin());
                 res.setMessage(HelperUtil.capitalizeFirst(type)+ " created successfully!");
                 ownerService.save(owner);
                 return ResponseEntity.status(HttpStatus.CREATED).body(res);
@@ -128,5 +131,10 @@ public class OwnerAndAssistantAuthController {
             res.setMessage("Error "+ e.getLocalizedMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
         }
+    }
+
+    @GetMapping(value = "/all-Assistants")
+    public ResponseEntity<List<Assistant>> getAllAssistants() {
+        return ResponseEntity.ok(assistantService.findAll());
     }
 }

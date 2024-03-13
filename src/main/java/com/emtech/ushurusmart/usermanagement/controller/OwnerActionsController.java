@@ -24,7 +24,7 @@ public class OwnerActionsController {
     private AssistantService assistantService;
 
     @PostMapping(value = "/update-details")
-    public ResponseEntity<?> updatedDetails(@NotNull @RequestParam(name = "unit_id", required = true) long unitId, @RequestBody Owner newOwner) {
+    public ResponseEntity<?> updatedDetails(@RequestBody Owner newOwner) {
         String ownerEmail = AuthUtils.getCurrentlyLoggedInPerson();
         Owner owner= ownerService.findByEmail(ownerEmail);
 
@@ -32,6 +32,8 @@ public class OwnerActionsController {
         owner.setEmail(newOwner.getEmail());
         owner.setName(newOwner.getName());
         owner.setPhoneNumber(newOwner.getPhoneNumber());
+        owner.setBusinessKRAPin(newOwner.getBusinessKRAPin());
+        owner.setBusinessOwnerKRAPin(newOwner.getBusinessOwnerKRAPin());
 
         ownerService.save(owner);
 
@@ -39,9 +41,22 @@ public class OwnerActionsController {
         res.setMessage("Your details have been updated successfully!");
         return ResponseEntity.status(HttpStatus.CREATED).body(res);
     }
+    @DeleteMapping(value = "/delete-owner")
+    public ResponseEntity<?> deleteOwner(@NotNull @RequestParam(name = "owner_id", required = true) String email) {
+
+        ResContructor res = new ResContructor();
+
+        Owner owner = ownerService.findByEmail(email);
+
+        ownerService.deleteByEmail(email);
+
+        res.setMessage("Owner deleted successfully!");
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(res);
+    }
 
     @PostMapping(value = "/add-assistant")
-    public ResponseEntity<?> createTenant(@NotNull @RequestParam(name = "unit_id", required = true) long unitId, @RequestBody Assistant assistant) {
+    public ResponseEntity<?> createAssistant(@RequestBody Assistant assistant) {
         String ownerEmail = AuthUtils.getCurrentlyLoggedInPerson();
         Owner owner= ownerService.findByEmail(ownerEmail);
         assistant.setOwner(owner);
@@ -50,12 +65,11 @@ public class OwnerActionsController {
         ResContructor res = new ResContructor();
         res.setMessage("Assistant added successfully!");
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(res)
-                ;
+        return ResponseEntity.status(HttpStatus.CREATED).body(res);
     }
 
     @DeleteMapping(value = "/delete-assistant")
-    public ResponseEntity<?> createAssistant(@NotNull @RequestParam(name = "assistant_id", required = true) long assistantId) {
+    public ResponseEntity<?> deleteAssistant(@NotNull @RequestParam(name = "assistant_id", required = true) long assistantId) {
         String ownerEmail = AuthUtils.getCurrentlyLoggedInPerson();
         Owner owner= ownerService.findByEmail(ownerEmail);
 
@@ -66,8 +80,9 @@ public class OwnerActionsController {
             res.setMessage("You are not authorized to delete this assistant ");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
         }
+        assistantService.deleteById(assistantId);
 
-        res.setMessage("Assistant added successfully!");
+        res.setMessage("Assistant deleted successfully!");
 
         return ResponseEntity.status(HttpStatus.CREATED).body(res);
     }
