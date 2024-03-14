@@ -1,10 +1,7 @@
 package com.emtech.ushurusmart.Transaction.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -15,6 +12,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Getter
+@Setter
 @Table(name = "products", schema="ushuru_smart")
 public class Products {
     @Id
@@ -23,11 +22,12 @@ public class Products {
 
     private String name;
     @Column(nullable=false)
-    private int unitPrice;
+    private double unitPrice;
     private String unitOfMeasure;
     @Column(nullable=false)
     private Boolean taxExempted;
     private int quantity;
+    private String type;
     private String description;
     @CreationTimestamp
     private LocalDateTime dateCreated;

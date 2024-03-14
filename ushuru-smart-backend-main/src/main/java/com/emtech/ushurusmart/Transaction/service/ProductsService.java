@@ -19,6 +19,7 @@ public class ProductsService {
     }
 
     public Products getByName(String name){return productsRepository.getByName(name);}
+    public Products getByQuantity(int quantity){return productsRepository.getByQuantity(quantity);}
 
     public Products save(Products product) {
         return productsRepository.save(product);
@@ -27,4 +28,5 @@ public class ProductsService {
     public void delete(long id) {
          productsRepository.deleteById(id);
     }
+
 }
