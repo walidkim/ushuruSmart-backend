@@ -10,10 +10,14 @@
         <module name="ushuru-smart" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="ushuru-smart (1)" target="17" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="ushuru-smart" options="-parameters" />
+      <module name="ushuru-smart (1)" options="-parameters" />
     </option>
   </component>
 </project>
