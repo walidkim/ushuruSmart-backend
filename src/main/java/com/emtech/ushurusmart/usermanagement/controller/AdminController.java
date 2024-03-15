@@ -3,6 +3,8 @@ package com.emtech.ushurusmart.usermanagement.controller;
 import com.emtech.ushurusmart.usermanagement.Dtos.ResContructor;
 import com.emtech.ushurusmart.usermanagement.model.Etims;
 import com.emtech.ushurusmart.usermanagement.service.AdminService;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,44 +13,55 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("api/v1/admin")
 public class AdminController {
 
-        private final AdminService adminService;
+    @Autowired
+    private AdminService adminService;
 
-        public AdminController(AdminService adminService) {
-            this.adminService = adminService;
-        }
+    @PostMapping("/etims")
+    public ResponseEntity<?> etimsSave(@RequestBody Etims data) {
+        ResContructor res = new ResContructor();
+        try {
+            Etims details = adminService.etimsSave(data);
 
-        @PostMapping("/etims")
-        public ResponseEntity<?> etimsSave(@RequestBody Etims data) {
-
-            adminService.etimsSave(data);
-
-            ResContructor res = new ResContructor();
             res.setMessage("Business Owner added successfully!");
-
+            res.setData(details);
             return ResponseEntity.status(HttpStatus.CREATED).body(res);
+        } catch (Exception e) {
+            res.setMessage("Unable to add  Business Owner");
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(res);
+        }
+    }
+
+    @PutMapping("/etims/{businessOwnerKRAPin}")
+    public ResponseEntity<?> etimsUpdate(@PathVariable String businessOwnerKRAPin, @RequestBody Etims data) {
+        ResContructor res = new ResContructor();
+        try {
+            if (adminService.findByBusinessOwnerKRAPin(businessOwnerKRAPin) == null) {
+                res.setMessage("No business owner with those details exists.");
+                return ResponseEntity.ok().body(res);
+            }
+            Etims updated = adminService.etimsUpdate(data);
+            res.setMessage("Business Owner updated Successfully.");
+            res.setData(updated);
+            return ResponseEntity.ok().body(res);
+        } catch (Exception e) {
+            res.setMessage("Error while to trying to update details");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
         }
 
-        @PutMapping("/etims/{businessOwnerKRAPin}")
-        public ResponseEntity<?> etimsUpdate(@PathVariable String businessOwnerKRAPin, @RequestBody Etims data) {
+    }
 
-            //first find the details of businessOwner kRa pin . The data  does not contain the id of the business owner
-            adminService.etimsUpdate(data);
+    @DeleteMapping("/etims/{businessOwnerKRAPin}")
+    public ResponseEntity<?> etimsDelete(@PathVariable String businessOwnerKRAPin) {
+        ResContructor res = new ResContructor();
 
-            ResContructor res = new ResContructor();
-            res.setMessage("Business Owner updated successfully!");
-
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body(res);
+        if (adminService.etimsDelete(businessOwnerKRAPin)) {
+            res.setMessage("Business Owner deleted successfully!");
+            return ResponseEntity.status(HttpStatus.OK).body(res);
+        } else {
+            res.setMessage("Unable to delete the business owner.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(res);
         }
 
-        @DeleteMapping("/etims/{businessOwnerKRAPin}")
-        public ResponseEntity<?> etimsDelete(@PathVariable String businessOwnerKRAPin) {
-
-                adminService.etimsDelete(businessOwnerKRAPin);
-
-                ResContructor res = new ResContructor();
-                res.setMessage("Business Owner deleted successfully!");
-
-                return  ResponseEntity.status(HttpStatus.OK).body(res);
-        }
+    }
 
 }
