@@ -6,6 +6,7 @@ import com.emtech.ushurusmart.usermanagement.Dtos.SignUpReq;
 import com.emtech.ushurusmart.usermanagement.model.Assistant;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
 import com.emtech.ushurusmart.usermanagement.service.AssistantService;
+import com.emtech.ushurusmart.usermanagement.service.KraPINValidator;
 import com.emtech.ushurusmart.usermanagement.service.OwnerService;
 import com.emtech.ushurusmart.usermanagement.service.jwtServices.JwtTokenUtil;
 import org.jetbrains.annotations.NotNull;
@@ -28,6 +29,8 @@ public class OwnerAndAssistantAuthController {
 
     @Autowired
     private OwnerService ownerService;
+    @Autowired
+    private KraPINValidator kraPINValidator;
 
     @Autowired
     private AssistantService assistantService;
@@ -55,6 +58,7 @@ public class OwnerAndAssistantAuthController {
                 owner.setPassword(data.getPassword());
                 owner.setBusinessOwnerKRAPin(data.getBusinessOwnerKRAPin());
                 owner.setBusinessKRAPin(data.getBusinessKRAPin());
+                kraPINValidator.validateKRAPins(data.getBusinessOwnerKRAPin(), data.getBusinessKRAPin());
                 res.setMessage(HelperUtil.capitalizeFirst(type)+ " created successfully!");
                 ownerService.save(owner);
                 return ResponseEntity.status(HttpStatus.CREATED).body(res);
@@ -133,8 +137,5 @@ public class OwnerAndAssistantAuthController {
         }
     }
 
-    @GetMapping(value = "/all-Assistants")
-    public ResponseEntity<List<Assistant>> getAllAssistants() {
-        return ResponseEntity.ok(assistantService.findAll());
-    }
+
 }

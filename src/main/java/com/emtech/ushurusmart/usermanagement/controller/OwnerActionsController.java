@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Objects;
 
 @RestController
@@ -39,21 +40,9 @@ public class OwnerActionsController {
 
         ResContructor res = new ResContructor();
         res.setMessage("Your details have been updated successfully!");
-        return ResponseEntity.status(HttpStatus.CREATED).body(res);
+        return ResponseEntity.status(HttpStatus.OK).body(res);
     }
-    @DeleteMapping(value = "/delete-owner")
-    public ResponseEntity<?> deleteOwner(@NotNull @RequestParam(name = "owner_id", required = true) String email) {
 
-        ResContructor res = new ResContructor();
-
-        Owner owner = ownerService.findByEmail(email);
-
-        ownerService.deleteByEmail(email);
-
-        res.setMessage("Owner deleted successfully!");
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(res);
-    }
 
     @PostMapping(value = "/add-assistant")
     public ResponseEntity<?> createAssistant(@RequestBody Assistant assistant) {
@@ -104,6 +93,11 @@ public class OwnerActionsController {
 
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
-
-
+//    @GetMapping(value = "/all-Assistants")
+//    public ResponseEntity<List<Assistant>> getAllAssistants(@NotNull @RequestParam(name = "admin_id", required = true)long adminId) {
+//        String ownerEmail = AuthUtils.getCurrentlyLoggedInPerson();
+//        Owner owner = ownerService.findByEmail(ownerEmail);
+//        ResContructor res = new ResContructor();
+//
+//        return ("");
 }

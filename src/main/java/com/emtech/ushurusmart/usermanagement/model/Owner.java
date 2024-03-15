@@ -17,13 +17,13 @@ import com.emtech.ushurusmart.payment.model.PaymentDetails;
 public class Owner extends BaseAuth {
 
         @Column(name = "BusinessKRAPin")
-        private String BusinessKRAPin;
+        private String businessKRAPin;
 
         @Column(name = "BusinessOwnerKRAPin")
-        private String BusinessOwnerKRAPin;
+        private String businessOwnerKRAPin;
 
         @Column(name = "PhoneNumber")
-        private Integer PhoneNumber;
+        private Integer phoneNumber;
 
 
         @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
