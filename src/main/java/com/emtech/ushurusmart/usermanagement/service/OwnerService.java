@@ -20,8 +20,12 @@ public class OwnerService {
         return ownerRepository.findByEmail(email);
     }
 
-    public Owner save(Owner admin) {
-        admin.setPassword(passwordEncoder.encode(admin.getPassword()));
-        return ownerRepository.save(admin);
+    public Owner save(Owner owner) {
+        owner.setPassword(passwordEncoder.encode(owner.getPassword()));
+        return ownerRepository.save(owner);
+    }
+
+    public Owner deleteByEmail(String email) {
+        return ownerRepository.deleteByEmail(email);
     }
 }

@@ -13,4 +13,6 @@ public interface AssistantRepository extends JpaRepository<Assistant, Long> {
     Collection<Assistant> findByBranch(String branch);
 
     Assistant findByEmail(String email);
+
+    // add query to list assistants by owner id
 }

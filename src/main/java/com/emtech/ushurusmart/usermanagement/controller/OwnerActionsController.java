@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Objects;
 
 @RestController
@@ -32,13 +33,16 @@ public class OwnerActionsController {
         owner.setEmail(newOwner.getEmail());
         owner.setName(newOwner.getName());
         owner.setPhoneNumber(newOwner.getPhoneNumber());
+        owner.setBusinessKRAPin(newOwner.getBusinessKRAPin());
+        owner.setBusinessOwnerKRAPin(newOwner.getBusinessOwnerKRAPin());
 
         ownerService.save(owner);
 
         ResContructor res = new ResContructor();
         res.setMessage("Your details have been updated successfully!");
-        return ResponseEntity.status(HttpStatus.CREATED).body(res);
+        return ResponseEntity.status(HttpStatus.OK).body(res);
     }
+
 
     @PostMapping(value = "/add-assistant")
     public ResponseEntity<?> createAssistant(@RequestBody Assistant assistant) {
@@ -50,8 +54,7 @@ public class OwnerActionsController {
         ResContructor res = new ResContructor();
         res.setMessage("Assistant added successfully!");
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(res)
-                ;
+        return ResponseEntity.status(HttpStatus.CREATED).body(res);
     }
 
     @DeleteMapping(value = "/delete-assistant")
@@ -67,6 +70,7 @@ public class OwnerActionsController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
         }
         assistantService.deleteById(assistantId);
+
         res.setMessage("Assistant deleted successfully!");
 
         return ResponseEntity.status(HttpStatus.CREATED).body(res);
@@ -89,6 +93,11 @@ public class OwnerActionsController {
 
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
-
-
+//    @GetMapping(value = "/all-Assistants")
+//    public ResponseEntity<List<Assistant>> getAllAssistants(@NotNull @RequestParam(name = "admin_id", required = true)long adminId) {
+//        String ownerEmail = AuthUtils.getCurrentlyLoggedInPerson();
+//        Owner owner = ownerService.findByEmail(ownerEmail);
+//        ResContructor res = new ResContructor();
+//
+//        return ("");
 }

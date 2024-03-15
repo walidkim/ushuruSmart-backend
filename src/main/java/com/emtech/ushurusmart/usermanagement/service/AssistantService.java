@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -29,6 +30,13 @@ public class AssistantService {
     public Assistant findById(long assistantId) {
         Optional<Assistant> assistant = assistantRepository.findById(assistantId);
         return assistant.orElse(null);
+    }
+    public List<Assistant> findAll(){
+        return assistantRepository.findAll();
+    }
+
+    public void deleteById(long assistantId) {
+        assistantRepository.deleteById(assistantId);
     }
 }
     

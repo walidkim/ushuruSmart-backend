@@ -1,6 +1,5 @@
 package com.emtech.ushurusmart.usermanagement.Dtos;
 
-
 import lombok.Data;
 
 @Data
