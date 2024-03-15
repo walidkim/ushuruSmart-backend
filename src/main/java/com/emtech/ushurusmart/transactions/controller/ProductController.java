@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.emtech.ushurusmart.transactions.entity.Product;
-import com.emtech.ushurusmart.transactions.service.ProductService;
 
 @RestController
 @RequestMapping("/api/tax/Product")
