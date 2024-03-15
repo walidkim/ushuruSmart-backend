@@ -2,6 +2,7 @@ package com.emtech.ushurusmart.repository;
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 import com.emtech.ushurusmart.etrModule.entity.Product;
 >>>>>>> dee7263 (TRansaction Crud)
@@ -11,6 +12,13 @@ import com.emtech.ushurusmart.etrModule.repository.TransactionRepository;
 import com.emtech.ushurusmart.Transaction.entity.Transaction;
 import com.emtech.ushurusmart.Transaction.repository.TransactionRepository;
 >>>>>>> b12f94f (changes)
+=======
+import com.emtech.ushurusmart.transactions.entity.Transaction;
+import com.emtech.ushurusmart.transactions.repository.TransactionRepository;
+=======
+import com.emtech.ushurusmart.Transaction.entity.Transaction;
+>>>>>>> origin/FrankEtr
+>>>>>>> 7f26281 (Credit Note)
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

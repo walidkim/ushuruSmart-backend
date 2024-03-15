@@ -1,10 +1,10 @@
-package com.emtech.ushurusmart.etrModule.controller;
+package com.emtech.ushurusmart.transactions.controller;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import com.emtech.ushurusmart.etrModule.service.InvoiceService;
+import com.emtech.ushurusmart.transactions.service.InvoiceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -16,10 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.emtech.ushurusmart.etrModule.Dto.Transaction;
-import com.emtech.ushurusmart.etrModule.Dto.TransactionRequest;
-import com.emtech.ushurusmart.etrModule.service.TaxCalculator;
+import com.emtech.ushurusmart.transactions.Dto.TransactionRequest;
+import com.emtech.ushurusmart.transactions.service.TaxCalculator;
 
 @RestController
 @RequestMapping("/api/tax")

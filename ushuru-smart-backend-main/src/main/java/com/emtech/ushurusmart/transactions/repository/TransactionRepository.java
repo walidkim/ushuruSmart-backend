@@ -1,6 +1,6 @@
-package com.emtech.ushurusmart.etrModule.repository;
+package com.emtech.ushurusmart.transactions.repository;
 
-import com.emtech.ushurusmart.etrModule.entity.Transaction;
+import com.emtech.ushurusmart.transactions.entity.Transaction;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 <<<<<<< HEAD
