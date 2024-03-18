@@ -20,9 +20,13 @@ public class ProductsService {
 
     public Products getByName(String name){return productsRepository.getByName(name);}
 <<<<<<< HEAD
+<<<<<<< HEAD
     public Products getByQuantity(int quantity){return productsRepository.getByQuantity(quantity);}
 =======
 >>>>>>> b12f94f (changes)
+=======
+    public Products getByQuantity(int quantity){return productsRepository.getByQuantity(quantity);}
+>>>>>>> 4476ce9 (Credit Note)
 
     public Products save(Products product) {
         return productsRepository.save(product);
@@ -32,7 +36,11 @@ public class ProductsService {
          productsRepository.deleteById(id);
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
 >>>>>>> b12f94f (changes)
+=======
+
+>>>>>>> 4476ce9 (Credit Note)
 }

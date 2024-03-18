@@ -18,7 +18,10 @@ public class TransactionDTO {
     @CreationTimestamp
     private LocalDateTime dateCreated;
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
 >>>>>>> b12f94f (changes)
+=======
+>>>>>>> 4476ce9 (Credit Note)
 }

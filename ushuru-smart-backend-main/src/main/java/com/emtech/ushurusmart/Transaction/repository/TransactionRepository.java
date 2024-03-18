@@ -7,9 +7,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
     Transaction getByBuyerPin(String buyerPin);
 <<<<<<< HEAD
+<<<<<<< HEAD
 
     Transaction findByInvoiceNumber(String invoiceNumber);
 =======
 >>>>>>> b12f94f (changes)
+=======
+
+    Transaction findByInvoiceNumber(String invoiceNumber);
+>>>>>>> 4476ce9 (Credit Note)
 }
 
