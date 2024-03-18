@@ -1,4 +1,4 @@
-package com.emtech.ushurusmart.etrModule.entity;
+package com.emtech.ushurusmart.transactions.entity;
 
 import org.junit.jupiter.api.Test;
 

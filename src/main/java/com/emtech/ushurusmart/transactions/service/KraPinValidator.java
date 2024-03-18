@@ -1,4 +1,4 @@
-package com.emtech.ushurusmart.etrModule.service;
+package com.emtech.ushurusmart.transactions.service;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

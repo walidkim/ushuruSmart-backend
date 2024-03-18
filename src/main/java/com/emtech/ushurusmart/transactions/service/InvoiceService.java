@@ -1,6 +1,6 @@
-package com.emtech.ushurusmart.etrModule.service;
+package com.emtech.ushurusmart.transactions.service;
 
-import com.emtech.ushurusmart.etrModule.Dto.TransactionRequest;
+import com.emtech.ushurusmart.transactions.Dto.TransactionRequest;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.pdf.PdfDocument;
@@ -9,7 +9,6 @@ import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Paragraph;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.StyleConstants;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
