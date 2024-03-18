@@ -19,7 +19,10 @@ public class ProductsService {
     }
 
     public Products getByName(String name){return productsRepository.getByName(name);}
+<<<<<<< HEAD
     public Products getByQuantity(int quantity){return productsRepository.getByQuantity(quantity);}
+=======
+>>>>>>> b12f94f (changes)
 
     public Products save(Products product) {
         return productsRepository.save(product);
@@ -28,5 +31,8 @@ public class ProductsService {
     public void delete(long id) {
          productsRepository.deleteById(id);
     }
+<<<<<<< HEAD
 
+=======
+>>>>>>> b12f94f (changes)
 }

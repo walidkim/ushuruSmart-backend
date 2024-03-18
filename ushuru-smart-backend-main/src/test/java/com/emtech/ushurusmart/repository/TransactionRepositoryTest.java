@@ -1,11 +1,16 @@
 package com.emtech.ushurusmart.repository;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 import com.emtech.ushurusmart.etrModule.entity.Product;
 >>>>>>> dee7263 (TRansaction Crud)
 import com.emtech.ushurusmart.etrModule.entity.Transaction;
 import com.emtech.ushurusmart.etrModule.repository.TransactionRepository;
+=======
+import com.emtech.ushurusmart.Transaction.entity.Transaction;
+import com.emtech.ushurusmart.Transaction.repository.TransactionRepository;
+>>>>>>> b12f94f (changes)
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -103,6 +108,7 @@ public class TransactionRepositoryTest {
     }
     @Test
 <<<<<<< HEAD
+<<<<<<< HEAD
     public void update() {
         Long id = 2L;
         Transaction transaction = transactionRepository.findById(id).get();
@@ -133,6 +139,8 @@ public class TransactionRepositoryTest {
         transactionRepository.deleteAll();
     }
     @Test
+=======
+>>>>>>> b12f94f (changes)
     public void count(){
         long count = transactionRepository.count();
 =======

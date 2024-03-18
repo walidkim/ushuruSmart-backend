@@ -4,6 +4,7 @@ import com.emtech.ushurusmart.Transaction.entity.Products;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+<<<<<<< HEAD
 @Repository
 public interface ProductsRepository extends JpaRepository <Products, Long> {
     Products getByName(String name);
@@ -11,4 +12,12 @@ public interface ProductsRepository extends JpaRepository <Products, Long> {
     Products findByProductId(String productId);
 
     Products getByQuantity(int quantity);
+=======
+
+
+
+@Repository
+public interface ProductsRepository extends JpaRepository <Products, Long> {
+    Products getByName(String name);
+>>>>>>> b12f94f (changes)
 }

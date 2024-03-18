@@ -17,4 +17,8 @@ public class TransactionDTO {
     private String buyerPin;
     @CreationTimestamp
     private LocalDateTime dateCreated;
+<<<<<<< HEAD
+=======
+
+>>>>>>> b12f94f (changes)
 }

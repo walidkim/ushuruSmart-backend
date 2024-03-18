@@ -1,4 +1,5 @@
 package com.emtech.ushurusmart.repository;
+<<<<<<< HEAD
 
 <<<<<<< HEAD
 import com.emtech.ushurusmart.etrModule.repository.ProductsRepository;
@@ -144,6 +145,9 @@ public class ProductsRepositoryTest {
         System.out.println(count);
     }
 >>>>>>> dee7263 (TRansaction Crud)
+=======
+public class ProductsRepositoryTest {
+>>>>>>> b12f94f (changes)
 }
 
 
