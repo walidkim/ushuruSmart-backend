@@ -43,35 +43,28 @@ public class OwnerAndAssistantAuthController {
             @RequestBody Owner data) {
         ResContructor res = new ResContructor();
 
-        switch (type) {
-            case ("owner"): {
-
-                if (ownerService.findByEmail(data.getEmail()) != null) {
-                    res.setMessage(HelperUtil.capitalizeFirst(type) + " by that email! exists");
-                    return ResponseEntity.badRequest().body(res);
-                }
-                Owner owner = new Owner();
-                owner.setName(data.getName());
-                owner.setEmail(data.getEmail());
-                owner.setPassword(data.getPassword());
-                owner.setBusinessOwnerKRAPin(data.getBusinessOwnerKRAPin());
-                owner.setBusinessKRAPin(data.getBusinessKRAPin());
-                if (kraPINValidator.validateKRAPins(data.getBusinessOwnerKRAPin(), data.getBusinessKRAPin())) {
-                    res.setMessage(HelperUtil.capitalizeFirst(type) + " created successfully!");
-                    ownerService.save(owner);
-                    return ResponseEntity.status(HttpStatus.CREATED).body(res);
-                } else {
-                    res.setMessage("Invalid details provided.");
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
-                }
-
-            }
-            default: {
-                res.setMessage(HelperUtil.capitalizeFirst(type) + " is invalid.");
+        if (type.equals("owner")) {
+            if (ownerService.findByEmail(data.getEmail()) != null) {
+                res.setMessage(HelperUtil.capitalizeFirst(type) + " by that email! exists");
                 return ResponseEntity.badRequest().body(res);
             }
-
+            Owner owner = new Owner();
+            owner.setName(data.getName());
+            owner.setEmail(data.getEmail());
+            owner.setPassword(data.getPassword());
+            owner.setBusinessOwnerKRAPin(data.getBusinessOwnerKRAPin());
+            owner.setBusinessKRAPin(data.getBusinessKRAPin());
+            if (kraPINValidator.validateKRAPins(data.getBusinessOwnerKRAPin(), data.getBusinessKRAPin())) {
+                res.setMessage(HelperUtil.capitalizeFirst(type) + " created successfully!");
+                ownerService.save(owner);
+                return ResponseEntity.status(HttpStatus.CREATED).body(res);
+            } else {
+                res.setMessage("Invalid details provided.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+            }
         }
+        res.setMessage(HelperUtil.capitalizeFirst(type) + " is invalid.");
+        return ResponseEntity.badRequest().body(res);
 
     }
 
