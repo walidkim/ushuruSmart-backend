@@ -1,4 +1,4 @@
-package com.emtech.ushurusmart.etrModule.repository;
+package com.emtech.ushurusmart.transactions.repository;
 
 public interface KraPinHolder {
   public String getKraPin();
