@@ -21,7 +21,7 @@ import javax.persistence.Table;
 @Entity
 @Getter
 @Setter
-@Table(name = "product", schema = "ushuru_smart")
+@Table(name = "products", schema = "ushuru_smart")
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
