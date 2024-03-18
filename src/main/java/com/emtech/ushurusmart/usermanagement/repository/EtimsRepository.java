@@ -14,8 +14,8 @@ public interface EtimsRepository extends JpaRepository<Etims, Long> {
     // List<String> findAllBusinessOwnerKraPins();
 
     // Find etims by business kra pin
-    Optional<Etims> findByBusinessKRAPin(String businessKrapin);
+    Optional<Etims> findByBusinessKRAPin(String businessKRAPin);
 
     // Find etims by business owner kra pin
-    Optional<Etims> findByBusinessOwnerKRAPin(String businessOwnerKrapin);
+    Optional<Etims> findByBusinessOwnerKRAPin(String businessOwnerKRAPin);
 }
