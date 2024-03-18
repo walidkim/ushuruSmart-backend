@@ -43,11 +43,7 @@ public class CreditNoteService {
     public void approveCreditNoteAndRestockProducts(Long creditNoteId) {
         CreditNote creditNote = creditNoteRepository.findById(creditNoteId)
                 .orElseThrow(() -> new RuntimeException("Credit Note not found"));
-<<<<<<< HEAD
-        Product product = productRepository.findByProductId(creditNote.getProductId());
-=======
         Product product = productRepository.findById(creditNote.getProductId()).orElseGet(null);
->>>>>>> 8398819 (fix: Fixed the Transaction related issues.)
         if (product != null) {
             product.setQuantity(product.getQuantity() + creditNote.getProductQuantity());
             productRepository.save(product);
