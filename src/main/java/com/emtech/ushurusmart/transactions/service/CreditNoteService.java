@@ -6,7 +6,9 @@ import com.emtech.ushurusmart.transactions.entity.Transaction;
 import com.emtech.ushurusmart.transactions.repository.CreditNoteRepository;
 import com.emtech.ushurusmart.transactions.repository.ProductRepository;
 import com.emtech.ushurusmart.transactions.repository.TransactionRepository;
-import jakarta.transaction.Transactional;
+
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +21,7 @@ public class CreditNoteService {
     @Autowired
     private CreditNoteRepository creditNoteRepository;
 
-    @Transactional
+    @javax.transaction.Transactional
     public CreditNote createCreditNoteFromSaleTransaction(String invoiceNumber) {
         Transaction transaction = transactionRepository.findByInvoiceNumber(invoiceNumber);
         if (transaction == null) {
@@ -36,9 +38,11 @@ public class CreditNoteService {
 
         return creditNoteRepository.save(creditNote);
     }
+
     @Transactional
     public void approveCreditNoteAndRestockProducts(Long creditNoteId) {
-        CreditNote creditNote = creditNoteRepository.findById(creditNoteId).orElseThrow(() -> new RuntimeException("Credit Note not found"));
+        CreditNote creditNote = creditNoteRepository.findById(creditNoteId)
+                .orElseThrow(() -> new RuntimeException("Credit Note not found"));
         Product product = productRepository.findByProductId(creditNote.getProductId());
         if (product != null) {
             product.setQuantity(product.getQuantity() + creditNote.getProductQuantity());
