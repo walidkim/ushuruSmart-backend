@@ -1,12 +1,11 @@
 package com.emtech.ushurusmart.usermanagement.service.jwtServices;
 
 import io.jsonwebtoken.*;
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;

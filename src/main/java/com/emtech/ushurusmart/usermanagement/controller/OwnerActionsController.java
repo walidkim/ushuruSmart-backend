@@ -7,7 +7,7 @@ import com.emtech.ushurusmart.usermanagement.model.Owner;
 import com.emtech.ushurusmart.usermanagement.service.AssistantService;
 import com.emtech.ushurusmart.usermanagement.service.OwnerService;
 import com.emtech.ushurusmart.usermanagement.utils.AuthUtils;
-import jakarta.validation.constraints.NotNull;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

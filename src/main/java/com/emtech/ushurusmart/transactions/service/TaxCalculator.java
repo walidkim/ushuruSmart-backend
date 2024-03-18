@@ -1,4 +1,4 @@
-package com.emtech.ushurusmart.etrModule.service;
+package com.emtech.ushurusmart.transactions.service;
 
 import org.springframework.stereotype.Service;
 

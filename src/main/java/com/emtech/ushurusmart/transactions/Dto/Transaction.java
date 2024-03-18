@@ -1,10 +1,10 @@
-package com.emtech.ushurusmart.etrModule.Dto;
+package com.emtech.ushurusmart.transactions.Dto;
 
-import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Id;
 import java.time.LocalDateTime;
 
 @Data
