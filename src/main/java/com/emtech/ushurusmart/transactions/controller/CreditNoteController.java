@@ -9,15 +9,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1/credit-notes")
 public class CreditNoteController {
     @Autowired
     private CreditNoteService creditNoteService;
-    @PostMapping("/createCreditNote")
+
+    @PostMapping("/create")
     public CreditNote createCreditNote(@RequestParam String invoiceNumber) {
         return creditNoteService.createCreditNoteFromSaleTransaction(invoiceNumber);
     }
-    @PostMapping("/approveCreditNote")
+
+    @PostMapping("/approve")
     public void approveCreditNote(@RequestParam Long creditNoteId) {
         creditNoteService.approveCreditNoteAndRestockProducts(creditNoteId);
     }

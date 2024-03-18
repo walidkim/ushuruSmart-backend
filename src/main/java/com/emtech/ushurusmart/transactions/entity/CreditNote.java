@@ -18,7 +18,7 @@ public class CreditNote {
     private Long id;
     private String invoiceNumber;
     private String buyerPin;
-    private String productId;
+    private Long productId;
     private Double productAmount;
     private String productName;
     private Integer productQuantity;
