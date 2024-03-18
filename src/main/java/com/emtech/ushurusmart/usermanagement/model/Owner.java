@@ -1,13 +1,12 @@
 package com.emtech.ushurusmart.usermanagement.model;
 
-import jakarta.persistence.*;
+import com.emtech.ushurusmart.payment.model.PaymentDetails;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.*;
 import java.util.List;
-
-import com.emtech.ushurusmart.payment.model.PaymentDetails;
 
 @Data
 @NoArgsConstructor
