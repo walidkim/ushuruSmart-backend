@@ -1,1 +1,0 @@
-# ushuru-smart-backend
