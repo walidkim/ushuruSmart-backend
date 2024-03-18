@@ -1,14 +1,16 @@
-package com.emtech.ushurusmart.transactions.service;
+package com.emtech.ushurusmart.etrModule.service;
 
-import com.emtech.ushurusmart.transactions.entity.Product;
-import com.emtech.ushurusmart.transactions.repository.ProductRepository;
+import com.emtech.ushurusmart.etrModule.entity.Product;
+import com.emtech.ushurusmart.etrModule.repository.ProductsRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public class ProductsService {
-    private ProductRepository productsRepository;
+    @Autowired
+    private ProductsRepository productsRepository;
 
     public List<Product> findAll() {
         return productsRepository.findAll();

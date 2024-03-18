@@ -3,6 +3,7 @@ package com.emtech.ushurusmart.usermanagement.service;
 import com.emtech.ushurusmart.usermanagement.model.Etims;
 import com.emtech.ushurusmart.usermanagement.repository.EtimsRepository;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
