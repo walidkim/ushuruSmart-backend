@@ -1,6 +1,8 @@
 package com.emtech.ushurusmart.transactions.controller;
 
 import java.util.List;
+
+import com.emtech.ushurusmart.transactions.entity.Product;
 import com.emtech.ushurusmart.transactions.service.ProductService;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
 import com.emtech.ushurusmart.usermanagement.repository.OwnerRepository;
@@ -17,11 +19,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.emtech.ushurusmart.transactions.entity.Product;
+
 
 @RestController
 @RequestMapping("/api/tax/Product")
 public class ProductController {
+
     @Autowired
     private ProductService productService;
 

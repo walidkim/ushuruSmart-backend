@@ -2,34 +2,33 @@ package com.emtech.ushurusmart.transactions.service;
 
 import com.emtech.ushurusmart.transactions.entity.Product;
 import com.emtech.ushurusmart.transactions.repository.ProductRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
 public class ProductService {
-    private ProductRepository productRepository;
+    @Autowired
+    private ProductRepository productsRepository;
 
     public List<Product> findAll() {
-        return productRepository.findAll();
+        return productsRepository.findAll();
     }
 
     public Product getById(long id) {
-        return productRepository.getById(id);
+        return productsRepository.getById(id);
     }
 
     public Product getByName(String name) {
-        return productRepository.getByName(name);
-    }
-
-    public Product getByQuantity(int quantity) {
-        return productRepository.getByQuantity(quantity);
+        return productsRepository.findByName(name);
     }
 
     public Product save(Product product) {
-        return productRepository.save(product);
+        return productsRepository.save(product);
     }
 
     public void delete(long id) {
-        productRepository.deleteById(id);
+         productsRepository.deleteById(id);
     }
 }

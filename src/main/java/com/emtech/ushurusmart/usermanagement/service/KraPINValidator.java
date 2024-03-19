@@ -19,11 +19,11 @@ public class KraPINValidator {
         Objects.requireNonNull(businessKRAPin, "businessKRAPin cannot be null");
         Objects.requireNonNull(businessOwnerKRAPin, "businessOwnerKRAPin cannot be null");
 
-        Pattern kraPinPattern = Pattern.compile("^[A-Z]\\d{10}[A-Z]$");
-
+        Pattern kraPinPattern = Pattern.compile("^[A-Z]\\d{9}[A-Z]$");
         if (!kraPinPattern.matcher(businessKRAPin).matches()) {
             return false;
         }
+
         if (!kraPinPattern.matcher(businessOwnerKRAPin).matches()) {
             return false;
         }

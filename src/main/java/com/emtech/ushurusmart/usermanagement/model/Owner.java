@@ -15,16 +15,10 @@ import java.util.List;
 @Table(name = "owners")
 public class Owner extends BaseAuth {
 
-        @Column(name = "BusinessKRAPin")
+
         private String businessKRAPin;
-
-        @Column(name = "BusinessOwnerKRAPin")
         private String businessOwnerKRAPin;
-
-        @Column(name = "PhoneNumber")
-        private Integer phoneNumber;
-
-
+        private String phoneNumber;
         @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
         private List<Assistant> assistants;
 
