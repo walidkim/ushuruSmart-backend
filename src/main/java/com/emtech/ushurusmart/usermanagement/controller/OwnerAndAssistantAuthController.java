@@ -54,14 +54,9 @@ public class OwnerAndAssistantAuthController {
             owner.setPassword(data.getPassword());
             owner.setBusinessOwnerKRAPin(data.getBusinessOwnerKRAPin());
             owner.setBusinessKRAPin(data.getBusinessKRAPin());
-            if (kraPINValidator.validateKRAPins(data.getBusinessOwnerKRAPin(), data.getBusinessKRAPin())) {
-                res.setMessage(HelperUtil.capitalizeFirst(type) + " created successfully!");
-                ownerService.save(owner);
-                return ResponseEntity.status(HttpStatus.CREATED).body(res);
-            } else {
-                res.setMessage("Invalid details provided.");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
-            }
+            res.setMessage(HelperUtil.capitalizeFirst(type) + " created successfully!");
+            ownerService.save(owner);
+            return ResponseEntity.status(HttpStatus.CREATED).body(res);
         }
         res.setMessage(HelperUtil.capitalizeFirst(type) + " is invalid.");
         return ResponseEntity.badRequest().body(res);
