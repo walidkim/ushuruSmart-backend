@@ -2,6 +2,7 @@ package com.emtech.ushurusmart.usermanagement.controller;
 
 import com.emtech.ushurusmart.usermanagement.Dtos.LoginRequest;
 import com.emtech.ushurusmart.usermanagement.Dtos.ResContructor;
+import com.emtech.ushurusmart.usermanagement.Dtos.auth.OwnerSignUp;
 import com.emtech.ushurusmart.usermanagement.model.Assistant;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
 import com.emtech.ushurusmart.usermanagement.service.AssistantService;
@@ -40,7 +41,7 @@ public class OwnerAndAssistantAuthController {
 
     @PostMapping(value = "/sign-up")
     public ResponseEntity<?> signUp(@RequestParam(name = "type", required = true) String type,
-            @RequestBody Owner data) {
+            @RequestBody OwnerSignUp data) {
         ResContructor res = new ResContructor();
 
         if (type.equals("owner")) {

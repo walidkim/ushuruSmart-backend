@@ -37,16 +37,11 @@ public class AdminService {
 
     public boolean etimsDelete(String businessOwnerKRAPin) {
         try {
-
-            if (!etimsRepository.findByBusinessKRAPin(businessOwnerKRAPin).isPresent()) {
-                return false;
-            }
-            etimsRepository.deleteById(Long.valueOf(businessOwnerKRAPin));
+            etimsRepository.deleteByBusinessOwnerKRAPin(businessOwnerKRAPin);
             return true;
 
         } catch (Exception e) {
-            return false;
-        } finally {
+            System.out.println(e.getLocalizedMessage());
             return false;
         }
 
@@ -54,10 +49,7 @@ public class AdminService {
 
     public Etims findByBusinessOwnerKRAPin(String businessOwnerKRAPin) {
         Optional<Etims> result = etimsRepository.findByBusinessOwnerKRAPin(businessOwnerKRAPin);
-        if (!result.isPresent()) {
-            return result.get();
-        }
-        return null;
+        return result.orElse(null);
 
     }
 }

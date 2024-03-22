@@ -33,11 +33,13 @@ public class AdminController {
 
     @PutMapping("/etims/{businessOwnerKRAPin}")
     public ResponseEntity<?> etimsUpdate(@PathVariable String businessOwnerKRAPin, @RequestBody Etims data) {
+        System.out.println(businessOwnerKRAPin);
         ResContructor res = new ResContructor();
         try {
+            System.out.println();
             if (adminService.findByBusinessOwnerKRAPin(businessOwnerKRAPin) == null) {
                 res.setMessage("No business owner with those details exists.");
-                return ResponseEntity.ok().body(res);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
             }
             Etims updated = adminService.etimsUpdate(data);
             res.setMessage("Business Owner updated Successfully.");

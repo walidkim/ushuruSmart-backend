@@ -3,8 +3,12 @@ package com.emtech.ushurusmart.transactions.entity;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
+import javax.persistence.ManyToMany;
 
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
@@ -18,7 +22,8 @@ public class CreditNote {
     private Long id;
     private String invoiceNumber;
     private String buyerPin;
-    private Long productId;
+    @ManyToMany
+    private List<Product> products= new ArrayList<>();
     private Double productAmount;
     private String productName;
     private Integer productQuantity;

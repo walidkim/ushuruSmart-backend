@@ -3,6 +3,8 @@ package com.emtech.ushurusmart.usermanagement.repository;
 import com.emtech.ushurusmart.usermanagement.model.Etims;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import javax.transaction.Transactional;
 import java.util.Optional;
 
 public interface EtimsRepository extends JpaRepository<Etims, Long> {
@@ -18,4 +20,6 @@ public interface EtimsRepository extends JpaRepository<Etims, Long> {
 
     // Find etims by business owner kra pin
     Optional<Etims> findByBusinessOwnerKRAPin(String businessOwnerKRAPin);
+        @Transactional
+    void deleteByBusinessOwnerKRAPin(String businessOwnerKRAPin);
 }

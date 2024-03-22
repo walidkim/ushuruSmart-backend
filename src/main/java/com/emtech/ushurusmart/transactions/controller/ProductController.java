@@ -4,25 +4,19 @@ import java.util.List;
 
 import com.emtech.ushurusmart.transactions.entity.Product;
 import com.emtech.ushurusmart.transactions.service.ProductService;
+import com.emtech.ushurusmart.usermanagement.Dtos.ResContructor;
+import com.emtech.ushurusmart.usermanagement.Dtos.entity.ProductDto;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
 import com.emtech.ushurusmart.usermanagement.repository.OwnerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/api/tax/Product")
+@RequestMapping("/api/tax")
 public class ProductController {
 
     @Autowired
@@ -31,22 +25,34 @@ public class ProductController {
     @Autowired
     private OwnerRepository ownerRepository;
 
-    @GetMapping
-    public ResponseEntity<List<Product>> getAllProduct(){
-        return new ResponseEntity<>(productService.findAll(), HttpStatus.OK);
+    @GetMapping("/products")
+    public ResponseEntity<ResContructor> getAllProduct(){
+        ResContructor res= new ResContructor();
+        res.setData(productService.findAll());
+        return  ResponseEntity.status(HttpStatus.CREATED).body(res);
     }
 
-    @GetMapping("/id")
-    public ResponseEntity<Product> getProductById(@PathVariable Integer id){
-        Product product = productService.getById(id);
-        if (product == null) {
-            return new ResponseEntity<Product>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<Product>(HttpStatus.OK);
+    @GetMapping("product/{id}")
+    public ResponseEntity<?> getProductById(@PathVariable int id){
+        ResContructor res= new ResContructor();
+       try {
+           Product product = productService.getById(id);
+           if (product == null) {
+               res.setMessage("No product with that Id exists");
+               return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
+           }
+
+           res.setData(product);
+
+           return ResponseEntity.status(HttpStatus.OK).body(" THis "+ res.toString());
+       }catch (Exception e){
+           res.setMessage(e.getLocalizedMessage());
+           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
+       }
 
     }
-    @GetMapping("/name/{name}")
-    public ResponseEntity<Product> getProductByName(@PathVariable String name){
+    @GetMapping("/product")
+    public ResponseEntity<Product> getProductByName(@RequestParam(name = "name", required = true) String name){
         Product product = productService.getByName(name);
         if (product == null) {
             return new ResponseEntity<Product>(HttpStatus.NOT_FOUND);
@@ -54,35 +60,45 @@ public class ProductController {
         }
         return new ResponseEntity<Product>(product, HttpStatus.OK);
     }
-    @PostMapping("/save")
-    public ResponseEntity<Product> addProduct(@RequestBody Product product){
-        Owner owner = (Owner) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if(ownerRepository.findById(owner.getId()).isEmpty()){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
+    @PostMapping("product/create")
+    public ResponseEntity<Product> addProduct(@RequestBody ProductDto prod){
+        Product product= new Product();
+        product.setDescription(prod.getDescription());
+        product.setName(prod.getName());
+        product.setType(prod.getType());
+        product.setUnitOfMeasure(prod.getUnitOfMeasure());
+        product.setTaxExempted(prod.isTaxExempted());
+        product.setQuantity(prod.getQuantity());
+        product.setUnitPrice(prod.getUnitPrice());
         productService.save(product);
         return new ResponseEntity<>(product, HttpStatus.CREATED);
     }
-    @PutMapping("/update/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable Integer id, @RequestBody Product product){
-        Owner owner = (Owner)  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if(!ownerRepository.findById(owner.getId()).isPresent()) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
+    @PutMapping("product/update/{id}")
+    public ResponseEntity<ResContructor> updateProduct(@PathVariable Integer id, @RequestBody ProductDto prod){
+        ResContructor res= new ResContructor();
         Product currentProduct = productService.getById(id);
         if (currentProduct == null){
-            return new ResponseEntity<Product>(HttpStatus.NOT_FOUND);
+            res.setMessage("No product with that id exists.");
+            return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
         }
-        productService.save(product);
-        return new ResponseEntity<Product>(product, HttpStatus.OK);
+
+        currentProduct.setDescription(prod.getDescription());
+        currentProduct.setName(prod.getName());
+        currentProduct.setType(prod.getType());
+        currentProduct.setUnitOfMeasure(prod.getUnitOfMeasure());
+        currentProduct.setTaxExempted(prod.isTaxExempted());
+        currentProduct.setQuantity(prod.getQuantity());
+        currentProduct.setUnitPrice(prod.getUnitPrice());
+        currentProduct= productService.save(currentProduct);
+        res.setMessage("Product updated successfully.");
+        res.setData(currentProduct);
+        return  ResponseEntity.status(HttpStatus.OK).body(res);
     }
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable int id) {
-        Owner owner = (Owner) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!ownerRepository.findById(owner.getId()).isPresent()) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
+    @DeleteMapping("product/delete/{id}")
+    public ResponseEntity<?> deleteProduct(@PathVariable int id) {
+        ResContructor res= new ResContructor();
         productService.delete(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        res.setMessage("Product successfully deleted.");
+        return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 }

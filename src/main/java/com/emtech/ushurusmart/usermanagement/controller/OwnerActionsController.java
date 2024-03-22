@@ -2,6 +2,7 @@ package com.emtech.ushurusmart.usermanagement.controller;
 
 
 import com.emtech.ushurusmart.usermanagement.Dtos.ResContructor;
+import com.emtech.ushurusmart.usermanagement.Dtos.entity.AssistantDto;
 import com.emtech.ushurusmart.usermanagement.model.Assistant;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
 import com.emtech.ushurusmart.usermanagement.service.AssistantService;
@@ -22,6 +23,7 @@ public class OwnerActionsController {
     @Autowired
     private OwnerService ownerService;
 
+    @Autowired
     private AssistantService assistantService;
 
     @PostMapping(value = "/update-details")
@@ -46,29 +48,24 @@ public class OwnerActionsController {
 
     @PostMapping(value = "/add-assistant")
     public ResponseEntity<?> createAssistant(@RequestBody Assistant assistant) {
-        String ownerEmail = AuthUtils.getCurrentlyLoggedInPerson();
-        Owner owner= ownerService.findByEmail(ownerEmail);
-        assistant.setOwner(owner);
         assistantService.save(assistant);
-
         ResContructor res = new ResContructor();
         res.setMessage("Assistant added successfully!");
-
         return ResponseEntity.status(HttpStatus.CREATED).body(res);
     }
 
     @DeleteMapping(value = "/delete-assistant")
-    public ResponseEntity<?> deleteAssistant(@NotNull @RequestParam(name = "assistant_id", required = true) long assistantId) {
+    public ResponseEntity<?> deleteAssistant(@RequestParam(name = "assistant_id", required = true) long assistantId) {
         String ownerEmail = AuthUtils.getCurrentlyLoggedInPerson();
         Owner owner= ownerService.findByEmail(ownerEmail);
 
         ResContructor res = new ResContructor();
 
         Assistant assistant = assistantService.findById(assistantId);
-        if(!Objects.equals(owner.getEmail(), assistant.getOwner().getEmail())){
-            res.setMessage("You are not authorized to delete this assistant ");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
-        }
+//        if(!Objects.equals(owner.getEmail(), assistant.getOwner().getEmail())){
+//            res.setMessage("You are not authorized to delete this assistant ");
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
+//        }
         assistantService.deleteById(assistantId);
 
         res.setMessage("Assistant deleted successfully!");
@@ -77,27 +74,35 @@ public class OwnerActionsController {
     }
 
     @PutMapping(value = "/update-assistant")
-    public ResponseEntity<?> updateAssistant(@NotNull @RequestParam(name = "assistant_id", required = true) long assistantId) {
+    public ResponseEntity<?> updateAssistant(@NotNull @RequestParam(name = "assistant_id", required = true) long assistantId,@RequestBody Assistant  newAssistant) {
         String ownerEmail = AuthUtils.getCurrentlyLoggedInPerson();
         Owner owner= ownerService.findByEmail(ownerEmail);
 
         ResContructor res = new ResContructor();
 
         Assistant assistant = assistantService.findById(assistantId);
-        if(!Objects.equals(owner.getEmail(), assistant.getOwner().getEmail())){
-            res.setMessage("You are not authorized to update this assistant ");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
-        }
-        assistantService.save(assistant);
+//        if(!Objects.equals(owner.getEmail(), assistant.getOwner().getEmail())){
+//            res.setMessage("You are not authorized to update this assistant ");
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
+//        }
+        assistant.setEmail(newAssistant.getEmail());
+        assistant.setName(newAssistant.getName());
+        assistant.setPassword(newAssistant.getPassword());
+        assistant.setBranch(newAssistant.getBranch());
+        assistant.setPhoneNumber(newAssistant.getPhoneNumber());
+        assistant = assistantService.save(assistant);
         res.setMessage("Assistant "+ assistant.getName()+" updated successfully.");
-
+        res.setData(assistant);
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
-//    @GetMapping(value = "/all-Assistants")
-//    public ResponseEntity<List<Assistant>> getAllAssistants(@NotNull @RequestParam(name = "admin_id", required = true)long adminId) {
+    @GetMapping(value = "/all-Assistants")
+    public ResponseEntity<?> getAllAssistants(@NotNull @RequestParam(name = "admin_id", required = true)long adminId) {
 //        String ownerEmail = AuthUtils.getCurrentlyLoggedInPerson();
 //        Owner owner = ownerService.findByEmail(ownerEmail);
-//        ResContructor res = new ResContructor();
-//
-//        return ("");
+        ResContructor res = new ResContructor();
+        res.setData(assistantService.findAll());
+        return ResponseEntity.status(HttpStatus.OK).body(res);
+
+
+    }
 }

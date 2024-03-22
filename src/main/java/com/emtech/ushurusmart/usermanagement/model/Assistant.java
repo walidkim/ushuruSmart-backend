@@ -21,7 +21,7 @@ public class Assistant extends BaseAuth {
         private String branch;
 
         private boolean verified;
-        @ManyToOne
-        @JoinColumn(name = "owner_id", nullable = false)
-        private Owner owner;
+//        @ManyToOne
+//        @JoinColumn(name = "owner_id", nullable = false)
+//        private Owner owner;
 }

@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.emtech.ushurusmart.transactions.service.InvoiceService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,14 +29,31 @@ public class TransactionController {
     @PostMapping("/make-transaction")
     public ResponseEntity makeTransaction(@RequestBody TransactionRequest request) {
         try {
+
+            List<TransactionRequest> requests = Arrays.asList(
+                    new TransactionRequest("A233333","taxable", 10.0),
+                    new TransactionRequest("A233333","free", 20.0),
+                    new TransactionRequest("A233333","taxable", 15.0));
             double tax = taxCalculatorService.calculateTax(request.getType(), request.getPrice());
-            return ResponseEntity.ok()
-                    .body("Transaction of type '" + request.getType() + " with tax "
-                            + tax + " of value" + request.getPrice() + " processed.");
+
+            byte[] invoice = pdfService.generateInvoice(request.getBuyerKRAPin(), requests);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", "invoice.pdf");
+
+// Wrap the byte array in a ByteArrayResource
+            ByteArrayResource resource = new ByteArrayResource(invoice);
+
+// Return the ResponseEntity with the resource as the body
+            return new ResponseEntity<>(resource, headers, HttpStatus.OK);
+
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest()
                     .body("Transaction of type '" + request.getType() + "' is not supported.");
-        }
+        } catch (IOException e) {
+        e.printStackTrace();
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
     }
 
     @Autowired
@@ -43,9 +61,9 @@ public class TransactionController {
     @GetMapping("/generate-invoice")
     public ResponseEntity<byte[]> generateInvoice(@RequestParam String buyerPin) {
         List<TransactionRequest> requests = Arrays.asList(
-                new TransactionRequest("taxable", 10.0),
-                new TransactionRequest("free", 20.0),
-                new TransactionRequest("taxable", 15.0));
+                new TransactionRequest("","taxable", 10.0),
+                new TransactionRequest("","free", 20.0),
+                new TransactionRequest("","taxable", 15.0));
 
         try {
             byte[] invoice = pdfService.generateInvoice(buyerPin, requests);
