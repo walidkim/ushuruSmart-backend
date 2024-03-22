@@ -19,8 +19,8 @@ public class CreditNoteController {
         return creditNoteService.createCreditNoteFromSaleTransaction(invoiceNumber);
     }
 
-    @PostMapping("/approve")
-    public void approveCreditNote(@RequestParam Long creditNoteId) {
-        creditNoteService.approveCreditNoteAndRestockProducts(creditNoteId);
-    }
+//    @PostMapping("/approve")
+//    public void approveCreditNote(@RequestParam Long creditNoteId) {
+//        creditNoteService.approveCreditNoteAndRestockProducts(creditNoteId);
+//    }
 }

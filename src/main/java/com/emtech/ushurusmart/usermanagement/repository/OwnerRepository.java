@@ -14,4 +14,5 @@ public interface OwnerRepository extends JpaRepository<Owner, Long> {
 
     Owner findByBusinessOwnerKRAPin(String businessOwnerKRAPin);
 
+
 }

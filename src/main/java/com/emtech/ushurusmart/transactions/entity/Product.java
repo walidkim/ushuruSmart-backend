@@ -5,14 +5,9 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Data
 @ToString
@@ -21,7 +16,7 @@ import javax.persistence.Table;
 @Entity
 @Getter
 @Setter
-@Table(name = "products", schema = "ushuru_smart")
+@Table(name = "products")
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -40,6 +35,6 @@ public class Product {
     @UpdateTimestamp
     private LocalDateTime dateUpdated;
 
-    @ManyToOne
-    private Transaction transaction;
+    @ManyToMany
+    private List<Transaction> transactions;
 }

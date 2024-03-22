@@ -22,6 +22,7 @@ public class InvoiceService {
         PdfWriter writer = new PdfWriter(outputStream);
         PdfDocument pdfDocument = new PdfDocument(writer);
         Document document = new Document(pdfDocument);
+        int counter=1;
 
         PdfFont font = PdfFontFactory.createFont();
 
@@ -29,10 +30,13 @@ public class InvoiceService {
         Paragraph buyerParagraph = new Paragraph("Buyer: " + buyerPin).setFont(font);
         document.add(buyerParagraph);
 
+        Paragraph columns = new Paragraph("No. Taxable Status \t Price: ").setFont(font);
+        document.add(columns);
+
         // Adding product details
         for (TransactionRequest product : products) {
-            Paragraph productParagraph = new Paragraph(
-                    "Product: " + product.getType() + ", Price: " + product.getPrice()).setFont(font);
+            Paragraph productParagraph = new Paragraph(counter + ")\t" + product.getType() + ",\t\t" + product.getPrice()).setFont(font);
+            counter++;
             document.add(productParagraph);
         }
 
@@ -40,7 +44,6 @@ public class InvoiceService {
         double total = products.stream().mapToDouble(TransactionRequest::getPrice).sum();
         Paragraph totalParagraph = new Paragraph("Total: " + total).setFont(font);
         document.add(totalParagraph);
-
         document.close();
 
         return outputStream.toByteArray();

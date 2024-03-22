@@ -31,7 +31,7 @@ public class CreditNoteService {
         CreditNote creditNote = new CreditNote();
         creditNote.setInvoiceNumber(transaction.getInvoiceNumber());
         creditNote.setBuyerPin(transaction.getBuyerPin());
-        creditNote.setProductId(transaction.getProduct().getId());
+        creditNote.setProducts(transaction.getProducts());
         creditNote.setProductAmount(transaction.getProductUnitPrice());
         creditNote.setProductName(transaction.getProductName());
         creditNote.setProductQuantity(transaction.getProductQuantity());
@@ -39,14 +39,14 @@ public class CreditNoteService {
         return creditNoteRepository.save(creditNote);
     }
 
-    @Transactional
-    public void approveCreditNoteAndRestockProducts(Long creditNoteId) {
-        CreditNote creditNote = creditNoteRepository.findById(creditNoteId)
-                .orElseThrow(() -> new RuntimeException("Credit Note not found"));
-        Product product = productRepository.findById(creditNote.getProductId()).orElseGet(null);
-        if (product != null) {
-            product.setQuantity(product.getQuantity() + creditNote.getProductQuantity());
-            productRepository.save(product);
-        }
-    }
+//    @Transactional
+//    public void approveCreditNoteAndRestockProducts(Long creditNoteId) {
+//        CreditNote creditNote = creditNoteRepository.findById(creditNoteId)
+//                .orElseThrow(() -> new RuntimeException("Credit Note not found"));
+//         product = productRepository.findById(creditNote.getProductId()).orElseGet(null);
+//        if (product != null) {
+//            product.setQuantity(product.getQuantity() + creditNote.getProductQuantity());
+//            productRepository.save(product);
+//        }
+//    }
 }
