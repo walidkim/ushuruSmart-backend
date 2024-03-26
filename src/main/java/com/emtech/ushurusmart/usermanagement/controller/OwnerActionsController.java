@@ -1,23 +1,24 @@
 package com.emtech.ushurusmart.usermanagement.controller;
 
 
-import com.emtech.ushurusmart.usermanagement.Dtos.ResContructor;
+import com.emtech.ushurusmart.usermanagement.Dtos.ResConstructor;
 import com.emtech.ushurusmart.usermanagement.model.Assistant;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
 import com.emtech.ushurusmart.usermanagement.service.AssistantService;
 import com.emtech.ushurusmart.usermanagement.service.OwnerService;
 import com.emtech.ushurusmart.usermanagement.utils.AuthUtils;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/v1/owner")
+@Tag(name="OwnerActions")
 public class OwnerActionsController {
     @Autowired
     private OwnerService ownerService;
@@ -33,12 +34,12 @@ public class OwnerActionsController {
         owner.setEmail(newOwner.getEmail());
         owner.setName(newOwner.getName());
         owner.setPhoneNumber(newOwner.getPhoneNumber());
-        owner.setBusinessKRAPin(newOwner.getBusinessKRAPin());
-        owner.setBusinessOwnerKRAPin(newOwner.getBusinessOwnerKRAPin());
+        owner.setBusinessKraPin(newOwner.getBusinessKraPin());
+        owner.setBusinessOwnerKraPin(newOwner.getBusinessOwnerKraPin());
 
         ownerService.save(owner);
 
-        ResContructor res = new ResContructor();
+        ResConstructor res = new  ResConstructor();
         res.setMessage("Your details have been updated successfully!");
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
@@ -51,7 +52,7 @@ public class OwnerActionsController {
         assistant.setOwner(owner);
         assistantService.save(assistant);
 
-        ResContructor res = new ResContructor();
+        ResConstructor res = new  ResConstructor();
         res.setMessage("Assistant added successfully!");
 
         return ResponseEntity.status(HttpStatus.CREATED).body(res);
@@ -62,7 +63,7 @@ public class OwnerActionsController {
         String ownerEmail = AuthUtils.getCurrentlyLoggedInPerson();
         Owner owner= ownerService.findByEmail(ownerEmail);
 
-        ResContructor res = new ResContructor();
+        ResConstructor res = new ResConstructor();
 
         Assistant assistant = assistantService.findById(assistantId);
         if(!Objects.equals(owner.getEmail(), assistant.getOwner().getEmail())){
@@ -81,7 +82,7 @@ public class OwnerActionsController {
         String ownerEmail = AuthUtils.getCurrentlyLoggedInPerson();
         Owner owner= ownerService.findByEmail(ownerEmail);
 
-        ResContructor res = new ResContructor();
+        ResConstructor res = new  ResConstructor();
 
         Assistant assistant = assistantService.findById(assistantId);
         if(!Objects.equals(owner.getEmail(), assistant.getOwner().getEmail())){

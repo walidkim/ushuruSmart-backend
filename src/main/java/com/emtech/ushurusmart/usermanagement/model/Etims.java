@@ -1,10 +1,9 @@
 package com.emtech.ushurusmart.usermanagement.model;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import javax.persistence.*;
 
 @Data
 @NoArgsConstructor
@@ -17,11 +16,12 @@ public class Etims {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "BusinessKRAPin")
-    private String businessKRAPin;
+    @Column(name = "business_kra_pin")
+    private String businessKraPin;
 
-    @Column(name = "BusinessOwnerKRAPin")
-    private String businessOwnerKRAPin;
+    @Column(name = "business_owner_kra_pin")
+    private String businessOwnerKraPin;
+
 
     @Column(name = "name")
     private String name;

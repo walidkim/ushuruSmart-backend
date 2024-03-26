@@ -1,16 +1,20 @@
 package com.emtech.ushurusmart.usermanagement.controller;
 
-import com.emtech.ushurusmart.usermanagement.Dtos.ResContructor;
+
+import com.emtech.ushurusmart.usermanagement.Dtos.ResConstructor;
 import com.emtech.ushurusmart.usermanagement.model.Etims;
 import com.emtech.ushurusmart.usermanagement.service.AdminService;
-
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping("api/v1/admin")
+@Tag(name = "Admin")
 public class AdminController {
 
     @Autowired
@@ -18,7 +22,7 @@ public class AdminController {
 
     @PostMapping("/etims")
     public ResponseEntity<?> etimsSave(@RequestBody Etims data) {
-        ResContructor res = new ResContructor();
+        ResConstructor res = new  ResConstructor();
         try {
             Etims details = adminService.etimsSave(data);
 
@@ -33,7 +37,7 @@ public class AdminController {
 
     @PutMapping("/etims/{businessOwnerKRAPin}")
     public ResponseEntity<?> etimsUpdate(@PathVariable String businessOwnerKRAPin, @RequestBody Etims data) {
-        ResContructor res = new ResContructor();
+        ResConstructor res = new  ResConstructor();
         try {
             if (adminService.findByBusinessOwnerKRAPin(businessOwnerKRAPin) == null) {
                 res.setMessage("No business owner with those details exists.");
@@ -52,7 +56,7 @@ public class AdminController {
 
     @DeleteMapping("/etims/{businessOwnerKRAPin}")
     public ResponseEntity<?> etimsDelete(@PathVariable String businessOwnerKRAPin) {
-        ResContructor res = new ResContructor();
+        ResConstructor res = new  ResConstructor();
 
         if (adminService.etimsDelete(businessOwnerKRAPin)) {
             res.setMessage("Business Owner deleted successfully!");
@@ -63,5 +67,15 @@ public class AdminController {
         }
 
     }
+    @GetMapping("/find/by/business/{kra}")
+    ResponseEntity<?> findBusinessKra(@PathVariable String kra) {
+            Optional<Etims> findkra = Optional.ofNullable(adminService.findByBusinessOwnerKRAPin(kra));
+        System.out.println("fetching kra...."+ findkra);
+        Etims response = new Etims();
+            if (findkra != null){
+                 response = findkra.get();
+            }
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
 
 }

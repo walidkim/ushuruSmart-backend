@@ -2,11 +2,10 @@ package com.emtech.ushurusmart.usermanagement.service;
 
 import com.emtech.ushurusmart.usermanagement.model.Etims;
 import com.emtech.ushurusmart.usermanagement.repository.EtimsRepository;
-
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class AdminService {
@@ -14,11 +13,13 @@ public class AdminService {
     @Autowired
     private EtimsRepository etimsRepository;
 
-    public Etims findByBusinessKRAPin(String businessKRAPin) {
-        Optional<Etims> etims = etimsRepository.findByBusinessKRAPin(businessKRAPin);
+    public Etims findBybusinesskrapin(String businesskrapin) {
+        Optional<Etims> etims = etimsRepository.findByBusinessKraPin(businesskrapin);
         if (etims.isPresent()) {
+            System.out.println("present");
             return etims.get();
         } else
+            System.out.println(etims);
             return null;
     }
 
@@ -28,7 +29,7 @@ public class AdminService {
     }
 
     public Etims etimsUpdate(Etims data) {
-        if (!etimsRepository.findByBusinessOwnerKRAPin(data.getBusinessOwnerKRAPin()).isPresent()) {
+        if (!etimsRepository.findByBusinessOwnerKraPin(data.getBusinessOwnerKraPin()).isPresent()) {
             return null;
         }
         return etimsRepository.save(data);
@@ -37,7 +38,7 @@ public class AdminService {
     public boolean etimsDelete(String businessOwnerKRAPin) {
         try {
 
-            if (!etimsRepository.findByBusinessKRAPin(businessOwnerKRAPin).isPresent()) {
+            if (!etimsRepository.findByBusinessKraPin(businessOwnerKRAPin).isPresent()) {
                 return false;
             }
             etimsRepository.deleteById(Long.valueOf(businessOwnerKRAPin));
@@ -52,11 +53,13 @@ public class AdminService {
     }
 
     public Etims findByBusinessOwnerKRAPin(String businessOwnerKRAPin) {
-        Optional<Etims> result = etimsRepository.findByBusinessOwnerKRAPin(businessOwnerKRAPin);
-        if (!result.isPresent()) {
-            return result.get();
-        }
-        return null;
+        Optional<Etims> result = etimsRepository.findByBusinessOwnerKraPin(businessOwnerKRAPin);
 
+        if (result.isPresent()) {
+            System.out.println("present");
+            return result.get();
+        } else
+            System.out.println(result);
+        return null;
     }
 }

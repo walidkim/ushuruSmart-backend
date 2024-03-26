@@ -9,7 +9,6 @@ import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Paragraph;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.StyleConstants;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;

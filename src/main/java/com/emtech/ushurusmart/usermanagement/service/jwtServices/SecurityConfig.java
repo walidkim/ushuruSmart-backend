@@ -40,26 +40,29 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(@NotNull HttpSecurity http) throws Exception {
 
-        http.csrf().disable()
-                .authorizeRequests()
-                .antMatchers("v2/api-docs/**").permitAll()
-                .antMatchers("/swagger-ui/**").permitAll()
-                .antMatchers("v2/api-docs/**",
-                        "/configuration/ui",
-                        "/swagger-resources/**",
-                        "/configuration/security",
-                        "/swagger-ui/**",
-                        "/webjars/**",
-                        "/swagger-ui.html"
-                ).permitAll()
-                .antMatchers("/v2/api-docs").permitAll()
-                .antMatchers("/swagger-resources/configuration/ui").permitAll()
-                .antMatchers("/swagger-ui/index.html").permitAll()
-                .requestMatchers().permitAll()
+        http.csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth.requestMatchers(
+                        "/v2/api-docs",
+                                        "/api-docs",
+                                        "/api-docs/**",
+                                        "/v3/api-docs",
+                                        "/v3/api-docs/**",
+                                        "/api/**",
+                                        "/swagger-ui/**",
+                                        "v2/api-docs/**",
+                                        "/configuration/ui",
+                                        "/swagger-resources/**",
+                                        "/swagger-resources",
+                                        "/configuration/security",
+                                        "/swagger-ui/**",
+                                        "/webjars/**",
+                                        "/swagger-ui.html",
+                                        "/swagger-resources/configuration/ui",
+                                        "/swagger-ui/index.html"
+                                ).permitAll()
                 .anyRequest().authenticated()
-                .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
+                )
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

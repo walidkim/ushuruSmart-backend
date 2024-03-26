@@ -3,7 +3,7 @@ package com.emtech.ushurusmart.payment.model;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
 import lombok.Data;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Data

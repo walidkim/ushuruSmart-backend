@@ -1,8 +1,5 @@
 package com.emtech.ushurusmart.usermanagement.service;
 
-import com.emtech.ushurusmart.usermanagement.repository.EtimsRepository;
-import com.emtech.ushurusmart.usermanagement.repository.OwnerRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,22 +12,27 @@ public class KraPINValidator {
     @Autowired
     private AdminService adminService;
 
-    public boolean validateKRAPins(String businessKRAPin, String businessOwnerKRAPin) {
-        Objects.requireNonNull(businessKRAPin, "businessKRAPin cannot be null");
+    public boolean validateKRAPins(String businesskrapin, String businessOwnerKRAPin) {
+        Objects.requireNonNull(businesskrapin, "businesskrapin cannot be null");
         Objects.requireNonNull(businessOwnerKRAPin, "businessOwnerKRAPin cannot be null");
 
-        Pattern kraPinPattern = Pattern.compile("^[A-Z]\\d{10}[A-Z]$");
+        Pattern kraPinPattern = Pattern.compile("^[A-Z]\\d{9}[A-Z]$");
 
-        if (!kraPinPattern.matcher(businessKRAPin).matches()) {
+        if (!kraPinPattern.matcher(businesskrapin).matches()) {
+            System.out.println("business does not match");
             return false;
         }
         if (!kraPinPattern.matcher(businessOwnerKRAPin).matches()) {
+            System.out.println("owner does not match");
             return false;
         }
-        if (adminService.findByBusinessKRAPin(businessKRAPin) == null) {
+        if (adminService.findBybusinesskrapin(businesskrapin) == null) {
+
+            System.out.println("business does not exist" + businesskrapin + businessOwnerKRAPin);
             return false;
         }
         if (adminService.findByBusinessOwnerKRAPin(businessOwnerKRAPin) == null) {
+            System.out.println("owner does not exist");
             return false;
         }
         return true;

@@ -4,14 +4,12 @@ import com.emtech.ushurusmart.usermanagement.model.Owner;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
 public interface OwnerRepository extends JpaRepository<Owner, Long> {
     Owner findByEmail(String email);
 
     Owner deleteByEmail(String email);
 
-    Owner findByBusinessOwnerKRAPin(String businessOwnerKRAPin);
+    Owner findByBusinessOwnerKraPin(String businessOwnerKRAPin);
 
 }
