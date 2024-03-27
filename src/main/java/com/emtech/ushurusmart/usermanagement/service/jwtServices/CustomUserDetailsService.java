@@ -1,15 +1,15 @@
 package com.emtech.ushurusmart.usermanagement.service.jwtServices;
 
+
 import com.emtech.ushurusmart.usermanagement.model.Assistant;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
+import com.emtech.ushurusmart.usermanagement.repository.AssistantRepository;
+import com.emtech.ushurusmart.usermanagement.repository.OwnerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import com.emtech.ushurusmart.usermanagement.repository.OwnerRepository;
-import com.emtech.ushurusmart.usermanagement.repository.AssistantRepository;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
