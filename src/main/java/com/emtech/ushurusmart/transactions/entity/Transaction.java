@@ -1,11 +1,11 @@
 package com.emtech.ushurusmart.transactions.entity;
 
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import javax.persistence.*;
 
 @Entity
 @Data
@@ -27,9 +27,10 @@ public class Transaction {
     private String invoiceNumber;
     @CreationTimestamp
     private LocalDateTime dateCreated;
+
+
     // assume sale transaction has only one product
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = true)
     private List<Product> products;
     private Integer productQuantity;
     private Double productUnitPrice;

@@ -2,28 +2,36 @@ package com.emtech.ushurusmart.usermanagement.service.jwtServices;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final JwtTokenUtil jwtUtil;
     private final ObjectMapper mapper;
+
+
+    @Autowired
+    private CustomUserDetailsService customUserDetailsService;
 
     public JwtAuthorizationFilter(JwtTokenUtil jwtUtil, ObjectMapper mapper) {
         this.jwtUtil = jwtUtil;
@@ -45,7 +53,11 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
             if (claims != null & jwtUtil.validateClaims(claims)) {
                 String email = claims.getSubject();
-                Authentication authentication = new UsernamePasswordAuthenticationToken(email, "", new ArrayList<>());
+                Collection<GrantedAuthority> roles = new ArrayList<>();
+                roles.add(new SimpleGrantedAuthority("ROLE_USER"));
+                roles.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+                UserDetails userDetails= customUserDetailsService.loadUserByUsername(email);
+                Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails,null, roles );
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
 

@@ -2,9 +2,9 @@ package com.emtech.ushurusmart.usermanagement.repository;
 
 import com.emtech.ushurusmart.usermanagement.model.Etims;
 
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import javax.transaction.Transactional;
 import java.util.Optional;
 
 public interface EtimsRepository extends JpaRepository<Etims, Long> {

@@ -1,10 +1,9 @@
 package com.emtech.ushurusmart.transactions.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.ManyToMany;
 
+
+
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -17,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreditNote {
-    @javax.persistence.Id
+    @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
     private String invoiceNumber;
