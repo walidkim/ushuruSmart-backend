@@ -8,6 +8,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -48,33 +49,34 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(@NotNull HttpSecurity http) throws Exception {
-        http.csrf().disable();
-//                .authorizeRequests()
-//                .antMatchers("v2/api-docs/**").permitAll()
-//                .antMatchers("/swagger-ui/**").permitAll()
-//                .antMatchers("v2/api-docs/**",
-//                        "/configuration/ui",
-//                        "/swagger-resources/**",
-//                        "/configuration/security",
-//                        "/swagger-ui/**",
-//                        "/webjars/**",
-//                        "/swagger-ui.html"
-//                ).permitAll()
-//                .antMatchers("/api/v1/auth/**","/api/v1/admin/**"
-//                ).permitAll()
-//                .antMatchers("/v2/api-docs").permitAll()
-//                .antMatchers("/swagger-resources/configuration/ui").permitAll()
-//                .antMatchers("/swagger-ui/index.html").permitAll()
-//                .requestMatchers().permitAll()
-//                .anyRequest().authenticated()
-//                .and()
-//                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//                .and()
-//                .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
+
+        http.csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth.requestMatchers(
+                                        "/v2/api-docs",
+                                        "/api-docs",
+                                        "/api-docs/**",
+                                        "/v3/api-docs",
+                                        "/v3/api-docs/**",
+                                        "/api/**",
+                                        "/swagger-ui/**",
+                                        "v2/api-docs/**",
+                                        "/configuration/ui",
+                                        "/swagger-resources/**",
+                                        "/swagger-resources",
+                                        "/configuration/security",
+                                        "/swagger-ui/**",
+                                        "/webjars/**",
+                                        "/swagger-ui.html",
+                                        "/swagger-resources/configuration/ui",
+                                        "/swagger-ui/index.html"
+                                ).permitAll()
+                                .anyRequest().authenticated()
+                )
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
-
     @Bean
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
