@@ -21,16 +21,21 @@ public class Owner extends BaseAuth {
         private String businessKRAPin;
         private String businessOwnerKRAPin;
         private String phoneNumber;
-//        @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
-//        private List<Assistant> assistants;
+        @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+        private List<Assistant> assistants;
 
         @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
         private List<PaymentDetails> payments;
+
+
+
 
         @Override
         public Collection<? extends GrantedAuthority> getAuthorities() {
                 return getRole().getAuthorities();
         }
+
+
 
         @Override
         public String getUsername() {

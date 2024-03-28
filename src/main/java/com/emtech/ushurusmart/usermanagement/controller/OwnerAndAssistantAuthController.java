@@ -59,7 +59,7 @@ public class OwnerAndAssistantAuthController {
             owner.setPassword(data.getPassword());
             owner.setBusinessOwnerKRAPin(data.getBusinessOwnerKRAPin());
             owner.setBusinessKRAPin(data.getBusinessKRAPin());
-            owner.setRole(Role.owner);
+//            owner.setRole(Role.owner);
             res.setMessage(HelperUtil.capitalizeFirst(type) + " created successfully!");
             ownerService.save(owner);
             res.setData(owner);
@@ -120,7 +120,7 @@ public class OwnerAndAssistantAuthController {
                     System.out.println(assistant.toString());
                     Authentication authentication = authenticationManager
                             .authenticate(new UsernamePasswordAuthenticationToken(loginReq.getEmail(),
-                                    loginReq.getPassword()));
+                                    loginReq.getPassword(), assistant.getAuthorities()));
                     String token = jwtUtil.createToken(assistant);
                     res.setMessage("Login successful.");
 

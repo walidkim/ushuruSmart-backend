@@ -3,6 +3,7 @@ package com.emtech.ushurusmart.usermanagement.controller;
 
 import com.emtech.ushurusmart.usermanagement.model.Assistant;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
+import com.emtech.ushurusmart.usermanagement.model.Role;
 import com.emtech.ushurusmart.usermanagement.service.AssistantService;
 import com.emtech.ushurusmart.usermanagement.service.OwnerService;
 import com.emtech.ushurusmart.usermanagement.utils.AuthUtils;
@@ -11,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -44,6 +46,10 @@ public class OwnerActionsController {
 
     @PostMapping(value = "/add-assistant")
     public ResponseEntity<?> createAssistant(@RequestBody Assistant assistant) {
+        String ownerEmail= AuthUtils.getCurrentlyLoggedInPerson();
+        Owner owner = ownerService.findByEmail(ownerEmail);
+        assistant.setRole(Role.assistant);
+        assistant.setOwner(owner);
         assistantService.save(assistant);
         ResContructor res = new ResContructor();
         res.setMessage("Assistant added successfully!");

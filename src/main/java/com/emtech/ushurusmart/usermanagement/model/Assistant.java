@@ -1,6 +1,8 @@
 package com.emtech.ushurusmart.usermanagement.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,9 +24,9 @@ public class Assistant extends BaseAuth {
         private String branch;
 
         private boolean verified;
-//        @ManyToOne
-//        @JoinColumn(name = "owner_id", nullable = false)
-//        private Owner owner;
+        @ManyToOne
+        @JoinColumn( nullable = false)
+        private Owner owner;
 
         @Override
         public Collection<? extends GrantedAuthority> getAuthorities() {
