@@ -1,14 +1,16 @@
 package com.emtech.ushurusmart.usermanagement.controller;
 
 import com.emtech.ushurusmart.usermanagement.Dtos.LoginRequest;
-import com.emtech.ushurusmart.usermanagement.Dtos.ResContructor;
+import com.emtech.ushurusmart.usermanagement.Dtos.auth.OwnerLoginRes;
 import com.emtech.ushurusmart.usermanagement.Dtos.auth.OwnerSignUp;
 import com.emtech.ushurusmart.usermanagement.model.Assistant;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
+import com.emtech.ushurusmart.usermanagement.model.Role;
 import com.emtech.ushurusmart.usermanagement.service.AssistantService;
 import com.emtech.ushurusmart.usermanagement.service.KraPINValidator;
 import com.emtech.ushurusmart.usermanagement.service.OwnerService;
 import com.emtech.ushurusmart.usermanagement.service.jwtServices.JwtTokenUtil;
+import com.emtech.ushurusmart.utils.controller.ResContructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,8 +59,10 @@ public class OwnerAndAssistantAuthController {
             owner.setPassword(data.getPassword());
             owner.setBusinessOwnerKRAPin(data.getBusinessOwnerKRAPin());
             owner.setBusinessKRAPin(data.getBusinessKRAPin());
+            owner.setRole(Role.owner);
             res.setMessage(HelperUtil.capitalizeFirst(type) + " created successfully!");
             ownerService.save(owner);
+            res.setData(owner);
             return ResponseEntity.status(HttpStatus.CREATED).body(res);
         }
         res.setMessage(HelperUtil.capitalizeFirst(type) + " is invalid.");
@@ -78,15 +84,29 @@ public class OwnerAndAssistantAuthController {
 
                         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
                     }
+
                     Authentication authentication = authenticationManager
                             .authenticate(new UsernamePasswordAuthenticationToken(loginReq.getEmail(),
-                                    loginReq.getPassword()));
-                    String token = jwtUtil.createToken(authentication.getName());
+                                    loginReq.getPassword(),owner.getAuthorities() != null ? owner.getAuthorities() : Collections.emptyList()));
+
+
+                    String token = jwtUtil.createToken(owner);
                     res.setMessage("Login successful!");
 
+
+
+
                     Map<String, Object> responseData = new HashMap<>();
-                    responseData.put("owner", owner);
+                    OwnerLoginRes resData= new OwnerLoginRes();
+                    resData.setName(owner.getName());
+                    resData.setId(owner.getId());
+                    resData.setEmail(owner.getEmail());
+                    resData.setBusinessKRAPin(owner.getBusinessKRAPin());
+                    resData.setBusinessOwnerKRAPin(owner.getBusinessOwnerKRAPin());
+                    resData.setPhoneNumber(owner.getPhoneNumber());
+                    responseData.put("owner", resData);
                     responseData.put("token", token);
+
                     res.setData(responseData);
 
                     return ResponseEntity.status(HttpStatus.CREATED).body(res);
@@ -101,7 +121,7 @@ public class OwnerAndAssistantAuthController {
                     Authentication authentication = authenticationManager
                             .authenticate(new UsernamePasswordAuthenticationToken(loginReq.getEmail(),
                                     loginReq.getPassword()));
-                    String token = jwtUtil.createToken(authentication.getName());
+                    String token = jwtUtil.createToken(assistant);
                     res.setMessage("Login successful.");
 
                     Map<String, Object> responseData = new HashMap<>();
@@ -122,7 +142,8 @@ public class OwnerAndAssistantAuthController {
             res.setMessage("Invalid email or password.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
         } catch (Exception e) {
-            res.setMessage("Error " + e.getLocalizedMessage());
+            res.setMessage("Error  234343" + e.getLocalizedMessage());
+            System.out.println(e.toString());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
         }
     }

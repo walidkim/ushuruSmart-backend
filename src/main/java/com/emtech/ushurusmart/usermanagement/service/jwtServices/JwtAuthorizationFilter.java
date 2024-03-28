@@ -1,5 +1,6 @@
 package com.emtech.ushurusmart.usermanagement.service.jwtServices;
 
+import com.emtech.ushurusmart.usermanagement.model.Role;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -16,6 +17,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -28,6 +30,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final JwtTokenUtil jwtUtil;
     private final ObjectMapper mapper;
+
+    @Autowired
+    private UserDetailsService userDetailsService;
 
 
     @Autowired
@@ -53,11 +58,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
             if (claims != null & jwtUtil.validateClaims(claims)) {
                 String email = claims.getSubject();
-                Collection<GrantedAuthority> roles = new ArrayList<>();
-                roles.add(new SimpleGrantedAuthority("ROLE_USER"));
-                roles.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
-                UserDetails userDetails= customUserDetailsService.loadUserByUsername(email);
-                Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails,null, roles );
+                UserDetails userDetails= userDetailsService.loadUserByUsername(email);
+                Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails,null,userDetails.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
 

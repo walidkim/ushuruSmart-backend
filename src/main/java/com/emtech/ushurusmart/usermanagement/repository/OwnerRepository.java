@@ -10,7 +10,7 @@ public interface OwnerRepository extends JpaRepository<Owner, Long> {
 
     Owner deleteByEmail(String email);
 
-    Owner findByBusinessOwnerKraPin(String businessOwnerKRAPin);
+    Owner findByBusinessOwnerKRAPin(String businessOwnerKRAPin);
 
 
 }

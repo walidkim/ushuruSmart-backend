@@ -4,6 +4,7 @@ import io.jsonwebtoken.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import java.util.Date;
 import java.util.List;
@@ -27,9 +28,9 @@ public class JwtTokenUtil {
         this.validityInHours = validityInHours;
     }
 
-    public String createToken(String email) {
-        Claims claims = Jwts.claims().setSubject(email);
-        claims.put("email", email);
+    public String createToken(UserDetails userDetails) {
+        Claims claims = Jwts.claims().setSubject(userDetails.getUsername());
+        claims.put("userDetails", userDetails);
         Date tokenCreateTime = new Date();
         Date tokenValidity = new Date(
                 tokenCreateTime.getTime() + TimeUnit.MINUTES.toMillis(validityInHours * 60));

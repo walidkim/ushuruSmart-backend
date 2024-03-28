@@ -1,11 +1,9 @@
 package com.emtech.ushurusmart;
 
 import com.emtech.ushurusmart.usermanagement.service.SampleDataInitializer;
-import org.springframework.beans.factory.BeanFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
-import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 @SpringBootApplication
 public class  UshuruSmartApplication {

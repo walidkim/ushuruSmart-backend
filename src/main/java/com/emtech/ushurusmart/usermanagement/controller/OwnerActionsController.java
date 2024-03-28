@@ -1,21 +1,17 @@
 package com.emtech.ushurusmart.usermanagement.controller;
 
 
-import com.emtech.ushurusmart.usermanagement.Dtos.ResContructor;
-import com.emtech.ushurusmart.usermanagement.Dtos.entity.AssistantDto;
 import com.emtech.ushurusmart.usermanagement.model.Assistant;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
 import com.emtech.ushurusmart.usermanagement.service.AssistantService;
 import com.emtech.ushurusmart.usermanagement.service.OwnerService;
 import com.emtech.ushurusmart.usermanagement.utils.AuthUtils;
+import com.emtech.ushurusmart.utils.controller.ResContructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/v1/owner")

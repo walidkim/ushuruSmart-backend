@@ -1,9 +1,9 @@
 package com.emtech.ushurusmart.usermanagement.controller;
 
-import com.emtech.ushurusmart.usermanagement.Dtos.ResContructor;
 import com.emtech.ushurusmart.usermanagement.model.Etims;
 import com.emtech.ushurusmart.usermanagement.service.AdminService;
 
+import com.emtech.ushurusmart.utils.controller.ResContructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
