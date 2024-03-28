@@ -1,6 +1,7 @@
 package com.emtech.ushurusmart.usermanagement.model;
 
 import com.emtech.ushurusmart.payment.model.PaymentDetails;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,7 +24,7 @@ public class Owner extends BaseAuth {
         private String phoneNumber;
         @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
         private List<Assistant> assistants;
-
+        @JsonManagedReference
         @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
         private List<PaymentDetails> payments;
 

@@ -66,14 +66,18 @@ public class AssistantAuthTest {
     }
 
     private void signUp(String name, String email, String password, String tel) {
-
-        Assistant assistant = new Assistant();
         Owner owner= new Owner();
-        owner.setName("test");
-        owner.setEmail("test@test.com");
-        owner.setPassword("test");
-        owner.setPhoneNumber("25489898989");
-        ownerService.save(owner);
+        if(ownerRepository.findAll().isEmpty()){
+            owner.setName("test");
+            owner.setEmail("test@test.com");
+            owner.setPassword("test");
+            owner.setPhoneNumber("25489898989");
+            owner.setRole(Role.owner);
+            ownerService.save(owner);
+        }else{
+            owner= ownerRepository.findAll().get(0);
+        }
+        Assistant assistant = new Assistant();
         assistant.setName(name);
         assistant.setEmail(email);
         assistant.setPassword(password);
@@ -105,7 +109,7 @@ public class AssistantAuthTest {
         ValidatableResponse res = given().header("Content-Type", "application/json").body(loginJson).when()
                 .post(loginUrl)
                 .then()
-                .statusCode(is(401));
+                .statusCode(is(201));
 
 
         String jsonString = res.body(containsString("")).extract().response().getBody().asString();
@@ -116,10 +120,10 @@ public class AssistantAuthTest {
         LoginResponse.DataResponse resData = response.getData();
         assertTrue(resData.getToken().contains("Bearer "));
         assertTrue(resData.getToken().length() > 50);
-        LoginResponse.DataResponse.TenantData tenant = resData.getTenant();
-        assertNotNull(tenant);
-        assertEquals(tenant.getName(), "John Doe");
-        assertEquals(tenant.getEmail(), "johndoe@example.com");
+        LoginResponse.DataResponse.Assistant assistant = resData.getAssistant();
+        assertNotNull(assistant);
+        assertEquals(assistant.getName(), "John Doe");
+        assertEquals(assistant.getEmail(), "johndoe@example.com");
 
 
     }
@@ -133,7 +137,7 @@ public class AssistantAuthTest {
                 .post(loginUrl)
                 .then()
                 .statusCode(is(404))
-                .body(containsString("No tenant by that email exists."));
+                .body(containsString("No Assistant by that email exists"));
 
     }
 
@@ -165,6 +169,7 @@ public class AssistantAuthTest {
 
     }
 
+
     @Data
     public static class LoginResponse {
 
@@ -175,17 +180,15 @@ public class AssistantAuthTest {
         private DataResponse data;
 
         @Data
-        public static class DataResponse {
+        public static  class DataResponse {
 
-            @JsonProperty("tenant")
-            private TenantData tenant;
+            @JsonProperty("assistant")
+            private Assistant assistant;
 
             @JsonProperty("token")
             private String token;
-
-
             @Data
-            public class TenantData {
+            public static class Assistant {
 
                 @JsonProperty("id")
                 private Long id;
@@ -193,79 +196,56 @@ public class AssistantAuthTest {
                 @JsonProperty("name")
                 private String name;
 
-                @JsonProperty("password")  // Security risk to include password in response, consider removing
+                @JsonProperty("password") // Security risk to include password in response, consider removing
                 private String password;
 
                 @JsonProperty("email")
                 private String email;
 
+                @JsonProperty("role")
+                private String role;
+
                 @JsonProperty("phoneNumber")
                 private String phoneNumber;
 
-                @JsonProperty("units")
-                private List<Object> units;  // Placeholder for potential apartment data
+                @JsonProperty("branch")
+                private Object branch;  // Placeholder for potential branch data
 
-                @JsonProperty("amountPaid")
-                private Double amountPaid;
+                @JsonProperty("verified")
+                private boolean verified;
 
-                @JsonProperty("createdAt")
-                private CreatedAt createdAt;
+                @JsonProperty("enabled")
+                private boolean enabled;
 
-                @JsonProperty("updatedAt")
-                private Object updatedAt;  // Can be null
+                @JsonProperty("accountNonExpired")
+                private boolean accountNonExpired;
+
+                @JsonProperty("accountNonLocked")
+                private boolean accountNonLocked;
+
+                @JsonProperty("credentialsNonExpired")
+                private boolean credentialsNonExpired;
+
+                @JsonProperty("authorities")
+                private List<Authority> authorities;
+
+                @JsonProperty("username")
+                private String username;
 
                 @Data
-                public class CreatedAt {
+                public static class Authority {
 
-                    @JsonProperty("year")
-                    private Integer year;
-
-                    @JsonProperty("monthValue")
-                    private Integer monthValue;
-
-                    @JsonProperty("dayOfMonth")
-                    private Integer dayOfMonth;
-
-                    @JsonProperty("hour")
-                    private Integer hour;
-
-                    @JsonProperty("minute")
-                    private Integer minute;
-
-                    @JsonProperty("second")
-                    private Integer second;
-
-                    @JsonProperty("nano")
-                    private Long nano;
-
-                    @JsonProperty("dayOfWeek")
-                    private String dayOfWeek;
-
-                    @JsonProperty("dayOfYear")
-                    private Integer dayOfYear;
-
-                    @JsonProperty("month")
-                    private String month;
-
-                    @JsonProperty("chronology")
-                    private Chronology chronology;
-
-
-                    @Data
-                    public class Chronology {
-
-                        @JsonProperty("id")
-                        private String id;
-
-                        @JsonProperty("calendarType")
-                        private String calendarType;
-                    }
+                    @JsonProperty("authority")
+                    private String authority;
                 }
-
             }
-
-
         }
     }
+
+
+
+
+
+
 
 }

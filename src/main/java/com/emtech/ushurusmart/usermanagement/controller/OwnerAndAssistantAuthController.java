@@ -47,26 +47,32 @@ public class OwnerAndAssistantAuthController {
     public ResponseEntity<?> signUp(@RequestParam(name = "type", required = true) String type,
             @RequestBody OwnerSignUp data) {
         ResContructor res = new ResContructor();
+        try {
 
-        if (type.equals("owner")) {
-            if (ownerService.findByEmail(data.getEmail()) != null) {
-                res.setMessage(HelperUtil.capitalizeFirst(type) + " by that email! exists");
-                return ResponseEntity.badRequest().body(res);
+            if (type.equals("owner")) {
+                if (ownerService.findByEmail(data.getEmail()) != null) {
+                    res.setMessage(HelperUtil.capitalizeFirst(type) + " with that email exists!");
+                    return ResponseEntity.badRequest().body(res);
+                }
+                Owner owner = new Owner();
+                owner.setName(data.getName());
+                owner.setEmail(data.getEmail());
+                owner.setPassword(data.getPassword());
+                owner.setBusinessOwnerKRAPin(data.getBusinessOwnerKRAPin());
+                owner.setBusinessKRAPin(data.getBusinessKRAPin());
+                owner.setRole(Role.owner);
+                res.setMessage(HelperUtil.capitalizeFirst(type) + " created successfully!");
+                ownerService.save(owner);
+                res.setData(owner);
+                return ResponseEntity.status(HttpStatus.CREATED).body(res);
             }
-            Owner owner = new Owner();
-            owner.setName(data.getName());
-            owner.setEmail(data.getEmail());
-            owner.setPassword(data.getPassword());
-            owner.setBusinessOwnerKRAPin(data.getBusinessOwnerKRAPin());
-            owner.setBusinessKRAPin(data.getBusinessKRAPin());
-//            owner.setRole(Role.owner);
-            res.setMessage(HelperUtil.capitalizeFirst(type) + " created successfully!");
-            ownerService.save(owner);
-            res.setData(owner);
-            return ResponseEntity.status(HttpStatus.CREATED).body(res);
+            res.setMessage(HelperUtil.capitalizeFirst(type) + " is invalid.");
+            return ResponseEntity.badRequest().body(res);
+
+        }catch (Exception e){
+            res.setMessage("Error " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
         }
-        res.setMessage(HelperUtil.capitalizeFirst(type) + " is invalid.");
-        return ResponseEntity.badRequest().body(res);
 
     }
 
@@ -112,17 +118,18 @@ public class OwnerAndAssistantAuthController {
                     return ResponseEntity.status(HttpStatus.CREATED).body(res);
                 }
                 case "assistant": {
+
                     Assistant assistant = assistantService.findByEmail(loginReq.getEmail());
+
                     if (assistant == null) {
                         res.setMessage("No " + HelperUtil.capitalizeFirst(type) + " by that email exists.");
                         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
                     }
-                    System.out.println(assistant.toString());
                     Authentication authentication = authenticationManager
                             .authenticate(new UsernamePasswordAuthenticationToken(loginReq.getEmail(),
                                     loginReq.getPassword(), assistant.getAuthorities()));
                     String token = jwtUtil.createToken(assistant);
-                    res.setMessage("Login successful.");
+                    res.setMessage("Login successful!");
 
                     Map<String, Object> responseData = new HashMap<>();
                     responseData.put(type, assistant);

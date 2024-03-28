@@ -1,5 +1,6 @@
 package com.emtech.ushurusmart.usermanagement.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -26,6 +27,7 @@ public class Assistant extends BaseAuth {
         private boolean verified;
         @ManyToOne
         @JoinColumn( nullable = false)
+        @JsonBackReference
         private Owner owner;
 
         @Override
