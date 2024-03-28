@@ -1,5 +1,6 @@
-package com.emtech.ushurusmart.usermanagement.controller;
+package com.emtech.ushurusmart.usermanagement.controller.owner;
 
+import com.emtech.ushurusmart.usermanagement.controller.Utils;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
 import com.emtech.ushurusmart.usermanagement.repository.OwnerRepository;
 import com.fasterxml.jackson.annotation.JsonProperty;

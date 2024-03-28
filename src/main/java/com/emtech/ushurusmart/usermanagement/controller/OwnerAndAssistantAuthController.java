@@ -1,8 +1,10 @@
 package com.emtech.ushurusmart.usermanagement.controller;
 
 import com.emtech.ushurusmart.usermanagement.Dtos.LoginRequest;
+import com.emtech.ushurusmart.usermanagement.Dtos.OwnerDto;
 import com.emtech.ushurusmart.usermanagement.Dtos.auth.OwnerLoginRes;
 import com.emtech.ushurusmart.usermanagement.Dtos.auth.OwnerSignUp;
+import com.emtech.ushurusmart.usermanagement.factory.EntityFactory;
 import com.emtech.ushurusmart.usermanagement.model.Assistant;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
 import com.emtech.ushurusmart.usermanagement.model.Role;
@@ -45,7 +47,7 @@ public class OwnerAndAssistantAuthController {
 
     @PostMapping(value = "/sign-up")
     public ResponseEntity<?> signUp(@RequestParam(name = "type", required = true) String type,
-            @RequestBody OwnerSignUp data) {
+            @RequestBody OwnerDto data) {
         ResContructor res = new ResContructor();
         try {
 
@@ -54,16 +56,9 @@ public class OwnerAndAssistantAuthController {
                     res.setMessage(HelperUtil.capitalizeFirst(type) + " with that email exists!");
                     return ResponseEntity.badRequest().body(res);
                 }
-                Owner owner = new Owner();
-                owner.setName(data.getName());
-                owner.setEmail(data.getEmail());
-                owner.setPassword(data.getPassword());
-                owner.setBusinessOwnerKRAPin(data.getBusinessOwnerKRAPin());
-                owner.setBusinessKRAPin(data.getBusinessKRAPin());
-                owner.setRole(Role.owner);
+                Owner owner = EntityFactory.createOwner(data);
                 res.setMessage(HelperUtil.capitalizeFirst(type) + " created successfully!");
-                ownerService.save(owner);
-                res.setData(owner);
+                res.setData( ownerService.save(owner));
                 return ResponseEntity.status(HttpStatus.CREATED).body(res);
             }
             res.setMessage(HelperUtil.capitalizeFirst(type) + " is invalid.");

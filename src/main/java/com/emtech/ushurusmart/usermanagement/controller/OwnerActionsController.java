@@ -1,6 +1,8 @@
 package com.emtech.ushurusmart.usermanagement.controller;
 
 
+import com.emtech.ushurusmart.usermanagement.Dtos.entity.AssistantDto;
+import com.emtech.ushurusmart.usermanagement.factory.EntityFactory;
 import com.emtech.ushurusmart.usermanagement.model.Assistant;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
 import com.emtech.ushurusmart.usermanagement.model.Role;
@@ -45,15 +47,20 @@ public class OwnerActionsController {
 
 
     @PostMapping(value = "/add-assistant")
-    public ResponseEntity<?> createAssistant(@RequestBody Assistant assistant) {
-        String ownerEmail= AuthUtils.getCurrentlyLoggedInPerson();
-        Owner owner = ownerService.findByEmail(ownerEmail);
-        assistant.setRole(Role.assistant);
-        assistant.setOwner(owner);
-        assistantService.save(assistant);
+    public ResponseEntity<?> createAssistant(@RequestBody AssistantDto data) {
         ResContructor res = new ResContructor();
-        res.setMessage("Assistant added successfully!");
-        return ResponseEntity.status(HttpStatus.CREATED).body(res);
+        try {
+            String ownerEmail= AuthUtils.getCurrentlyLoggedInPerson();
+            Owner owner = ownerService.findByEmail(ownerEmail);
+            Assistant assistant= EntityFactory.createAssistant(data);
+            assistant.setOwner(owner);
+            res.setMessage("Assistant added successfully!");
+            res.setData(assistantService.save(assistant));
+            return ResponseEntity.status(HttpStatus.CREATED).body(res);
+        }catch ( Exception e){
+            res.setMessage("Something happened. Please try again later.");
+            return ResponseEntity.internalServerError().body(res);
+        }
     }
 
     @DeleteMapping(value = "/delete-assistant")
