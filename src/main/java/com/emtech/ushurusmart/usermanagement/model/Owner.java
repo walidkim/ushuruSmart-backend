@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
@@ -25,12 +26,14 @@ public class Owner extends BaseAuth {
         private String phoneNumber;
         @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
         private List<Assistant> assistants;
+
         @JsonManagedReference
         @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
         private List<PaymentDetails> paymentDetails;
 
 
         @JsonManagedReference
+        @ToString.Exclude
         @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch =  FetchType.EAGER)
         private List<Product> products;
 

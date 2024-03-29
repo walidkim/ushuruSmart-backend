@@ -48,17 +48,21 @@ public class ProductController {
         ResContructor res= new ResContructor();
        try {
            Product product = productService.getById(id);
+
            if (product == null) {
                res.setMessage("No product with that Id exists");
                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
            }
-
+           long ownerId= ownerService.findByEmail(AuthUtils.getCurrentlyLoggedInPerson()).getId();
+           if(ownerId != product.getOwner().getId()){
+               res.setMessage("You are not allowed to view this product.");
+               return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
+           }
+           res.setMessage("Product fetched successfully.");
            res.setData(product);
-
-           return ResponseEntity.status(HttpStatus.OK).body(" THis "+ res.toString());
+           return ResponseEntity.status(HttpStatus.OK).body(res);
        }catch (Exception e){
-           res.setMessage(e.getLocalizedMessage());
-           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
+         return Responses.create500Response(e);
        }
 
     }
