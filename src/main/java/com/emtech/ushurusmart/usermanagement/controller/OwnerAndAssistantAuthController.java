@@ -144,7 +144,7 @@ public class OwnerAndAssistantAuthController {
             res.setMessage("Invalid email or password.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
         } catch (Exception e) {
-            res.setMessage("Error  234343" + e.getLocalizedMessage());
+            res.setMessage("Error " + e.getLocalizedMessage());
             System.out.println(e.toString());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
         }

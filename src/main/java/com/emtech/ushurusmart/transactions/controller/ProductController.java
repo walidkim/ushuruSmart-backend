@@ -1,10 +1,15 @@
 package com.emtech.ushurusmart.transactions.controller;
 
 import com.emtech.ushurusmart.transactions.entity.Product;
+import com.emtech.ushurusmart.transactions.factory.EntityFactory;
 import com.emtech.ushurusmart.transactions.service.ProductService;
 import com.emtech.ushurusmart.usermanagement.Dtos.entity.ProductDto;
+import com.emtech.ushurusmart.usermanagement.model.Owner;
 import com.emtech.ushurusmart.usermanagement.repository.OwnerRepository;
+import com.emtech.ushurusmart.usermanagement.service.OwnerService;
+import com.emtech.ushurusmart.usermanagement.utils.AuthUtils;
 import com.emtech.ushurusmart.utils.controller.ResContructor;
+import com.emtech.ushurusmart.utils.controller.Responses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/api/tax")
+@RequestMapping("/api/v1")
 public class ProductController {
 
     @Autowired
@@ -20,6 +25,10 @@ public class ProductController {
 
     @Autowired
     private OwnerRepository ownerRepository;
+
+
+    @Autowired
+    private OwnerService ownerService;
 
     @GetMapping("/products")
     public ResponseEntity<ResContructor> getAllProduct(){
@@ -57,44 +66,53 @@ public class ProductController {
         return new ResponseEntity<Product>(product, HttpStatus.OK);
     }
     @PostMapping("product/create")
-    public ResponseEntity<Product> addProduct(@RequestBody ProductDto prod){
-        Product product= new Product();
-        product.setDescription(prod.getDescription());
-        product.setName(prod.getName());
-        product.setType(prod.getType());
-        product.setUnitOfMeasure(prod.getUnitOfMeasure());
-        product.setTaxExempted(prod.isTaxExempted());
-        product.setQuantity(prod.getQuantity());
-        product.setUnitPrice(prod.getUnitPrice());
-        productService.save(product);
-        return new ResponseEntity<>(product, HttpStatus.CREATED);
+    public ResponseEntity<ResContructor> addProduct(@RequestBody ProductDto prod){
+        ResContructor res= new ResContructor();
+        try {
+            Owner owner= ownerService.findByEmail(AuthUtils.getCurrentlyLoggedInPerson());
+            Product product= EntityFactory.createProduct(prod);
+            product.setOwner(owner);
+            res.setMessage("Product created successfully!");
+            res.setData(productService.save(product));
+            return ResponseEntity.status(HttpStatus.CREATED).body(res);
+        }catch (Exception e){
+            return Responses.create500Response(e);
+        }
     }
     @PutMapping("product/update/{id}")
     public ResponseEntity<ResContructor> updateProduct(@PathVariable Integer id, @RequestBody ProductDto prod){
         ResContructor res= new ResContructor();
-        Product currentProduct = productService.getById(id);
-        if (currentProduct == null){
-            res.setMessage("No product with that id exists.");
-            return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
-        }
+       try {
+           Product currentProduct = productService.getById(id);
+           if (currentProduct == null){
+               res.setMessage("No product with that id exists.");
+               return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
+           }
 
-        currentProduct.setDescription(prod.getDescription());
-        currentProduct.setName(prod.getName());
-        currentProduct.setType(prod.getType());
-        currentProduct.setUnitOfMeasure(prod.getUnitOfMeasure());
-        currentProduct.setTaxExempted(prod.isTaxExempted());
-        currentProduct.setQuantity(prod.getQuantity());
-        currentProduct.setUnitPrice(prod.getUnitPrice());
-        currentProduct= productService.save(currentProduct);
-        res.setMessage("Product updated successfully.");
-        res.setData(currentProduct);
-        return  ResponseEntity.status(HttpStatus.OK).body(res);
+           currentProduct.setDescription(prod.getDescription());
+           currentProduct.setName(prod.getName());
+           currentProduct.setType(prod.getType());
+           currentProduct.setUnitOfMeasure(prod.getUnitOfMeasure());
+           currentProduct.setTaxExempted(prod.isTaxExempted());
+           currentProduct.setQuantity(prod.getQuantity());
+           currentProduct.setUnitPrice(prod.getUnitPrice());
+           currentProduct= productService.save(currentProduct);
+           res.setMessage("Product updated successfully.");
+           res.setData(currentProduct);
+           return  ResponseEntity.status(HttpStatus.OK).body(res);
+       } catch (Exception e){
+           return Responses.create500Response(e);
+       }
     }
     @DeleteMapping("product/delete/{id}")
     public ResponseEntity<?> deleteProduct(@PathVariable int id) {
-        ResContructor res= new ResContructor();
-        productService.delete(id);
-        res.setMessage("Product successfully deleted.");
-        return ResponseEntity.status(HttpStatus.OK).body(res);
+      try {
+          ResContructor res= new ResContructor();
+          productService.delete(id);
+          res.setMessage("Product successfully deleted.");
+          return ResponseEntity.status(HttpStatus.OK).body(res);
+      }catch ( Exception e){
+          return Responses.create500Response(e);
+      }
     }
 }

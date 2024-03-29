@@ -1,21 +1,21 @@
 package com.emtech.ushurusmart.transactions.entity;
 
+import com.emtech.ushurusmart.usermanagement.model.Owner;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 
 @Data
-@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Getter
-@Setter
 @Table(name = "products")
 public class Product {
     @Id
@@ -35,6 +35,10 @@ public class Product {
     @UpdateTimestamp
     private LocalDateTime dateUpdated;
 
-    @ManyToMany
-    private List<Transaction> transactions;
+    @ManyToMany(fetch = FetchType.EAGER)
+    private List<Transaction> transactions= new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    @JsonBackReference
+    private Owner owner;
 }

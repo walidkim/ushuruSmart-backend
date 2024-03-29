@@ -30,7 +30,7 @@ public class Transaction {
 
 
     // assume sale transaction has only one product
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<Product> products;
     private Integer productQuantity;
     private Double productUnitPrice;
