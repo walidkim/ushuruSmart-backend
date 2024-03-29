@@ -80,13 +80,18 @@ public class ProductController {
         }
     }
     @PutMapping("product/update/{id}")
-    public ResponseEntity<ResContructor> updateProduct(@PathVariable Integer id, @RequestBody ProductDto prod){
+    public ResponseEntity<ResContructor> updateProduct(@PathVariable long id, @RequestBody ProductDto prod){
         ResContructor res= new ResContructor();
        try {
            Product currentProduct = productService.getById(id);
+           Owner owner= ownerService.findByEmail(AuthUtils.getCurrentlyLoggedInPerson());
            if (currentProduct == null){
                res.setMessage("No product with that id exists.");
                return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
+           }
+           if(owner.getId() != currentProduct.getOwner().getId()){
+               res.setMessage("You are not authorized to modify this product.");
+               return  ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
            }
 
            currentProduct.setDescription(prod.getDescription());

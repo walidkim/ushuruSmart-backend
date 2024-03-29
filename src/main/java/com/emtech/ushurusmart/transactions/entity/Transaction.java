@@ -3,6 +3,8 @@ package com.emtech.ushurusmart.transactions.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -15,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @ToString
 @Table(name = "transactions")
-public class Transaction {
+public class Transaction implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
@@ -30,7 +32,7 @@ public class Transaction {
 
 
     // assume sale transaction has only one product
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER,cascade = { CascadeType.MERGE})
     private List<Product> products;
     private Integer productQuantity;
     private Double productUnitPrice;
