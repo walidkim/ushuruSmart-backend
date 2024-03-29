@@ -176,7 +176,25 @@ public class ProductControllerTest {
         assertNull(product);
 
     }
+    @Test
+    public void shouldDeleteProduct() {
+        Product prod= addProduct();
+        String url = ("http://localhost:" + port + "/api/v1/product/delete/"+ prod.getId());
+        String payload = "{\"description\": \"This is a product with a test description containing double quotes.\", \"name\": \"Amazing Product\", \"quantity\": 10, \"taxExempted\": false, \"type\": \"Gadget\", \"unitOfMeasure\": \"pcs\", \"unitPrice\": 19.99}";
+        ValidatableResponse res = given().header("Content-Type", "application/json").header("Authorization", token).body(payload).when()
+                .delete(url)
+                .then()
+                .statusCode(is(200));
 
+        List<Product> saved = productRepository.findAll();
+        assertEquals(0, saved.size());
+        String jsonString = res.body(containsString("")).extract().response().getBody().asString();
+        ProductCreatedResponse response = Utils.parseJsonString(jsonString,ProductCreatedResponse.class);
+        assertEquals(response.getMessage(), "Product deleted successfully.");
+        ProductCreatedResponse.ProductData product= response.getData();
+        assertNull( product);
+
+    }
 
     @Test
     public void shouldRefuseIfOwnerDoesNotOwnProduct() {
@@ -190,10 +208,10 @@ public class ProductControllerTest {
         ownerService.save(owner);
         prod.setOwner(owner);
         productRepository.save(prod);
-        String url = ("http://localhost:" + port + "/api/v1/product/update/"+ prod.getId());
+        String url = ("http://localhost:" + port + "/api/v1/product/delete/"+ prod.getId());
         String payload = "{\"description\": \"This is a product with a test description containing double quotes.\", \"name\": \"Amazing Product\", \"quantity\": 10, \"taxExempted\": false, \"type\": \"Gadget\", \"unitOfMeasure\": \"pcs\", \"unitPrice\": 19.99}";
         ValidatableResponse res = given().header("Content-Type", "application/json").header("Authorization", token).body(payload).when()
-                .put(url)
+                .delete(url)
                 .then()
                 .statusCode(is(401));
 
@@ -201,7 +219,7 @@ public class ProductControllerTest {
         assertEquals(1, saved.size());
         String jsonString = res.body(containsString("")).extract().response().getBody().asString();
         ProductCreatedResponse response = Utils.parseJsonString(jsonString,ProductCreatedResponse.class);
-        assertEquals(response.getMessage(), "You are not authorized to modify this product.");
+        assertEquals(response.getMessage(), "You are not authorized to delete this product.");
         ProductCreatedResponse.ProductData product= response.getData();
         assertNull(product);
 

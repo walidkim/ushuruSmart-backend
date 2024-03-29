@@ -113,8 +113,14 @@ public class ProductController {
     public ResponseEntity<?> deleteProduct(@PathVariable int id) {
       try {
           ResContructor res= new ResContructor();
+          Owner owner= ownerService.findByEmail(AuthUtils.getCurrentlyLoggedInPerson());
+          if(productService.getById(id).getOwner().getId() != owner.getId()){
+              res.setMessage("You are not authorized to delete this product.");
+              return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
+          }
+
           productService.delete(id);
-          res.setMessage("Product successfully deleted.");
+          res.setMessage("Product deleted successfully.");
           return ResponseEntity.status(HttpStatus.OK).body(res);
       }catch ( Exception e){
           return Responses.create500Response(e);
