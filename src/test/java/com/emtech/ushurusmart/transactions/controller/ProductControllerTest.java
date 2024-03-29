@@ -241,6 +241,24 @@ public class ProductControllerTest {
     }
 
 
+    @Test
+    public void shouldGetProductById() {
+        Product prod= addProduct();
+        String url = ("http://localhost:" + port + "/api/v1/products");
+        ValidatableResponse res = given().header("Content-Type", "application/json").header("Authorization", token).when()
+                .get(url)
+                .then()
+                .statusCode(is(200));
+        String jsonString = res.body(containsString("")).extract().response().getBody().asString();
+        AllProductResponse response = Utils.parseJsonString(jsonString,AllProductResponse.class);
+        assertEquals(response.getMessage(), "Products fetched successfully.");
+        List<ProductCreatedResponse.ProductData> products= response.getData();
+        assertEquals(products.size(),1);
+        assertEquals(products.get(0).getName(), "test");
+
+    }
+
+
 
 
 //    @Test
