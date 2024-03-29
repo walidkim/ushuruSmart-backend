@@ -135,6 +135,15 @@ public class ProductControllerTest {
         return productRepository.save(prod);
    }
 
+    @Transactional
+    private Product addProduct(String name){
+        Product prod= EntityFactory.createProduct(new ProductDto("test desc",name,34,false,"pcs","pcs",23.45));
+        prod= productRepository.save(prod);
+        Owner owner = ownerRepository.findAll().get(0);
+        prod.setOwner(owner);
+        return productRepository.save(prod);
+    }
+
 
 
    @Test
@@ -225,7 +234,19 @@ public class ProductControllerTest {
 
     @Test
     public void shouldGetAllProducts() {
-        Product prod= addProduct();
+        Product prod= addProduct("test1");
+        Product prod2= addProduct("test2");
+        Product prod3= addProduct("test3");
+
+        Owner owner= new Owner();
+        owner.setName("test2");
+        owner.setEmail("test2@test.com");
+        owner.setPassword("test2");
+        owner.setPhoneNumber("25489898989");
+        owner.setRole(Role.owner);
+        ownerService.save(owner);
+        prod.setOwner(owner);
+        productRepository.save(prod);
         String url = ("http://localhost:" + port + "/api/v1/products");
         ValidatableResponse res = given().header("Content-Type", "application/json").header("Authorization", token).when()
                 .get(url)
@@ -235,26 +256,58 @@ public class ProductControllerTest {
         AllProductResponse response = Utils.parseJsonString(jsonString,AllProductResponse.class);
         assertEquals(response.getMessage(), "Products fetched successfully.");
         List<ProductCreatedResponse.ProductData> products= response.getData();
-        assertEquals(products.size(),1);
-        assertEquals(products.get(0).getName(), "test");
+        assertEquals(products.size(),2);
+        assertEquals(products.get(0).getName(), "test2");
 
     }
 
 
     @Test
     public void shouldGetProductById() {
-        Product prod= addProduct();
-        String url = ("http://localhost:" + port + "/api/v1/products");
+        Product prod= addProduct("test1");
+        Product prod2= addProduct("test2");
+        Product prod3= addProduct("test3");
+
+
+        String url = ("http://localhost:" + port + "/api/v1/product/"+prod.getId());
         ValidatableResponse res = given().header("Content-Type", "application/json").header("Authorization", token).when()
                 .get(url)
                 .then()
                 .statusCode(is(200));
         String jsonString = res.body(containsString("")).extract().response().getBody().asString();
-        AllProductResponse response = Utils.parseJsonString(jsonString,AllProductResponse.class);
-        assertEquals(response.getMessage(), "Products fetched successfully.");
-        List<ProductCreatedResponse.ProductData> products= response.getData();
-        assertEquals(products.size(),1);
-        assertEquals(products.get(0).getName(), "test");
+        ProductCreatedResponse response = Utils.parseJsonString(jsonString,ProductCreatedResponse.class);
+        assertEquals(response.getMessage(), "Product fetched successfully.");
+        ProductCreatedResponse.ProductData product= response.getData();
+        assertEquals(product.getName(), "test1");
+
+    }
+
+
+    @Test
+    public void shouldRefuseIfOwnerDoesOwnProductID() {
+        Product prod= addProduct("test1");
+        Product prod2= addProduct("test2");
+        Product prod3= addProduct("test3");
+        Owner owner= new Owner();
+        owner.setName("test2");
+        owner.setEmail("test2@test.com");
+        owner.setPassword("test2");
+        owner.setPhoneNumber("25489898989");
+        owner.setRole(Role.owner);
+        ownerService.save(owner);
+        prod.setOwner(owner);
+        productRepository.save(prod);
+
+        String url = ("http://localhost:" + port + "/api/v1/product/"+prod.getId());
+        ValidatableResponse res = given().header("Content-Type", "application/json").header("Authorization", token).when()
+                .get(url)
+                .then()
+                .statusCode(is(401));
+        String jsonString = res.body(containsString("")).extract().response().getBody().asString();
+        ProductCreatedResponse response = Utils.parseJsonString(jsonString,ProductCreatedResponse.class);
+        assertEquals(response.getMessage(), "You are not allowed to view this product.");
+        ProductCreatedResponse.ProductData product= response.getData();
+        assertNull(product);
 
     }
 
