@@ -5,7 +5,6 @@ import com.emtech.ushurusmart.transactions.factory.EntityFactory;
 import com.emtech.ushurusmart.transactions.repository.ProductRepository;
 import com.emtech.ushurusmart.usermanagement.Dtos.entity.ProductDto;
 import com.emtech.ushurusmart.usermanagement.controller.Utils;
-import com.emtech.ushurusmart.usermanagement.model.Assistant;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
 import com.emtech.ushurusmart.usermanagement.model.Role;
 import com.emtech.ushurusmart.usermanagement.repository.AssistantRepository;
@@ -24,7 +23,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.annotation.Repeat;
 import org.springframework.test.context.TestPropertySource;
 
 import java.io.IOException;
@@ -225,6 +223,25 @@ public class ProductControllerTest {
 
     }
 
+    @Test
+    public void shouldGetAllProducts() {
+        Product prod= addProduct();
+        String url = ("http://localhost:" + port + "/api/v1/products");
+        ValidatableResponse res = given().header("Content-Type", "application/json").header("Authorization", token).when()
+                .get(url)
+                .then()
+                .statusCode(is(200));
+        String jsonString = res.body(containsString("")).extract().response().getBody().asString();
+        AllProductResponse response = Utils.parseJsonString(jsonString,AllProductResponse.class);
+        assertEquals(response.getMessage(), "Products fetched successfully.");
+        List<ProductCreatedResponse.ProductData> products= response.getData();
+        assertEquals(products.size(),1);
+        assertEquals(products.get(0).getName(), "test");
+
+    }
+
+
+
 
 //    @Test
 //    public void shouldRefuseTenantAdditionIflandlordDoesNotOwnUnit() throws IOException {
@@ -326,6 +343,14 @@ public class ProductControllerTest {
 //    }
 
 
+
+    @Data
+     public static  class AllProductResponse{
+        @JsonProperty("message")
+        private String message;
+        private List<ProductCreatedResponse.ProductData> data;
+
+     }
 @Data
 
     public static class ProductCreatedResponse {

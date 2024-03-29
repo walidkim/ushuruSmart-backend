@@ -32,9 +32,15 @@ public class ProductController {
 
     @GetMapping("/products")
     public ResponseEntity<ResContructor> getAllProduct(){
-        ResContructor res= new ResContructor();
-        res.setData(productService.findAll());
-        return  ResponseEntity.status(HttpStatus.CREATED).body(res);
+        try {
+            ResContructor res= new ResContructor();
+            long id= ownerService.findByEmail(AuthUtils.getCurrentlyLoggedInPerson()).getId();
+            res.setData(productService.findAllByOwnerId(id));
+            res.setMessage("Products fetched successfully.");
+            return  ResponseEntity.status(HttpStatus.OK).body(res);
+        }catch (Exception e){
+            return Responses.create500Response(e);
+        }
     }
 
     @GetMapping("product/{id}")
