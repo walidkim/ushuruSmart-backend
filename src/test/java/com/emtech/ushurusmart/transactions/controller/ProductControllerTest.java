@@ -119,11 +119,29 @@ public class ProductControllerTest {
         assertNotNull(saved);
         assertEquals(saved.getOwner().getId(), owner.getId());
         String jsonString = res.body(containsString("")).extract().response().getBody().asString();
-        ProductCreatedResponse response = Utils.parseJsonString(jsonString,ProductCreatedResponse.class);
+        ProductResponse response = Utils.parseJsonString(jsonString,ProductResponse.class);
         assertEquals(response.getMessage(), "Product created successfully!");
-        ProductCreatedResponse.ProductData product= response.getData();
+        ProductResponse.ProductData product= response.getData();
         assertNotNull(product);
         assertEquals(product.getName(),"Amazing Product");
+
+    }
+    @Test
+    public void shouldRefuseAddProductIfOwnerNotLoggedIn() {
+        String url = ("http://localhost:" + port + "/api/v1/product/create");
+        String payload = "{\"description\": \"This is a product with a test description containing double quotes.\", \"name\": \"Amazing Product\", \"quantity\": 10, \"taxExempted\": false, \"type\": \"Gadget\", \"unitOfMeasure\": \"pcs\", \"unitPrice\": 19.99}";
+        ValidatableResponse res = given().header("Content-Type", "application/json").body(payload).when()
+                .post(url)
+                .then()
+                .statusCode(is(403));
+
+        List<Product> saved = productRepository.findAll();
+        assertEquals(saved.size(),0);
+
+        String jsonString = res.body(containsString("")).extract().response().getBody().asString();
+        ErrorResponse response = Utils.parseJsonString(jsonString,ErrorResponse.class);
+        assertEquals(response.getError(), "Forbidden");
+        assertEquals(response.getPath(),"/api/v1/product/create");
 
     }
     @Transactional
@@ -159,9 +177,9 @@ public class ProductControllerTest {
         List<Product> saved = productRepository.findAll();
        assertEquals(1, saved.size());
         String jsonString = res.body(containsString("")).extract().response().getBody().asString();
-        ProductCreatedResponse response = Utils.parseJsonString(jsonString,ProductCreatedResponse.class);
+        ProductResponse response = Utils.parseJsonString(jsonString,ProductResponse.class);
         assertEquals(response.getMessage(), "Product updated successfully.");
-        ProductCreatedResponse.ProductData product= response.getData();
+        ProductResponse.ProductData product= response.getData();
         assertNotNull(product);
         assertEquals(product.getName(),"Amazing Product");
 
@@ -177,29 +195,10 @@ public class ProductControllerTest {
                 .then()
                 .statusCode(is(404));
         String jsonString = res.body(containsString("")).extract().response().getBody().asString();
-        ProductCreatedResponse response = Utils.parseJsonString(jsonString,ProductCreatedResponse.class);
+        ProductResponse response = Utils.parseJsonString(jsonString,ProductResponse.class);
         assertEquals(response.getMessage(), "No product with that id exists.");
-        ProductCreatedResponse.ProductData product= response.getData();
+        ProductResponse.ProductData product= response.getData();
         assertNull(product);
-
-    }
-    @Test
-    public void shouldDeleteProduct() {
-        Product prod= addProduct();
-        String url = ("http://localhost:" + port + "/api/v1/product/delete/"+ prod.getId());
-        String payload = "{\"description\": \"This is a product with a test description containing double quotes.\", \"name\": \"Amazing Product\", \"quantity\": 10, \"taxExempted\": false, \"type\": \"Gadget\", \"unitOfMeasure\": \"pcs\", \"unitPrice\": 19.99}";
-        ValidatableResponse res = given().header("Content-Type", "application/json").header("Authorization", token).body(payload).when()
-                .delete(url)
-                .then()
-                .statusCode(is(200));
-
-        List<Product> saved = productRepository.findAll();
-        assertEquals(0, saved.size());
-        String jsonString = res.body(containsString("")).extract().response().getBody().asString();
-        ProductCreatedResponse response = Utils.parseJsonString(jsonString,ProductCreatedResponse.class);
-        assertEquals(response.getMessage(), "Product deleted successfully.");
-        ProductCreatedResponse.ProductData product= response.getData();
-        assertNull( product);
 
     }
 
@@ -225,9 +224,9 @@ public class ProductControllerTest {
         List<Product> saved = productRepository.findAll();
         assertEquals(1, saved.size());
         String jsonString = res.body(containsString("")).extract().response().getBody().asString();
-        ProductCreatedResponse response = Utils.parseJsonString(jsonString,ProductCreatedResponse.class);
+        ProductResponse response = Utils.parseJsonString(jsonString,ProductResponse.class);
         assertEquals(response.getMessage(), "You are not authorized to delete this product.");
-        ProductCreatedResponse.ProductData product= response.getData();
+        ProductResponse.ProductData product= response.getData();
         assertNull(product);
 
     }
@@ -255,7 +254,7 @@ public class ProductControllerTest {
         String jsonString = res.body(containsString("")).extract().response().getBody().asString();
         AllProductResponse response = Utils.parseJsonString(jsonString,AllProductResponse.class);
         assertEquals(response.getMessage(), "Products fetched successfully.");
-        List<ProductCreatedResponse.ProductData> products= response.getData();
+        List<ProductResponse.ProductData> products= response.getData();
         assertEquals(products.size(),2);
         assertEquals(products.get(0).getName(), "test2");
 
@@ -275,9 +274,9 @@ public class ProductControllerTest {
                 .then()
                 .statusCode(is(200));
         String jsonString = res.body(containsString("")).extract().response().getBody().asString();
-        ProductCreatedResponse response = Utils.parseJsonString(jsonString,ProductCreatedResponse.class);
+        ProductResponse response = Utils.parseJsonString(jsonString,ProductResponse.class);
         assertEquals(response.getMessage(), "Product fetched successfully.");
-        ProductCreatedResponse.ProductData product= response.getData();
+        ProductResponse.ProductData product= response.getData();
         assertEquals(product.getName(), "test1");
 
     }
@@ -304,10 +303,58 @@ public class ProductControllerTest {
                 .then()
                 .statusCode(is(401));
         String jsonString = res.body(containsString("")).extract().response().getBody().asString();
-        ProductCreatedResponse response = Utils.parseJsonString(jsonString,ProductCreatedResponse.class);
+        ProductResponse response = Utils.parseJsonString(jsonString,ProductResponse.class);
         assertEquals(response.getMessage(), "You are not allowed to view this product.");
-        ProductCreatedResponse.ProductData product= response.getData();
+        ProductResponse.ProductData product= response.getData();
         assertNull(product);
+
+    }
+
+    @Test
+    public void shouldDeleteProduct() {
+        Product prod= addProduct();
+        String url = ("http://localhost:" + port + "/api/v1/product/delete/"+ prod.getId());
+       ValidatableResponse res = given().header("Content-Type", "application/json").header("Authorization", token).when()
+                .delete(url)
+                .then()
+                .statusCode(is(200));
+
+        List<Product> saved = productRepository.findAll();
+        assertEquals(0, saved.size());
+        String jsonString = res.body(containsString("")).extract().response().getBody().asString();
+        ProductResponse response = Utils.parseJsonString(jsonString,ProductResponse.class);
+        assertEquals(response.getMessage(), "Product deleted successfully.");
+        ProductResponse.ProductData product= response.getData();
+        assertNull( product);
+
+    }
+    @Test
+    public void shouldRefuseDeletionIfProductDoesntBelongToOwner() {
+        Product prod= addProduct("test1");
+        Product prod2= addProduct("test2");
+        Product prod3= addProduct("test3");
+        Owner owner= new Owner();
+        owner.setName("test2");
+        owner.setEmail("test2@test.com");
+        owner.setPassword("test2");
+        owner.setPhoneNumber("25489898989");
+        owner.setRole(Role.owner);
+        ownerService.save(owner);
+        prod.setOwner(owner);
+        productRepository.save(prod);
+        String url = ("http://localhost:" + port + "/api/v1/product/delete/"+ prod.getId());
+       ValidatableResponse res = given().header("Content-Type", "application/json").header("Authorization", token).when()
+                .delete(url)
+                .then()
+                .statusCode(is(200));
+
+        List<Product> saved = productRepository.findAll();
+        assertEquals(0, saved.size());
+        String jsonString = res.body(containsString("")).extract().response().getBody().asString();
+        ProductResponse response = Utils.parseJsonString(jsonString,ProductResponse.class);
+        assertEquals(response.getMessage(), "You are not authorized to delete this product.");
+        ProductResponse.ProductData product= response.getData();
+        assertNull( product);
 
     }
 
@@ -419,12 +466,12 @@ public class ProductControllerTest {
      public static  class AllProductResponse{
         @JsonProperty("message")
         private String message;
-        private List<ProductCreatedResponse.ProductData> data;
+        private List<ProductResponse.ProductData> data;
 
      }
 @Data
 
-    public static class ProductCreatedResponse {
+    public static class ProductResponse {
 
         @JsonProperty("message")
         private String message;
@@ -467,6 +514,23 @@ public class ProductControllerTest {
             @JsonProperty("transactions")
             private Object transactions; // Placeholder for potential transactions data
         }
+    }
+
+
+    @Data
+    public static  class ErrorResponse {
+
+        @JsonProperty("timestamp")
+        private String timestamp;
+
+        @JsonProperty("status")
+        private int status;
+
+        @JsonProperty("error")
+        private String error;
+
+        @JsonProperty("path")
+        private String path;
     }
 
 
