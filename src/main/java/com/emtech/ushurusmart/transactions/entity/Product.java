@@ -1,5 +1,6 @@
 package com.emtech.ushurusmart.transactions.entity;
 
+import com.emtech.ushurusmart.Etims.entity.Transaction;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
@@ -24,13 +25,19 @@ public class Product implements Serializable {
     private Long id;
     private String name;
     @Column(nullable = false)
-    private Double unitPrice;
-    private String unitOfMeasure;
+    private double unitPrice;
+
     @Column(nullable = false)
-    private Boolean taxExempted;
+    private String unitOfMeasure;
+
+    @Column(nullable = false)
     private Integer quantity;
+
+    @Column(nullable = false)
     private String description;
-    private String type;
+
+    @Column(nullable = false)
+    private boolean taxable;
     @CreationTimestamp
     private LocalDateTime dateCreated;
     @UpdateTimestamp
