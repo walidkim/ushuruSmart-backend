@@ -346,10 +346,10 @@ public class ProductControllerTest {
        ValidatableResponse res = given().header("Content-Type", "application/json").header("Authorization", token).when()
                 .delete(url)
                 .then()
-                .statusCode(is(200));
+                .statusCode(is(401));
 
         List<Product> saved = productRepository.findAll();
-        assertEquals(0, saved.size());
+        assertEquals(3, saved.size());
         String jsonString = res.body(containsString("")).extract().response().getBody().asString();
         ProductResponse response = Utils.parseJsonString(jsonString,ProductResponse.class);
         assertEquals(response.getMessage(), "You are not authorized to delete this product.");
