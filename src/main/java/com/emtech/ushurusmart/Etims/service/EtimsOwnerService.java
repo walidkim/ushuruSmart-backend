@@ -1,16 +1,16 @@
-package com.emtech.ushurusmart.usermanagement.service;
+package com.emtech.ushurusmart.Etims.service;
 
-import com.emtech.ushurusmart.usermanagement.model.Etims;
-import com.emtech.ushurusmart.usermanagement.repository.EtimsRepository;
+import com.emtech.ushurusmart.Etims.entity.Etims;
+import com.emtech.ushurusmart.Etims.repository.EtimsRepository;
 
-import java.util.ArrayList;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static com.emtech.ushurusmart.utils.service.GeneratorService.generateRandomString;
+
 @Service
-public class AdminService {
+public class EtimsOwnerService {
 
     @Autowired
     private EtimsRepository etimsRepository;
@@ -23,9 +23,13 @@ public class AdminService {
             return null;
     }
 
-    public Etims etimsSave(Etims data) {
-        return etimsRepository.save(data);
 
+
+    public Etims save(Etims data) {
+        data.setEtimsCode(generateRandomString(32));
+        Etims res = etimsRepository.save(data);
+        System.out.println(res);
+       return res;
     }
 
     public Etims etimsUpdate(Etims data) {
@@ -51,5 +55,9 @@ public class AdminService {
         Optional<Etims> result = etimsRepository.findByBusinessOwnerKRAPin(businessOwnerKRAPin);
         return result.orElse(null);
 
+    }
+
+    public long count() {
+        return etimsRepository.count();
     }
 }

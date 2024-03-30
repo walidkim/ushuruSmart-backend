@@ -3,13 +3,10 @@ package com.emtech.ushurusmart.usermanagement.controller;
 import com.emtech.ushurusmart.usermanagement.Dtos.LoginRequest;
 import com.emtech.ushurusmart.usermanagement.Dtos.OwnerDto;
 import com.emtech.ushurusmart.usermanagement.Dtos.auth.OwnerLoginRes;
-import com.emtech.ushurusmart.usermanagement.Dtos.auth.OwnerSignUp;
 import com.emtech.ushurusmart.usermanagement.factory.EntityFactory;
 import com.emtech.ushurusmart.usermanagement.model.Assistant;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
-import com.emtech.ushurusmart.usermanagement.model.Role;
 import com.emtech.ushurusmart.usermanagement.service.AssistantService;
-import com.emtech.ushurusmart.usermanagement.service.KraPINValidator;
 import com.emtech.ushurusmart.usermanagement.service.OwnerService;
 import com.emtech.ushurusmart.usermanagement.service.jwtServices.JwtTokenUtil;
 import com.emtech.ushurusmart.utils.controller.ResContructor;
@@ -23,7 +20,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,8 +30,7 @@ public class OwnerAndAssistantAuthController {
 
     @Autowired
     private OwnerService ownerService;
-    @Autowired
-    private KraPINValidator kraPINValidator;
+
 
     @Autowired
     private AssistantService assistantService;
@@ -103,7 +98,7 @@ public class OwnerAndAssistantAuthController {
                     resData.setId(owner.getId());
                     resData.setEmail(owner.getEmail());
                     resData.setBusinessKRAPin(owner.getBusinessKRAPin());
-                    resData.setBusinessOwnerKRAPin(owner.getBusinessOwnerKRAPin());
+                    resData.setBusinessOwnerKRAPin(owner.getBusinessKRAPin());
                     resData.setPhoneNumber(owner.getPhoneNumber());
                     responseData.put("owner", resData);
                     responseData.put("token", token);
@@ -144,7 +139,7 @@ public class OwnerAndAssistantAuthController {
             res.setMessage("Invalid email or password.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
         } catch (Exception e) {
-            res.setMessage("Error " + e.getLocalizedMessage());
+            res.setMessage("Error  234343" + e.getLocalizedMessage());
             System.out.println(e.toString());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
         }

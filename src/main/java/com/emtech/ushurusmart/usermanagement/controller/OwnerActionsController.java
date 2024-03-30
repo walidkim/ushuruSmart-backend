@@ -36,7 +36,7 @@ public class OwnerActionsController {
         owner.setName(newOwner.getName());
         owner.setPhoneNumber(newOwner.getPhoneNumber());
         owner.setBusinessKRAPin(newOwner.getBusinessKRAPin());
-        owner.setBusinessOwnerKRAPin(newOwner.getBusinessOwnerKRAPin());
+        owner.setKRAPin(newOwner.getKRAPin());
 
         ownerService.save(owner);
 

@@ -1,7 +1,7 @@
 package com.emtech.ushurusmart.usermanagement.service;
 
-import com.emtech.ushurusmart.usermanagement.model.Etims;
-import com.emtech.ushurusmart.usermanagement.repository.EtimsRepository;
+import com.emtech.ushurusmart.Etims.entity.Etims;
+import com.emtech.ushurusmart.Etims.service.EtimsOwnerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -12,23 +12,21 @@ import java.util.List;
 @Component
 public class SampleDataInitializer {
 
-    private final EtimsRepository etimsRepository;
-
     @Autowired
-    public SampleDataInitializer(EtimsRepository etimsRepository) {
-        this.etimsRepository = etimsRepository;
-    }
+    private EtimsOwnerService ownerService;
+
 
     public void initSampleData() {
         // Add sample data for Etims class
         List<Etims> etimsSampleDataList = getEtimsSampleDataList();
         for (Etims etims : etimsSampleDataList) {
-            etimsRepository.save(etims);
+            ownerService.save(etims);
         }
+
     }
 
     public List<Etims> getEtimsSampleDataList() {
-        if( etimsRepository.count() ==0 ){
+        if(ownerService.count() ==0 ){
             List<Etims> etimsSampleDataList = new ArrayList<>();
             etimsSampleDataList.add(new Etims("P012345678Z", "A012345678B", "Green Energy Solutions Ltd"));
             etimsSampleDataList.add(new Etims("P098765432Z", "A098765432B", "SolarTech Innovations Ltd"));

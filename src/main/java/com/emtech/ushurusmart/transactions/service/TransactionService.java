@@ -1,8 +1,8 @@
 package com.emtech.ushurusmart.transactions.service;
 
 import org.springframework.stereotype.Service;
-import com.emtech.ushurusmart.transactions.entity.Transaction;
-import com.emtech.ushurusmart.transactions.repository.TransactionRepository;
+import com.emtech.ushurusmart.Etims.entity.Transaction;
+import com.emtech.ushurusmart.Etims.repository.TransactionRepository;
 import java.util.List;
 
 @Service

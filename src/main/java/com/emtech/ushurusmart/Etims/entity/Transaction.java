@@ -1,5 +1,6 @@
-package com.emtech.ushurusmart.transactions.entity;
+package com.emtech.ushurusmart.Etims.entity;
 
+import com.emtech.ushurusmart.transactions.entity.Product;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -11,11 +12,8 @@ import java.util.List;
 
 @Entity
 @Data
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Table(name = "transactions")
 public class Transaction implements Serializable {
     @Id
@@ -23,18 +21,22 @@ public class Transaction implements Serializable {
     private Long id;
     @Column(nullable = false)
     private Double amount;
+
+    @Column(nullable = false)
+    private Double tax;
+
+    @Column(nullable = false)
+    private String ownerPin;
     @Column(nullable = false)
     private String buyerPin;
-    private Boolean taxExemption;
+
+    @Column(nullable = false)
+    private boolean taxable;
     private String invoiceNumber;
+
+    private String etimsNumber;
     @CreationTimestamp
     private LocalDateTime dateCreated;
 
 
-    // assume sale transaction has only one product
-    @ManyToMany(fetch = FetchType.EAGER,cascade = { CascadeType.MERGE})
-    private List<Product> products;
-    private Integer productQuantity;
-    private Double productUnitPrice;
-    private String productName;
 }

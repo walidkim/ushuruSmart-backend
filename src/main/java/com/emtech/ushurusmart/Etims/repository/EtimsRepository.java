@@ -1,6 +1,6 @@
-package com.emtech.ushurusmart.usermanagement.repository;
+package com.emtech.ushurusmart.Etims.repository;
 
-import com.emtech.ushurusmart.usermanagement.model.Etims;
+import com.emtech.ushurusmart.Etims.entity.Etims;
 
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;

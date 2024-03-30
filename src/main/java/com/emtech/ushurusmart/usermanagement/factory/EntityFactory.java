@@ -15,7 +15,7 @@ public class EntityFactory {
         owner.setName(data.getName());
         owner.setEmail(data.getEmail());
         owner.setBusinessKRAPin((data.getBusinessKRAPin()));
-        owner.setBusinessOwnerKRAPin(data.getBusinessOwnerKRAPin());
+        owner.setKRAPin(data.getBusinessOwnerKRAPin());
         owner.setPassword(data.getPassword());
         return owner;
     }
