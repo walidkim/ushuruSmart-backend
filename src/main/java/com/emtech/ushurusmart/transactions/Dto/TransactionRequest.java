@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TransactionRequest {
     private String buyerKRAPin;
-    private String type;
-    private double price;
+    private long productId;
+    private int quantity;
 }

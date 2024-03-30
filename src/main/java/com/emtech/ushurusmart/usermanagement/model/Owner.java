@@ -19,10 +19,8 @@ import java.util.List;
 @Entity
 @Table(name = "owners")
 public class Owner extends BaseAuth {
-
-
         private String businessKRAPin;
-        private String businessOwnerKRAPin;
+        private String KRAPin;
         private String phoneNumber;
         @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
         private List<Assistant> assistants;
@@ -37,10 +35,6 @@ public class Owner extends BaseAuth {
         @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch =  FetchType.EAGER)
         private List<Product> products;
 
-
-        public void addProduct(Product prod){
-                this.products.add(prod);
-        }
 
         @Override
         public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -73,4 +67,5 @@ public class Owner extends BaseAuth {
         public boolean isEnabled() {
                 return true;
         }
+
 }

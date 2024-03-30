@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.emtech.ushurusmart.transactions.Dto.TransactionReportRequest;
-import com.emtech.ushurusmart.transactions.repository.TransactionRepository;
+import com.emtech.ushurusmart.Etims.repository.TransactionRepository;
 
 @RestController
 @RequestMapping("/api/tax/report")
