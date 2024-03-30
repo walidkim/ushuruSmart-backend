@@ -90,7 +90,7 @@ public class ProductController {
         }
     }
     @PutMapping("product/update/{id}")
-    public ResponseEntity<ResContructor> updateProduct(@PathVariable long id, @RequestBody ProductDto prod){
+    public ResponseEntity<ResContructor> updateProduct(@PathVariable long id, @RequestBody ProductDto data){
         ResContructor res= new ResContructor();
        try {
            Product currentProduct = productService.getById(id);
@@ -103,15 +103,7 @@ public class ProductController {
                res.setMessage("You are not authorized to modify this product.");
                return  ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
            }
-
-           currentProduct.setDescription(prod.getDescription());
-           currentProduct.setName(prod.getName());
-           currentProduct.setType(prod.getType());
-           currentProduct.setUnitOfMeasure(prod.getUnitOfMeasure());
-           currentProduct.setTaxExempted(prod.isTaxExempted());
-           currentProduct.setQuantity(prod.getQuantity());
-           currentProduct.setUnitPrice(prod.getUnitPrice());
-           currentProduct= productService.save(currentProduct);
+           currentProduct= productService.save(EntityFactory.updateProduct(currentProduct,data));
            res.setMessage("Product updated successfully.");
            res.setData(currentProduct);
            return  ResponseEntity.status(HttpStatus.OK).body(res);

@@ -32,7 +32,6 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 
@@ -493,8 +492,8 @@ public class ProductControllerTest {
             @JsonProperty("unitOfMeasure")
             private String unitOfMeasure;
 
-            @JsonProperty("taxExempted")
-            private boolean taxExempted;
+            @JsonProperty("taxable")
+            private boolean taxable;
 
             @JsonProperty("quantity")
             private int quantity;
@@ -502,8 +501,6 @@ public class ProductControllerTest {
             @JsonProperty("description")
             private String description;
 
-            @JsonProperty("type")
-            private String type;
 
             @JsonProperty("dateCreated")
             private String dateCreated;
