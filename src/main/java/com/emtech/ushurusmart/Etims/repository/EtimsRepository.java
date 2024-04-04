@@ -1,12 +1,15 @@
 package com.emtech.ushurusmart.Etims.repository;
 
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
 import com.emtech.ushurusmart.Etims.entity.Etims;
 
 import jakarta.transaction.Transactional;
-import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.Optional;
-
+@Repository
 public interface EtimsRepository extends JpaRepository<Etims, Long> {
     // @Query("SELECT e.businessKRAPins FROM Etims e")
     // List<String> findAllBusinessKraPins();
@@ -20,6 +23,7 @@ public interface EtimsRepository extends JpaRepository<Etims, Long> {
 
     // Find etims by business owner kra pin
     Optional<Etims> findByBusinessOwnerKRAPin(String businessOwnerKRAPin);
-        @Transactional
+
+    @Transactional
     void deleteByBusinessOwnerKRAPin(String businessOwnerKRAPin);
 }
