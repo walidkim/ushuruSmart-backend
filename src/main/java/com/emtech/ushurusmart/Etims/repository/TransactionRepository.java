@@ -4,13 +4,15 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import com.emtech.ushurusmart.Etims.entity.Transaction;
+import com.emtech.ushurusmart.Etims.entity.EtimsTransaction;
 
-public interface TransactionRepository extends JpaRepository<Transaction, Long> {
-    Transaction getByBuyerPin(String buyerPin);
+@Repository
+public interface TransactionRepository extends JpaRepository<EtimsTransaction, Long> {
+    EtimsTransaction getByBuyerPin(String buyerPin);
 
-    Transaction findByInvoiceNumber(String invoiceNumber);
+    EtimsTransaction findByInvoiceNumber(String invoiceNumber);
 
-    List<Transaction> findByDateCreatedBetween(LocalDateTime startDate, LocalDateTime endDate);
+    List<EtimsTransaction> findByDateCreatedBetween(LocalDateTime startDate, LocalDateTime endDate);
 }
