@@ -1,17 +1,9 @@
 package com.emtech.ushurusmart.transactions.controller;
 
-import com.emtech.ushurusmart.Etims.Dtos.controller.TransactionDto;
-import com.emtech.ushurusmart.Etims.controller.EtimTransactionController;
-import com.emtech.ushurusmart.transactions.Dto.TransactionRequest;
-import com.emtech.ushurusmart.transactions.entity.Product;
-import com.emtech.ushurusmart.transactions.service.InvoiceService;
-import com.emtech.ushurusmart.transactions.service.ProductService;
-import com.emtech.ushurusmart.transactions.service.TaxCalculator;
-import com.emtech.ushurusmart.usermanagement.model.Owner;
-import com.emtech.ushurusmart.usermanagement.service.OwnerService;
-import com.emtech.ushurusmart.usermanagement.utils.AuthUtils;
-import com.emtech.ushurusmart.utils.controller.ResContructor;
-import lombok.Data;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
@@ -23,10 +15,24 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.emtech.ushurusmart.Etims.Dtos.controller.TransactionDto;
+import com.emtech.ushurusmart.Etims.controller.EtimTransactionController;
+import com.emtech.ushurusmart.transactions.Dto.TransactionRequest;
+import com.emtech.ushurusmart.transactions.entity.Product;
+import com.emtech.ushurusmart.transactions.service.InvoiceService;
+import com.emtech.ushurusmart.transactions.service.ProductService;
+import com.emtech.ushurusmart.transactions.service.TaxCalculator;
+import com.emtech.ushurusmart.usermanagement.model.Owner;
+import com.emtech.ushurusmart.usermanagement.service.OwnerService;
+import com.emtech.ushurusmart.usermanagement.utils.AuthUtils;
+import com.emtech.ushurusmart.utils.controller.ResContructor;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import lombok.Data;
+
 
 @RestController
 @RequestMapping("/api/v1/tax")
@@ -36,7 +42,6 @@ public class TransactionController {
 
     @Autowired
     private OwnerService ownerService;
-
 
     @Autowired
     private ProductService productService;
@@ -48,15 +53,16 @@ public class TransactionController {
 
     @PostMapping("/make-transaction")
     public ResponseEntity<?> makeTransaction(@RequestBody TransactionRequest data) throws IOException {
-        TransactionDto etimReq= new TransactionDto();
+        TransactionDto etimReq = new TransactionDto();
         Owner owner = ownerService.findByEmail(AuthUtils.getCurrentlyLoggedInPerson());
-        Product product= productService.findById(data.getProductId());
+        Product product = productService.findById(data.getProductId());
         etimReq.setOwnerPin(owner.getKRAPin());
         etimReq.setTaxable(product.isTaxable());
         etimReq.setAmount(product.getUnitPrice() * data.getQuantity());
         etimReq.setBussinessPin(owner.getBusinessKRAPin());
         etimReq.setBuyerPin(data.getBuyerKRAPin());
         ResponseEntity<ResContructor> response = etimTransactionController.makeTransaction(etimReq);
+
         if(response.getStatusCode()==HttpStatus.NOT_FOUND){
             return response;
         }
@@ -65,19 +71,19 @@ public class TransactionController {
         products.add(new InvoiceService.ProductInfo(data.getProductId(),data.getQuantity()));
 
 
-       byte[] invoice = pdfService.generateInvoice(data.getBuyerKRAPin(),products,parsed);
+
+        byte[] invoice = pdfService.generateInvoice(data.getBuyerKRAPin(), products, parsed);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);
         headers.setContentDispositionFormData("attachment", "invoice-test.pdf");
 
-// Wrap the byte array in a ByteArrayResource
-           ByteArrayResource resource = new ByteArrayResource(invoice);
+        // Wrap the byte array in a ByteArrayResource
+        ByteArrayResource resource = new ByteArrayResource(invoice);
 
-// Return the ResponseEntity with the resource as the body
-        return new ResponseEntity<>(resource,headers, HttpStatus.CREATED);
+        // Return the ResponseEntity with the resource as the body
+        return new ResponseEntity<>(resource, headers, HttpStatus.CREATED);
 
     }
-
 
     @Data
     public static class TransactionData {
@@ -132,8 +138,5 @@ public class TransactionController {
             }
         }
     }
-
-
-
 
 }
