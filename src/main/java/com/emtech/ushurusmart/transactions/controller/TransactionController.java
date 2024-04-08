@@ -27,7 +27,12 @@ import com.emtech.ushurusmart.usermanagement.service.OwnerService;
 import com.emtech.ushurusmart.usermanagement.utils.AuthUtils;
 import com.emtech.ushurusmart.utils.controller.ResContructor;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import lombok.Data;
+
 
 @RestController
 @RequestMapping("/api/v1/tax")
@@ -57,9 +62,15 @@ public class TransactionController {
         etimReq.setBussinessPin(owner.getBusinessKRAPin());
         etimReq.setBuyerPin(data.getBuyerKRAPin());
         ResponseEntity<ResContructor> response = etimTransactionController.makeTransaction(etimReq);
-        TransactionData parsed = new TransactionData(response.getBody().getData().toString());
-        List<InvoiceService.ProductInfo> products = new ArrayList<>();
-        products.add(new InvoiceService.ProductInfo(data.getProductId(), data.getQuantity()));
+
+        if(response.getStatusCode()==HttpStatus.NOT_FOUND){
+            return response;
+        }
+        TransactionData parsed= new TransactionData(Objects.requireNonNull(response.getBody()).getData().toString());
+        List<InvoiceService.ProductInfo> products= new ArrayList<>();
+        products.add(new InvoiceService.ProductInfo(data.getProductId(),data.getQuantity()));
+
+
 
         byte[] invoice = pdfService.generateInvoice(data.getBuyerKRAPin(), products, parsed);
         HttpHeaders headers = new HttpHeaders();
