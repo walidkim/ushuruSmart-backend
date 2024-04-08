@@ -2,10 +2,10 @@ package com.emtech.ushurusmart.Etims.service;
 
 import com.emtech.ushurusmart.Etims.entity.Etims;
 import com.emtech.ushurusmart.Etims.repository.EtimsRepository;
-
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 import static com.emtech.ushurusmart.utils.service.GeneratorService.generateRandomString;
 
@@ -53,6 +53,12 @@ public class EtimsOwnerService {
 
     public Etims findByBusinessOwnerKRAPin(String businessOwnerKRAPin) {
         Optional<Etims> result = etimsRepository.findByBusinessOwnerKRAPin(businessOwnerKRAPin);
+        return result.orElse(null);
+
+    }
+
+    public Etims findByBusinnessKRAPin(String businessKRAPin) {
+        Optional<Etims> result = etimsRepository.findByBusinessKRAPin(businessKRAPin);
         return result.orElse(null);
 
     }

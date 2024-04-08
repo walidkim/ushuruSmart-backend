@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/v1/tax")
@@ -56,7 +57,10 @@ public class TransactionController {
         etimReq.setBussinessPin(owner.getBusinessKRAPin());
         etimReq.setBuyerPin(data.getBuyerKRAPin());
         ResponseEntity<ResContructor> response = etimTransactionController.makeTransaction(etimReq);
-        TransactionData parsed= new TransactionData(response.getBody().getData().toString());
+        if(response.getStatusCode()==HttpStatus.NOT_FOUND){
+            return response;
+        }
+        TransactionData parsed= new TransactionData(Objects.requireNonNull(response.getBody()).getData().toString());
         List<InvoiceService.ProductInfo> products= new ArrayList<>();
         products.add(new InvoiceService.ProductInfo(data.getProductId(),data.getQuantity()));
 
