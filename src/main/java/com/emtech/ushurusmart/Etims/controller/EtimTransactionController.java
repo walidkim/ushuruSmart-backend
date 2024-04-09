@@ -1,7 +1,7 @@
 package com.emtech.ushurusmart.Etims.controller;
 
 import com.emtech.ushurusmart.Etims.Dtos.controller.TransactionDto;
-import com.emtech.ushurusmart.Etims.entity.Transaction;
+import com.emtech.ushurusmart.Etims.entity.EtimsTransaction;
 import com.emtech.ushurusmart.Etims.factory.EntityFactory;
 import com.emtech.ushurusmart.Etims.service.EtimsOwnerService;
 import com.emtech.ushurusmart.Etims.service.EtimsTransactionService;
@@ -38,12 +38,12 @@ public class EtimTransactionController {
                res.setMessage("Business is not registered by Etims.");
                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
             }
-            Transaction transaction= EntityFactory.createTransaction(data);
+            EtimsTransaction transaction= EntityFactory.createTransaction(data);
 
             double tax = taxCalculatorService.calculateTax(data.isTaxable(), data.getAmount());
             transaction.setTax(tax);
 
-            Transaction saved= transactionService.save(transaction);
+            EtimsTransaction saved= transactionService.save(transaction);
 
             res.setData(saved);
             return ResponseEntity.status(HttpStatus.CREATED).body(res);

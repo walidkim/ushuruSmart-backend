@@ -1,7 +1,8 @@
-package com.emtech.ushurusmart.transactions.entity;
+package com.emtech.ushurusmart.Etims.entity;
 
 import java.time.LocalDateTime;
 
+import com.emtech.ushurusmart.transactions.entity.Product;
 import org.hibernate.annotations.CreationTimestamp;
 
 import jakarta.persistence.Column;
