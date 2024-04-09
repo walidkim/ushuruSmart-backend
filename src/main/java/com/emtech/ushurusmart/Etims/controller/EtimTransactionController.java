@@ -5,7 +5,7 @@ import com.emtech.ushurusmart.Etims.entity.Transaction;
 import com.emtech.ushurusmart.Etims.factory.EntityFactory;
 import com.emtech.ushurusmart.Etims.service.EtimsOwnerService;
 import com.emtech.ushurusmart.Etims.service.EtimsTransactionService;
-import com.emtech.ushurusmart.transactions.service.TaxCalculator;
+import com.emtech.ushurusmart.Etims.service.TaxCalculator;
 import com.emtech.ushurusmart.utils.controller.ResContructor;
 import com.emtech.ushurusmart.utils.controller.Responses;
 import org.springframework.beans.factory.annotation.Autowired;

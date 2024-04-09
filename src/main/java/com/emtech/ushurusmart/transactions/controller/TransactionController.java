@@ -6,7 +6,7 @@ import com.emtech.ushurusmart.transactions.Dto.TransactionRequest;
 import com.emtech.ushurusmart.transactions.entity.Product;
 import com.emtech.ushurusmart.transactions.service.InvoiceService;
 import com.emtech.ushurusmart.transactions.service.ProductService;
-import com.emtech.ushurusmart.transactions.service.TaxCalculator;
+import com.emtech.ushurusmart.Etims.service.TaxCalculator;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
 import com.emtech.ushurusmart.usermanagement.service.OwnerService;
 import com.emtech.ushurusmart.usermanagement.utils.AuthUtils;
