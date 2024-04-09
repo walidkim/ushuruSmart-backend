@@ -11,5 +11,5 @@ public interface OwnerRepository extends JpaRepository<Owner, Long> {
     Owner deleteByEmail(String email);
 
 
-
+    Owner findByPhoneNumber(String phoneNumber);
 }

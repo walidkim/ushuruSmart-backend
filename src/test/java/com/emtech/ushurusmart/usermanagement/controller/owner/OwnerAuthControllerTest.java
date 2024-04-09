@@ -72,8 +72,9 @@ public class OwnerAuthControllerTest {
 
     private void signUp(String name, String email, String password) {
 
-        String signupRequestJson = String.format("{\"name\":\"%s\",\"password\":\"%s\",\"email\":\"%s\"}", name,
-                password, email);
+        String signupRequestJson = String.format( "{\"name\":\"John Doe\",\"password\":\"strongpassword123\",\"email\":\"johndoe@example.com\",\"businessKRAPin\":\"123456789\",\"businessOwnerKRAPin\":\"987654321\",\"phoneNumber\":\"+1234567890\"}");
+
+        password, email);
         given().header("Content-Type",
                         "application/json").body(signupRequestJson).when()
                 .post(signUpUrl)

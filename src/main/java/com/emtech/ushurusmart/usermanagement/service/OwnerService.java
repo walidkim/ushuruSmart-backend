@@ -28,4 +28,8 @@ public class OwnerService {
     public Owner deleteByEmail(String email) {
         return ownerRepository.deleteByEmail(email);
     }
+
+    public Owner findByPhoneNumber(String phoneNumber) {
+        return ownerRepository.findByPhoneNumber(phoneNumber);
+    }
 }

@@ -2,6 +2,7 @@ package com.emtech.ushurusmart.usermanagement.controller;
 
 import com.emtech.ushurusmart.usermanagement.Dtos.LoginRequest;
 import com.emtech.ushurusmart.usermanagement.Dtos.OwnerDto;
+import com.emtech.ushurusmart.usermanagement.Dtos.auth.OtpDataDto;
 import com.emtech.ushurusmart.usermanagement.Dtos.auth.OwnerLoginRes;
 import com.emtech.ushurusmart.usermanagement.factory.EntityFactory;
 import com.emtech.ushurusmart.usermanagement.model.Assistant;
@@ -10,6 +11,7 @@ import com.emtech.ushurusmart.usermanagement.service.AssistantService;
 import com.emtech.ushurusmart.usermanagement.service.OwnerService;
 import com.emtech.ushurusmart.usermanagement.service.jwtServices.JwtTokenUtil;
 import com.emtech.ushurusmart.utils.controller.ResContructor;
+import com.emtech.ushurusmart.utils.otp.OTPService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,6 +32,10 @@ public class OwnerAndAssistantAuthController {
 
     @Autowired
     private OwnerService ownerService;
+
+
+    @Autowired
+    private OTPService otpService;
 
 
     @Autowired
@@ -84,29 +90,15 @@ public class OwnerAndAssistantAuthController {
                     Authentication authentication = authenticationManager
                             .authenticate(new UsernamePasswordAuthenticationToken(loginReq.getEmail(),
                                     loginReq.getPassword(),owner.getAuthorities() != null ? owner.getAuthorities() : Collections.emptyList()));
-
-
-                    String token = jwtUtil.createToken(owner);
-                    res.setMessage("Login successful!");
-
-
-
-
-                    Map<String, Object> responseData = new HashMap<>();
-                    OwnerLoginRes resData= new OwnerLoginRes();
-                    resData.setName(owner.getName());
-                    resData.setId(owner.getId());
-                    resData.setEmail(owner.getEmail());
-                    resData.setBusinessKRAPin(owner.getBusinessKRAPin());
-                    resData.setBusinessOwnerKRAPin(owner.getBusinessKRAPin());
-                    resData.setPhoneNumber(owner.getPhoneNumber());
-                    responseData.put("owner", resData);
-                    responseData.put("token", token);
-
-                    res.setData(responseData);
-
+                    otpService.sendOTP(owner.getPhoneNumber());
+                    res.setMessage("Sent an otp short code to your phone for verification");
+                    Map<String,String> resBody= new HashMap<>();
+                    resBody.put("type", type);
+                    resBody.put("phoneNumber", owner.getPhoneNumber());
+                    res.setData(resBody);
                     return ResponseEntity.status(HttpStatus.CREATED).body(res);
-                }
+
+              }
                 case "assistant": {
 
                     Assistant assistant = assistantService.findByEmail(loginReq.getEmail());
@@ -131,6 +123,56 @@ public class OwnerAndAssistantAuthController {
                 default:
                     res.setMessage(HelperUtil.capitalizeFirst(type) + " is invalid");
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+
+            }
+
+        } catch (BadCredentialsException e) {
+            res.setMessage("Invalid email or password.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
+        } catch (Exception e) {
+            res.setMessage("Error  234343" + e.getLocalizedMessage());
+            System.out.println(e.toString());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
+        }
+    }
+
+
+    @PostMapping(value = "/verify-otp")
+    public ResponseEntity<?> verifyOtp(@RequestBody OtpDataDto req) {
+        ResContructor res = new ResContructor();
+        try {
+            if(!otpService.verifyOTP(req.getPhoneNumber(),req.getOptCode())){
+                throw new BadCredentialsException("Invalid otpCode");
+            }
+
+            switch (req.getType()){
+                case "owner":{
+                    Owner owner = ownerService.findByPhoneNumber(req.getPhoneNumber());
+                    if(owner==null){
+                        throw new BadCredentialsException("Invalid owner");
+                    }
+                    OwnerLoginRes resData= new OwnerLoginRes();
+                    resData.setName(owner.getName());
+                    resData.setId(owner.getId());
+                    resData.setEmail(owner.getEmail());
+                    resData.setBusinessKRAPin(owner.getBusinessKRAPin());
+                    resData.setBusinessOwnerKRAPin(owner.getBusinessKRAPin());
+                    resData.setPhoneNumber(owner.getPhoneNumber());
+
+                    String token = jwtUtil.createToken(owner);
+                    Map<String, Object> responseData = new HashMap<>();
+                    responseData.put("owner", resData);
+                    responseData.put("token", token);
+                    res.setData(responseData);
+                    res.setMessage("Login successful!");
+                    return ResponseEntity.status(HttpStatus.CREATED).body(res);
+
+
+                }
+                default:
+                    res.setMessage("Invalid type!");
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+
 
             }
 
