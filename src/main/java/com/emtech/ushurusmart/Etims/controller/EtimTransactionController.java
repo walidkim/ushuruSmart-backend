@@ -32,7 +32,7 @@ public class EtimTransactionController {
     @PostMapping("/make-transaction")
     public ResponseEntity<ResContructor> makeTransaction(@RequestBody TransactionDto data) {
         try {
-            ResContructor res= new ResContructor();
+            ResContructor res = new ResContructor();
             res.setMessage("Registered the owner successfully.");
             if(etimsOwnerService.findByBusinessKRAPin(data.getBussinessPin())==null){
                res.setMessage("Business is not registered by Etims.");
