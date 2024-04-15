@@ -46,7 +46,7 @@ public class OwnerActionsController {
     }
 
 
-    @PostMapping(value = "/add-assistant")
+    @PostMapping(value = "/create-assistant")
     public ResponseEntity<?> createAssistant(@RequestBody AssistantDto data) {
         ResContructor res = new ResContructor();
         try {
