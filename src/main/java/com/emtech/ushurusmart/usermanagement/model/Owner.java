@@ -23,6 +23,7 @@ public class Owner extends BaseAuth {
         private String KRAPin;
         private String phoneNumber;
         @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+        @JsonManagedReference
         private List<Assistant> assistants;
 
         @JsonManagedReference

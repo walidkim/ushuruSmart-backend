@@ -7,5 +7,5 @@ import lombok.Data;
 public class OtpDataDto {
     String phoneNumber;
     String type;
-    String optCode;
+    String otpCode;
 }

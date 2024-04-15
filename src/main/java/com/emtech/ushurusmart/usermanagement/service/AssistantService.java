@@ -38,5 +38,9 @@ public class AssistantService {
     public void deleteById(long assistantId) {
         assistantRepository.deleteById(assistantId);
     }
+
+    public Assistant findByPhoneNumber(String phoneNumber) {
+        return assistantRepository.findByPhoneNumber(phoneNumber);
+    }
 }
     

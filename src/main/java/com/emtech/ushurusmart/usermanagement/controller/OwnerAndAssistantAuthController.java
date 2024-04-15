@@ -109,15 +109,13 @@ public class OwnerAndAssistantAuthController {
                     }
                     Authentication authentication = authenticationManager
                             .authenticate(new UsernamePasswordAuthenticationToken(loginReq.getEmail(),
-                                    loginReq.getPassword(), assistant.getAuthorities()));
-                    String token = jwtUtil.createToken(assistant);
-                    res.setMessage("Login successful!");
-
-                    Map<String, Object> responseData = new HashMap<>();
-                    responseData.put(type, assistant);
-                    responseData.put("token", token);
-                    res.setData(responseData);
-
+                                    loginReq.getPassword(),assistant.getAuthorities() != null ? assistant.getAuthorities() : Collections.emptyList()));
+                    otpService.sendOTP(assistant.getPhoneNumber());
+                    res.setMessage("Sent an otp short code to your phone for verification");
+                    Map<String,String> resBody= new HashMap<>();
+                    resBody.put("type", type);
+                    resBody.put("phoneNumber", assistant.getPhoneNumber());
+                    res.setData(resBody);
                     return ResponseEntity.status(HttpStatus.CREATED).body(res);
                 }
                 default:
@@ -141,7 +139,7 @@ public class OwnerAndAssistantAuthController {
     public ResponseEntity<?> verifyOtp(@RequestBody OtpDataDto req) {
         ResContructor res = new ResContructor();
         try {
-            if(!otpService.verifyOTP(req.getPhoneNumber(),req.getOptCode())){
+            if(!otpService.verifyOTP(req.getPhoneNumber(),req.getOtpCode())){
                 throw new BadCredentialsException("Invalid otpCode");
             }
 
@@ -162,6 +160,27 @@ public class OwnerAndAssistantAuthController {
                     String token = jwtUtil.createToken(owner);
                     Map<String, Object> responseData = new HashMap<>();
                     responseData.put("owner", resData);
+                    responseData.put("token", token);
+                    res.setData(responseData);
+                    res.setMessage("Login successful!");
+                    return ResponseEntity.status(HttpStatus.CREATED).body(res);
+
+
+                }
+
+                case "assistant":{
+                    System.out.println(req);
+                    Assistant assistant = assistantService.findByPhoneNumber(req.getPhoneNumber());
+                    if(assistant==null){
+                        throw new BadCredentialsException("Invalid assistant");
+                    }
+
+                    System.out.println(assistant);
+
+
+                    String token = jwtUtil.createToken(assistant);
+                    Map<String, Object> responseData = new HashMap<>();
+                    responseData.put("assistant", assistant);
                     responseData.put("token", token);
                     res.setData(responseData);
                     res.setMessage("Login successful!");
