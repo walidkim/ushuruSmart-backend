@@ -1,10 +1,6 @@
 package com.emtech.ushurusmart.utils.otp;
 
-import com.emtech.ushurusmart.config.otpconfig;
-import com.twilio.Twilio;
 import com.twilio.exception.TwilioException;
-import com.twilio.rest.api.v2010.account.Message;
-import com.twilio.type.PhoneNumber;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -50,19 +46,19 @@ public class OTPService {
             String messageBody = "Your UshuruSmart OTP code is: " + otpCode + ".\n Do not share this with anyone.";
 
             try {
-                Twilio.init(otpconfig.ACCOUNT_SID, otpconfig.AUTH_TOKEN);
-                Message message = Message.creator(
-                        new PhoneNumber("+" + phoneNo),
-                        new PhoneNumber(otpconfig.TWILIO_PHONE_NUMBER),
-                        messageBody)
-                        .create();
-                System.out.println(message);
+//                Twilio.init(otpconfig.ACCOUNT_SID, otpconfig.AUTH_TOKEN);
+//                Message message = Message.creator(
+//                        new PhoneNumber("+" + phoneNo),
+//                        new PhoneNumber(otpconfig.TWILIO_PHONE_NUMBER),
+//                        messageBody)
+//                        .create();
+//                System.out.println(message);
                 System.out.println(otpCode + " "+phoneNo);
                 saveOtp(phoneNo,otpCode);
                 return "OTP sent successfully!";
 
             } catch (TwilioException e) {
-                System.out.println(e);
+                System.out.println("twillio" + e);
                 return "Failed to send OTP!";
             }
         }

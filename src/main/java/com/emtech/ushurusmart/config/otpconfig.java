@@ -7,11 +7,10 @@ import lombok.Data;
 @Data
 @Configuration
 public class otpconfig {
-
     // twilio configuration properties
-    public static final String ACCOUNT_SID = "ACc75272f6f52759c2159e57e70326df21";
-    public static final String AUTH_TOKEN = "b7671a2445d5b2e116e10ae5d1a67c3d";
-    public static final String TWILIO_PHONE_NUMBER = "+12694431149";
+    public static final String ACCOUNT_SID = "ACc26c8aa04fa5255e88000124087eaee0";
+    public static final String AUTH_TOKEN = "f7f93b9cb4b4aff3a790a1803b076cf5";
+    public static final String TWILIO_PHONE_NUMBER = "+12515721303";
 
     @Override
     public String toString() {

@@ -35,6 +35,9 @@ import java.util.Objects;
 @RequestMapping("/api/v1/tax")
 public class TransactionController {
     @Autowired
+    private TaxCalculator taxCalculatorService;
+
+    @Autowired
     private OwnerService ownerService;
 
     @Autowired

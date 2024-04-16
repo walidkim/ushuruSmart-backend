@@ -16,7 +16,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Product getByName(String name);
 
     Product getByQuantity(int quantity);
-    @Query("SELECT p FROM Product p WHERE p.owner.id = :ownerId")
-    List<Product> findByOwnerId(@Param("ownerId")long id);
 
+    List<Product> findByOwnerId(long id);
 }
