@@ -3,6 +3,8 @@ package com.emtech.ushurusmart.usermanagement.repository;
 
 import com.emtech.ushurusmart.usermanagement.model.Assistant;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
@@ -16,5 +18,8 @@ public interface AssistantRepository extends JpaRepository<Assistant, Long> {
 
     Assistant findByPhoneNumber(String phoneNumber);
 
-    // add query to list assistants by owner id
+    @Query("SELECT a FROM Assistant a WHERE a.ownerId = :ownerId")
+    Assistant getOwnerId(@Param("ownerId") long ownerId);
+
+
 }

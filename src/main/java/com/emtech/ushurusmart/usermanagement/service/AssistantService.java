@@ -42,5 +42,9 @@ public class AssistantService {
     public Assistant findByPhoneNumber(String phoneNumber) {
         return assistantRepository.findByPhoneNumber(phoneNumber);
     }
+    public Assistant getOwnerId(Long ownerId){
+        return assistantRepository.getOwnerId(ownerId);
+    }
+
 }
     

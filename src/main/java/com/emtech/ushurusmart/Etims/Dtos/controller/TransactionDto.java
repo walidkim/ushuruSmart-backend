@@ -12,6 +12,7 @@ public class TransactionDto {
     private String buyerPin;
 
  private String bussinessPin;
+ private String name;
 
 
 }
