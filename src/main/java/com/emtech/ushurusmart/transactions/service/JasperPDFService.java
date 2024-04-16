@@ -62,7 +62,8 @@ public class JasperPDFService {
         JasperReport jasperReport = JasperCompileManager.compileReport(file.getAbsolutePath());
         JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(dataList);
 
-        ProductInfo info = products.get(0);
+        ProductInfo info;
+        info = products.get(0);
         Product prod = productService.getById(info.getProductId());
 
 
