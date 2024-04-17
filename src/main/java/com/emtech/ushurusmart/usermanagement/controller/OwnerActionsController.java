@@ -5,7 +5,6 @@ import com.emtech.ushurusmart.usermanagement.Dtos.entity.AssistantDto;
 import com.emtech.ushurusmart.usermanagement.factory.EntityFactory;
 import com.emtech.ushurusmart.usermanagement.model.Assistant;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
-import com.emtech.ushurusmart.usermanagement.model.Role;
 import com.emtech.ushurusmart.usermanagement.service.AssistantService;
 import com.emtech.ushurusmart.usermanagement.service.OwnerService;
 import com.emtech.ushurusmart.usermanagement.utils.AuthUtils;
@@ -14,7 +13,6 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -104,12 +102,12 @@ public class OwnerActionsController {
         res.setData(assistant);
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
-    @GetMapping(value = "/all-Assistants")
-    public ResponseEntity<?> getAllAssistants(@NotNull @RequestParam(name = "admin_id", required = true)long adminId) {
-//        String ownerEmail = AuthUtils.getCurrentlyLoggedInPerson();
-//        Owner owner = ownerService.findByEmail(ownerEmail);
+    @GetMapping(value = "/assistants")
+    public ResponseEntity<?> getAllAssistants() {
+        String ownerEmail = AuthUtils.getCurrentlyLoggedInPerson();
+        Owner owner = ownerService.findByEmail(ownerEmail);
         ResContructor res = new ResContructor();
-        res.setData(assistantService.findAll());
+        res.setData(owner.getAssistants());
         return ResponseEntity.status(HttpStatus.OK).body(res);
 
 
