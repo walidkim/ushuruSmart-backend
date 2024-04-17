@@ -1,6 +1,7 @@
 package com.emtech.ushurusmart.payment.model;
 
 import com.emtech.ushurusmart.usermanagement.model.Owner;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -20,6 +21,7 @@ public class PaymentDetails {
 
     @ManyToOne
     @JoinColumn(name = "owner_id", nullable = false)
+    @JsonBackReference
     private Owner owner;
 
     private String method;
