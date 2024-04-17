@@ -92,7 +92,7 @@ public class InvoiceService {
         details.add("Invoice Number: ").setFont(boldFont).add(new Paragraph(product.getInvoiceNumber()).setFont(normalFont));
         details.setMarginTop(10);
         details.add("\n");
-        details.add("Total: ").setFont(boldFont).add(new Paragraph(currency + (product.getTax() + product.getAmount())).setFont(normalFont));
+        details.add("Total: ").setFont(boldFont).add(new Paragraph(currency + (product.getTax() + product.getTotalAmount())).setFont(normalFont));
         details.add("\n");
 
         document.add(details.setMarginTop(10));

@@ -43,4 +43,7 @@ public class EtimsTransaction implements Serializable {
     @CreationTimestamp
     private LocalDateTime dateCreated;
 
+    @Column
+    private String name;
+
 }

@@ -15,4 +15,5 @@ public interface TransactionRepository extends JpaRepository<EtimsTransaction, L
     EtimsTransaction findByInvoiceNumber(String invoiceNumber);
 
     List<EtimsTransaction> findByDateCreatedBetween(LocalDateTime startDate, LocalDateTime endDate);
+    List<EtimsTransaction> findByOwnerPin(String ownerPin);
 }

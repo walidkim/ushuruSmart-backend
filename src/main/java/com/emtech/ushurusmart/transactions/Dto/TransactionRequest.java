@@ -11,4 +11,5 @@ public class TransactionRequest {
     private String buyerKRAPin;
     private long productId;
     private int quantity;
+    private double amount;
 }
