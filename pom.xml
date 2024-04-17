@@ -55,12 +55,12 @@
 			<artifactId>commons-text</artifactId>
 			<version>1.8</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/com.bytes-pot/daraja-api -->
-		<dependency>
-			<groupId>com.bytes-pot</groupId>
-			<artifactId>daraja-api</artifactId>
-			<version>1.6-b</version>
-		</dependency>
+<!--		&lt;!&ndash; https://mvnrepository.com/artifact/com.bytes-pot/daraja-api &ndash;&gt;-->
+<!--		<dependency>-->
+<!--			<groupId>com.bytes-pot</groupId>-->
+<!--			<artifactId>daraja-api</artifactId>-->
+<!--			<version>1.6-b</version>-->
+<!--		</dependency>-->
 		<dependency>
 			<groupId>org.eclipse.paho</groupId>
 			<artifactId>org.eclipse.paho.client.mqttv3</artifactId>
@@ -171,6 +171,11 @@
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
 			<version>3.11</version>
+		</dependency>
+			<dependency>
+			<groupId>net.sf.jasperreports</groupId>
+			<artifactId>jasperreports</artifactId>
+			<version>6.20.6</version>
 		</dependency>
 
 
