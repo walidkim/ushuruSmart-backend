@@ -68,7 +68,7 @@ public class TransactionController {
         }
         TransactionData parsed= new TransactionData(Objects.requireNonNull(response.getBody()).getData().toString());
         List<JasperPDFService.ProductInfo> products = new ArrayList<>();
-        products.add(new JasperPDFService.ProductInfo(data.getProductId(), data.getQuantity(), data.getBuyerKRAPin()));
+        products.add(new JasperPDFService.ProductInfo(data.getProductId(), data.getQuantity(), data.getBuyerKRAPin(), data.getAmount()));
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);
         headers.setContentDispositionFormData("attachment", "invoice.pdf");
@@ -92,7 +92,7 @@ public class TransactionController {
     public static class TransactionData {
 
         private long id;
-        private double amount;
+        private double totalAmount;
         private double tax;
         private String ownerPin;
         private String buyerPin;
@@ -110,8 +110,8 @@ public class TransactionController {
                     case "id":
                         this.id = Long.parseLong(keyValue[1]);
                         break;
-                    case "amount":
-                        this.amount = Double.parseDouble(keyValue[1]);
+                    case "totalAmount":
+                        this.totalAmount = Double.parseDouble(keyValue[1]);
                         break;
                     case "tax":
                         this.tax = Double.parseDouble(keyValue[1]);

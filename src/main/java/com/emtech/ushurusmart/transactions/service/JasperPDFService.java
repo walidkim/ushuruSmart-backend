@@ -35,6 +35,7 @@ public class JasperPDFService {
         private long productId;
         private int  quantity;
         private String buyerKRAPin;
+        private double amount;
 
     }
 
@@ -52,13 +53,14 @@ public class JasperPDFService {
             data.put("quantity", info.getQuantity());
             data.put("unitOfMeasure", prod.getUnitOfMeasure());
             data.put("tax", currency + product.getTax());
+            data.put("amount", info.getAmount());
             dataList.add(data);
             counter++;
 
         }
         System.out.println(dataList);
 
-        File file = ResourceUtils.getFile("C:\\Users\\PC\\Desktop\\ushuru-smart-backend\\src\\main\\resources\\ETR-Reciept.jrxml");
+        File file = ResourceUtils.getFile("C:\\Users\\PC\\Desktop\\backend\\src\\main\\resources\\ETR-Reciept.jrxml");
         JasperReport jasperReport = JasperCompileManager.compileReport(file.getAbsolutePath());
         JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(dataList);
 
@@ -69,6 +71,7 @@ public class JasperPDFService {
 
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("buyerKRAPin", info.getBuyerKRAPin());
+        parameters.put("amount", info.getAmount());
         parameters.put("ownerPin", product.getOwnerPin());
         parameters.put("etimsNumber", product.getEtimsNumber());
         parameters.put("invoiceNumber", product.getInvoiceNumber());
@@ -81,6 +84,8 @@ public class JasperPDFService {
         parameters.put("taxable", prod.isTaxable()? "Taxable" : "Tax Exempted");
         parameters.put("counter", 1);
         parameters.put("tax", product.getTax());
+        System.out.println(parameters);
+
 
 
         JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters , dataSource);
