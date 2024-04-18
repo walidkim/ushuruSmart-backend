@@ -1,16 +1,16 @@
-package com.emtech.ushurusmart.payments.MpesaControllers;
+package com.emtech.ushurusmart.payments.controller;
 
-import com.emtech.ushurusmart.payments.callback.StkCallbackRequest;
+import com.emtech.ushurusmart.payments.dtos.callback.StkCallbackRequest;
 import com.emtech.ushurusmart.payments.dtos.sendPushRequest;
-import com.emtech.ushurusmart.payments.service.DarajaApiImpl;
+import com.emtech.ushurusmart.payments.service.PaymentImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("mpesa")
-public class MpesaController {
+public class PaymentController {
 
-    private final  DarajaApiImpl darajaApiImpl=new DarajaApiImpl();
+    private final PaymentImpl darajaApiImpl=new PaymentImpl();
 
     @PostMapping("/sendPush")
     public ResponseEntity<String> sendSTK(@RequestBody sendPushRequest request) {

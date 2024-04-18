@@ -1,6 +1,7 @@
 package com.emtech.ushurusmart.usermanagement.model;
 
-import com.emtech.ushurusmart.payment.model.PaymentDetails;
+import com.emtech.ushurusmart.payments.entity.PaymentDetails;
+import com.emtech.ushurusmart.payments.entity.PaymentEntity;
 import com.emtech.ushurusmart.transactions.entity.Product;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;

@@ -1,16 +1,14 @@
-package com.emtech.ushurusmart.payments.model;
+package com.emtech.ushurusmart.payments.entity;
 
 import com.emtech.ushurusmart.usermanagement.model.Owner;
 import jakarta.persistence.*;
 import lombok.Data;
 
-
-
 @Entity
 @Data
 @Table(name = "payments")
-public class PaymentDetails {
 
+public class PaymentDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
