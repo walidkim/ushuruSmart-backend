@@ -1,6 +1,6 @@
-package com.emtech.ushurusmart.payments;
+package com.emtech.ushurusmart.config;
 
-public class config {
+public class PaymentConfig {
 //Mpesa Credentials
     public static String authURL=" https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
     public static String keySecret="c6TuFwoSjJy5d9IUe3bNBxxImoD2YBTFoV2e3ui7XGiFzbWf:FGlhiBK2QvtumfRp6rEFKmZ9Yv4tvj02QgC0P4Dj0TjPjqdPPErfplbgzjXLhcti";

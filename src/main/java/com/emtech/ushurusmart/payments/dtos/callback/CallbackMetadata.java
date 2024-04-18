@@ -1,4 +1,4 @@
-package com.emtech.ushurusmart.payments.callback;
+package com.emtech.ushurusmart.payments.dtos.callback;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

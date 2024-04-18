@@ -1,16 +1,15 @@
-package com.emtech.ushurusmart.payments.callback;
+package com.emtech.ushurusmart.payments.dtos.callback;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.SneakyThrows;
 @Data
-public class Item {
-    @JsonProperty("Name")
-    private String name;
+public class StkCallbackRequest {
 
-    @JsonProperty("Value")
-    private Object value;
+
+    @JsonProperty("Body")
+    private StkCallbackBody body;
 
     @SneakyThrows
     @Override
@@ -18,6 +17,5 @@ public class Item {
 
         return new ObjectMapper().writeValueAsString(this);
     }
-    // Getters and setters
-}
 
+}
