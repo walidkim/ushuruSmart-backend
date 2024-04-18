@@ -76,6 +76,12 @@ public class EtimTransactionController {
         }
         return new ResponseEntity<>(transactionData, HttpStatus.OK);
     }
+    @GetMapping("transaction-amount-history")
+    public ResponseEntity<Double> getTransactionAmountTotal(){
+        Double total = transactionService.getTransactionHistory();
+        return ResponseEntity.ok(total);
+
+    }
 
 
 

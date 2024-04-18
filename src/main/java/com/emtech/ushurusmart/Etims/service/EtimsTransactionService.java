@@ -5,6 +5,7 @@ import static com.emtech.ushurusmart.utils.service.GeneratorService.*;
 import java.util.List;
 import java.time.LocalDateTime;
 
+import com.emtech.ushurusmart.Etims.entity.Transaction;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -36,6 +37,16 @@ public class EtimsTransactionService {
         assert owner != null;
         transaction.setEtimsNumber(owner.getEtimsCode());
         return transactionRepository.save(transaction);
+    }
+    public List<EtimsTransaction> findAll(){
+        return transactionRepository.findAll();
+    }
+    public Double getTransactionHistory(){
+        List<EtimsTransaction> transactions = transactionRepository.findAll();
+        double total = transactions.stream()
+                .map(EtimsTransaction::getAmount)
+                .reduce(0.0, Double::sum);
+        return total;
     }
     public List<EtimsTransaction> getByOwnerPin(String ownerPin) {
         return transactionRepository.findByOwnerPin(ownerPin);

@@ -9,7 +9,6 @@ import com.emtech.ushurusmart.transactions.service.ProductService;
 import com.emtech.ushurusmart.usermanagement.model.Assistant;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
 import com.emtech.ushurusmart.usermanagement.service.AssistantService;
-import com.emtech.ushurusmart.usermanagement.service.OwnerService;
 import com.emtech.ushurusmart.usermanagement.utils.AuthUtils;
 import com.emtech.ushurusmart.utils.controller.ResContructor;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,10 +19,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -34,8 +30,7 @@ import java.util.Objects;
 @RestController
 @RequestMapping("/api/v1/assistant/tax")
 public class AssistantController {
-    @Autowired
-    private OwnerService ownerService;
+
     @Autowired
     private AssistantService assistantService;
     @Autowired
@@ -83,6 +78,7 @@ public class AssistantController {
         return new ResponseEntity<>(reportBytes,responseHeaders,HttpStatus.CREATED);
 
     }
+
 
     @Data
     public static class TransactionData {
