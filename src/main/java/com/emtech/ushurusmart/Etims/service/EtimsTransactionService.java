@@ -1,26 +1,23 @@
 package com.emtech.ushurusmart.Etims.service;
 
-import static com.emtech.ushurusmart.utils.service.GeneratorService.*;
-
-import java.util.List;
-import java.time.LocalDateTime;
-
-import com.emtech.ushurusmart.Etims.entity.Transaction;
+import com.emtech.ushurusmart.Etims.entity.Etims;
+import com.emtech.ushurusmart.Etims.entity.EtimsTransaction;
+import com.emtech.ushurusmart.Etims.repository.EtimsRepository;
+import com.emtech.ushurusmart.Etims.repository.TransactionRepository;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.emtech.ushurusmart.Etims.entity.Etims;
-import com.emtech.ushurusmart.Etims.entity.EtimsTransaction;
-import com.emtech.ushurusmart.Etims.repository.EtimsRepository;
-import com.emtech.ushurusmart.Etims.repository.TransactionRepository;
-
 import java.io.IOException;
+import java.time.LocalDate;
+import java.util.List;
 
-import jakarta.servlet.ServletOutputStream;
-import jakarta.servlet.http.HttpServletResponse;
+import static com.emtech.ushurusmart.utils.service.GeneratorService.generateRandomString;
 
 @Service
 public class EtimsTransactionService {
@@ -38,9 +35,6 @@ public class EtimsTransactionService {
         transaction.setEtimsNumber(owner.getEtimsCode());
         return transactionRepository.save(transaction);
     }
-    public List<EtimsTransaction> findAll(){
-        return transactionRepository.findAll();
-    }
     public Double getTransactionHistory(){
         List<EtimsTransaction> transactions = transactionRepository.findAll();
         double total = transactions.stream()
@@ -48,12 +42,19 @@ public class EtimsTransactionService {
                 .reduce(0.0, Double::sum);
         return total;
     }
-    public List<EtimsTransaction> getByOwnerPin(String ownerPin) {
-        return transactionRepository.findByOwnerPin(ownerPin);
+    @Transactional
+    public List<EtimsTransaction> getTransactionsDaily(LocalDate date){
+        return transactionRepository.findByTransactionDate(date);
     }
-    public void generateExcel (HttpServletResponse response, String ownerPin) throws IOException {
+    @Transactional
+    public List<EtimsTransaction> getTransactionsMonthly(LocalDate startDate, LocalDate endDate){
+        return transactionRepository.findByTransactionDateBetween(startDate, endDate);
+    }
 
-        List<EtimsTransaction> etimsTransactionList = transactionRepository.findByOwnerPin(ownerPin);
+
+    public void generateExcel(HttpServletResponse response) throws IOException {
+
+        List<EtimsTransaction> etimsTransactionList = transactionRepository.findAll();
 
         HSSFWorkbook workbook = new HSSFWorkbook();
         HSSFSheet sheet = workbook.createSheet("Transaction Report");

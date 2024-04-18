@@ -8,20 +8,16 @@ import com.emtech.ushurusmart.Etims.service.EtimsTransactionService;
 import com.emtech.ushurusmart.Etims.service.TaxCalculator;
 import com.emtech.ushurusmart.utils.controller.ResContructor;
 import com.emtech.ushurusmart.utils.controller.Responses;
-
 import jakarta.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("/etims/tax")
@@ -59,30 +55,31 @@ public class EtimTransactionController {
         }
     }
      @GetMapping("/generate-TransactionXLS-report")
-    public void generateExcelReport(@RequestParam("ownerPin") String ownerPin,HttpServletResponse response) throws IOException {
+    public void generateExcelReport(HttpServletResponse response) throws IOException {
 
         response.setContentType("application/octet-stream");
 
         String headerKey = "Content-Disposition";
         String headerValue = "attachment; filename = transactionReport.xls";
         response.setHeader(headerKey,headerValue);
-        transactionService.generateExcel(response, ownerPin);
+        transactionService.generateExcel(response);
     }
-    @GetMapping("/get-transaction-by-owner-pin")
-    public ResponseEntity<EtimsTransaction> getTransactionByOwnerPin(@RequestParam(value = "ownerPin", required = true) String ownerPin) {
-        EtimsTransaction transactionData = (EtimsTransaction) transactionService.getByOwnerPin(ownerPin);
-        if (transactionData == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(transactionData, HttpStatus.OK);
-    }
+
     @GetMapping("transaction-amount-history")
     public ResponseEntity<Double> getTransactionAmountTotal(){
         Double total = transactionService.getTransactionHistory();
         return ResponseEntity.ok(total);
-
     }
-
+    @GetMapping("/daily/{date}")
+    public List<EtimsTransaction> getTransactionsDaily(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+       return transactionService.getTransactionsDaily(date);
+    }
+    @GetMapping("/monthly")
+    public List<EtimsTransaction> getTransactionsMonthly(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        return transactionService.getTransactionsMonthly(startDate,endDate);
+    }
 
 
 }
