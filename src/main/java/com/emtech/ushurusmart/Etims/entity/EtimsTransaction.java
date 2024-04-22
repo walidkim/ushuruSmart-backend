@@ -1,7 +1,7 @@
 package com.emtech.ushurusmart.Etims.entity;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -41,7 +41,7 @@ public class EtimsTransaction implements Serializable {
 
     private String etimsNumber;
     @CreationTimestamp
-    private LocalDateTime dateCreated;
+    private LocalDate dateCreated;
 
     @Column
     private String name;
