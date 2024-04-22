@@ -23,6 +23,10 @@ public interface TransactionRepository extends JpaRepository<EtimsTransaction, L
     @Query("SELECT t FROM EtimsTransaction t WHERE t.dateCreated = :date")
     List<EtimsTransaction> findByTransactionDate(@Param("date") LocalDate date);
 
-    @Query("SELECT t FROM Transaction t WHERE t.dateCreated BETWEEN :startDate AND :endDate")
+    @Query("SELECT t FROM Transaction t WHERE t.dateCreated BETWEEN CAST(:startDate AS TIMESTAMP) AND CAST(:endDate AS TIMESTAMP)")
     List<EtimsTransaction> findByTransactionDateBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+
+
+//    @Query("SELECT t FROM Transaction t WHERE t.dateCreated BETWEEN :startDate AND :endDate")
+//    List<EtimsTransaction> findByTransactionDateBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 }

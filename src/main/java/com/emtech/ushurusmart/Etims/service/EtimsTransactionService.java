@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.emtech.ushurusmart.utils.service.GeneratorService.generateRandomString;
@@ -42,15 +43,26 @@ public class EtimsTransactionService {
                 .reduce(0.0, Double::sum);
         return total;
     }
+
+    @Transactional
+    public List<EtimsTransaction> getTransactionToday() {
+        LocalDate today = LocalDate.now();
+        return transactionRepository.findByTransactionDate(today);
+    }
     @Transactional
     public List<EtimsTransaction> getTransactionsDaily(LocalDate date){
         return transactionRepository.findByTransactionDate(date);
     }
+//    @Transactional
+//    public List<EtimsTransaction> getTransactionsMonthly(LocalDate startDate, LocalDate endDate){
+//        return transactionRepository.findByTransactionDateBetween(startDate, endDate);
+//    }
     @Transactional
-    public List<EtimsTransaction> getTransactionsMonthly(LocalDate startDate, LocalDate endDate){
+    public List<EtimsTransaction> getTransactionsMonthly(LocalDate startDate, LocalDate endDate) {
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.plusDays(1).atStartOfDay();
         return transactionRepository.findByTransactionDateBetween(startDate, endDate);
     }
-
 
     public void generateExcel(HttpServletResponse response) throws IOException {
 

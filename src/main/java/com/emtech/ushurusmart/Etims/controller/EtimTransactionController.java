@@ -70,6 +70,10 @@ public class EtimTransactionController {
         Double total = transactionService.getTransactionHistory();
         return ResponseEntity.ok(total);
     }
+    @GetMapping("/daily")
+    public List<EtimsTransaction> getTransactionToday() {
+        return transactionService.getTransactionToday();
+    }
     @GetMapping("/daily/{date}")
     public List<EtimsTransaction> getTransactionsDaily(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
        return transactionService.getTransactionsDaily(date);
