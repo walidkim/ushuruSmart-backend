@@ -13,6 +13,8 @@ import com.emtech.ushurusmart.transactions.service.ProductService;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
 import com.emtech.ushurusmart.usermanagement.service.OwnerService;
 import com.emtech.ushurusmart.usermanagement.utils.AuthUtils;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Data;
@@ -55,7 +57,7 @@ public class TaxController {
     @PostMapping("/make-transaction")
     public ResponseEntity<?> makeTransaction(@RequestBody TransactionRequest request, HttpServletResponse responses) throws IOException, JRException {
         System.out.println(" The data is " + request);
-  
+
         Owner owner = ownerService.findByEmail(AuthUtils.getCurrentlyLoggedInPerson());
 
         List<JasperPDFService.ProductInfo> reportProducts = new ArrayList<>();
@@ -66,9 +68,9 @@ public class TaxController {
         etimReq.setBuyerPin(request.getBuyerKRAPin());
         List<EtimsProduct> etimsSales = new ArrayList<>();
 
-        for(TransactionProduct sold:  request.getSales()){
-            Product product= productService.findById(sold.getProductId());
-            double amount= product.getUnitPrice() * sold.getQuantity();
+        for (TransactionProduct sold : request.getSales()) {
+            Product product = productService.findById(sold.getProductId());
+            double amount = product.getUnitPrice() * sold.getQuantity();
             EtimsProduct etimsProduct = new EtimsProduct();
             etimsProduct.setTaxable(product.isTaxable());
             etimsProduct.setAmount(amount);
@@ -77,17 +79,38 @@ public class TaxController {
             etimsSales.add(etimsProduct);
         }
         etimReq.setSales(etimsSales);
-        System.out.println(etimReq.toString());
+
 
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonString = objectMapper.writeValueAsString(etimReq);
-        System.out.println(jsonString);
+
 
         ResponseEntity<?> response = transactionMiddleware.makeTransaction(jsonString);
 
+        if (response.getStatusCode() == HttpStatus.CREATED) {
+            TransactionResponse transactionResponse = objectMapper.readValue(response.getBody().toString(), TransactionResponse.class);
 
-        System.out.println(response.getBody());
-        System.out.println(response.getStatusCode().value());
+
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", "invoice.pdf");
+            System.out.println("Generated PDF");
+
+            ByteArrayOutputStream reportArrayOutputStream = jasperPDFService.exportJasperReport(request,transactionResponse.getData());
+            System.out.println("Generated output Stream");
+            byte[] reportBytes = reportArrayOutputStream.toByteArray();
+            reportArrayOutputStream.close();
+
+            HttpHeaders responseHeaders = new HttpHeaders();
+            responseHeaders.setContentType(MediaType.APPLICATION_PDF);
+            responseHeaders.setContentLength(reportBytes.length);
+            responseHeaders.setContentDispositionFormData("attachment", "receipt.pdf");
+
+            return new ResponseEntity<>(reportBytes, responseHeaders, HttpStatus.CREATED);
+
+        }
+
 
 
 //        if(response.getStatusCode()==HttpStatus.NOT_FOUND){
@@ -98,24 +121,26 @@ public class TaxController {
 //
 //
 
-     
-      
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_PDF);
-        headers.setContentDispositionFormData("attachment", "invoice.pdf");
-        System.out.println("Generated PDF");
+//        TransactionResponse transactionResponse = objectMapper.readValue(response.getBody().toString(), TransactionResponse.class);
+//        System.out.println(transactionResponse.toString());
+//
+//
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.APPLICATION_PDF);
+//        headers.setContentDispositionFormData("attachment", "invoice.pdf");
+//        System.out.println("Generated PDF");
+//
+//        ByteArrayOutputStream reportArrayOutputStream = jasperPDFService.exportJasperReport(responses, request.getBuyerKRAPin(), reportProducts, null);
+//        System.out.println("Generated output Stream");
+//        byte[] reportBytes = reportArrayOutputStream.toByteArray();
+//        reportArrayOutputStream.close();
+//
+//        HttpHeaders responseHeaders = new HttpHeaders();
+//        responseHeaders.setContentType(MediaType.APPLICATION_PDF);
+//        responseHeaders.setContentLength(reportBytes.length);
+//        responseHeaders.setContentDispositionFormData("attachment", "receipt.pdf");
 
-        ByteArrayOutputStream reportArrayOutputStream = jasperPDFService.exportJasperReport(responses, request.getBuyerKRAPin(), reportProducts, null);
-        System.out.println("Generated output Stream");
-        byte[] reportBytes = reportArrayOutputStream.toByteArray();
-        reportArrayOutputStream.close();
-
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.setContentType(MediaType.APPLICATION_PDF);
-        responseHeaders.setContentLength(reportBytes.length);
-        responseHeaders.setContentDispositionFormData("attachment","receipt.pdf");
-
-        return new ResponseEntity<>(reportBytes, responseHeaders, HttpStatus.CREATED);
+        return  ResponseEntity.ok( "Good");
 
     }
 
@@ -170,6 +195,64 @@ public class TaxController {
                         System.out.println("Ignoring unknown field: " + field);
                 }
             }
+        }
+    }
+
+
+    @Data
+    public static class TransactionResponse {
+
+        @JsonProperty("message")
+        private String message;
+
+        @JsonProperty("data")
+        private TransactionData data;
+
+        @Data
+        public static class TransactionData {
+
+            @JsonProperty("id")
+            private int id;
+
+            @JsonProperty("amount")
+            private double amount;
+
+            @JsonProperty("buyerPin")
+            private String buyerPin;
+
+            @JsonProperty("invoiceNumber")
+            private String invoiceNumber;
+
+            @JsonProperty("tax")
+            private double tax;
+
+            @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
+            @JsonProperty("dateCreated")
+            private String dateCreated;
+
+            @JsonProperty("sales")
+            private List<Sale> sales;
+            @JsonProperty("etims")
+            private Object etims;
+        }
+
+        @Data
+        public static class Sale {
+
+            @JsonProperty("id")
+            private int id;
+
+            @JsonProperty("taxable")
+            private boolean taxable;
+
+            @JsonProperty("tax")
+            private double tax;
+
+            @JsonProperty("name")
+            private String name;
+
+            @JsonProperty("amount")
+            private double amount;
         }
     }
 

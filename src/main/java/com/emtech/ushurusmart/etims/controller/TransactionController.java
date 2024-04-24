@@ -41,6 +41,7 @@ public class TransactionController {
             Transaction transaction = transactionService.createTransaction(data, owner);
 
             Transaction saved = transactionService.save(transaction);
+            saved.setEtims(null);
 
             res.setData(saved);
             return ResponseEntity.status(HttpStatus.CREATED).body(res);
