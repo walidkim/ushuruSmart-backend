@@ -1,11 +1,10 @@
-package com.emtech.ushurusmart.payments.paymenthist.service;
+package com.emtech.ushurusmart.payments.service;
 
-import com.emtech.ushurusmart.payments.paymenthist.entity.payment;
-import com.emtech.ushurusmart.payments.paymenthist.repository.PaymentRepository;
+import com.emtech.ushurusmart.payments.entity.PaymentEntity;
+import com.emtech.ushurusmart.payments.repository.PaymentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -13,7 +12,7 @@ import java.util.List;
 public class PaymentHistService {
 @Autowired
 private PaymentRepository paymentRepository;
-public List<payment> getPaymentsBetweenDates(LocalDateTime startDate, LocalDateTime endDate) {
+public List<PaymentEntity> getPaymentsBetweenDates(LocalDateTime startDate, LocalDateTime endDate) {
     return paymentRepository.findByTransactionDateBetween(startDate, endDate);
 }
 

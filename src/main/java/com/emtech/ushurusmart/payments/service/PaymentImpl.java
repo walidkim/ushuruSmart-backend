@@ -8,12 +8,16 @@ import com.emtech.ushurusmart.payments.dtos.okPushResponse;
 import com.emtech.ushurusmart.payments.Utils.HelperUtility;
 import com.emtech.ushurusmart.config.PaymentConfig;
 import com.emtech.ushurusmart.payments.entity.PaymentDetails;
+import com.emtech.ushurusmart.payments.repository.PaymentRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -122,6 +126,7 @@ public class PaymentImpl implements Payment {
         System.out.println("Checkout Request ID: " + stkCallBack.getCheckoutRequestId());
 
     }
+
 }
 
 
