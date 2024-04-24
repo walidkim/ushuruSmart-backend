@@ -11,6 +11,7 @@ import com.emtech.ushurusmart.usermanagement.service.AssistantService;
 import com.emtech.ushurusmart.usermanagement.service.OwnerService;
 import com.emtech.ushurusmart.usermanagement.service.jwtServices.JwtTokenUtil;
 import com.emtech.ushurusmart.utils.controller.ResContructor;
+import com.emtech.ushurusmart.utils.controller.Responses;
 import com.emtech.ushurusmart.utils.otp.OTPService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,8 +63,8 @@ public class AuthController {
             return ResponseEntity.badRequest().body(res);
 
         }catch (Exception e){
-            res.setMessage("Error " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
+            System.out.println(e.getMessage());
+            return Responses.create500Response(e);
         }
 
     }
@@ -78,25 +79,9 @@ public class AuthController {
         try {
             switch (type) {
                 case "owner": {
-                    Owner owner = ownerService.findByEmail(loginReq.getEmail());
-                    if (owner == null) {
-                        res.setMessage("No " + HelperUtil.capitalizeFirst(type) + " by that email exists.");
+                    return ownerService.loginOwner(type, loginReq, res);
 
-                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
-                    }
-
-                    Authentication authentication = authenticationManager
-                            .authenticate(new UsernamePasswordAuthenticationToken(loginReq.getEmail(),
-                                    loginReq.getPassword(),owner.getAuthorities() != null ? owner.getAuthorities() : Collections.emptyList()));
-                    otpService.sendOTP(owner.getPhoneNumber());
-                    res.setMessage("A short code has been sent to your phone for verification");
-                    Map<String,String> resBody= new HashMap<>();
-                    resBody.put("type", type);
-                    resBody.put("phoneNumber", owner.getPhoneNumber());
-                    res.setData(resBody);
-                    return ResponseEntity.status(HttpStatus.CREATED).body(res);
-
-              }
+                }
                 case "assistant": {
 
                     Assistant assistant = assistantService.findByEmail(loginReq.getEmail());
@@ -131,6 +116,9 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
         }
     }
+
+    @NotNull
+
 
 
     @PostMapping(value = "/verify-otp")

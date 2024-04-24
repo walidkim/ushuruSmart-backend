@@ -19,7 +19,7 @@ import java.util.Objects;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class OwnerServiceTest {
 
@@ -51,7 +51,7 @@ class OwnerServiceTest {
         when(userRepository.findByEmail(email)).thenReturn(new Owner()); // Assuming Owner is the entity class
 
         ResponseEntity<ResContructor> response = userService.validateAndCreateUser("owner", ownerDto, res);
-
+        verify(userRepository, never()).save(any(Owner.class));
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertTrue(Objects.requireNonNull(response.getBody()).getMessage().contains("Owner with that email exists!"));
     }
@@ -67,9 +67,9 @@ class OwnerServiceTest {
         when(etimsMiddleware.verifyBusinessKRAPin(any())).thenReturn(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
 
         ResponseEntity<ResContructor> response = userService.validateAndCreateUser("owner", ownerDto, res);
-
+        verify(userRepository, never()).save(any(Owner.class));
         assertEquals(HttpStatus.UNAVAILABLE_FOR_LEGAL_REASONS, response.getStatusCode());
-        assertTrue(response.getBody().getMessage().contains("Owner can not be onboarded. Business is not registered by KRA!"));
+        assertTrue(Objects.requireNonNull(response.getBody()).getMessage().contains("Owner can not be onboarded. Business is not registered by KRA!"));
     }
 
     @Test
@@ -88,6 +88,9 @@ class OwnerServiceTest {
         ResponseEntity<ResContructor> response = userService.validateAndCreateUser("owner", ownerDto, res);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertTrue(response.getBody().getMessage().contains("Owner created successfully!"));
+        verify(userRepository, times(1)).save(any(Owner.class));
+        assertTrue(Objects.requireNonNull(response.getBody()).getMessage().contains("Owner created successfully!"));
     }
+
+
 }
