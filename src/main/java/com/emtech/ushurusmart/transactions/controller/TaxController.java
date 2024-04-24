@@ -1,7 +1,6 @@
 package com.emtech.ushurusmart.transactions.controller;
 
 
-import com.emtech.ushurusmart.etims.service.TaxCalculator;
 import com.emtech.ushurusmart.etims_middleware.TransactionMiddleware;
 import com.emtech.ushurusmart.transactions.Dto.EtimsProduct;
 import com.emtech.ushurusmart.transactions.Dto.EtimsTransactionDto;
@@ -19,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Data;
 import net.sf.jasperreports.engine.JRException;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -38,8 +38,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/tax")
 public class TaxController {
-    @Autowired
-    private TaxCalculator taxCalculatorService;
+
 
     @Autowired
     private TransactionMiddleware transactionMiddleware;
@@ -60,25 +59,7 @@ public class TaxController {
 
         Owner owner = ownerService.findByEmail(AuthUtils.getCurrentlyLoggedInPerson());
 
-        List<JasperPDFService.ProductInfo> reportProducts = new ArrayList<>();
-
-        EtimsTransactionDto etimReq = new EtimsTransactionDto();
-        etimReq.setOwnerPin(owner.getKRAPin());
-        etimReq.setBussinessPin(owner.getBusinessKRAPin());
-        etimReq.setBuyerPin(request.getBuyerKRAPin());
-        List<EtimsProduct> etimsSales = new ArrayList<>();
-
-        for (TransactionProduct sold : request.getSales()) {
-            Product product = productService.findById(sold.getProductId());
-            double amount = product.getUnitPrice() * sold.getQuantity();
-            EtimsProduct etimsProduct = new EtimsProduct();
-            etimsProduct.setTaxable(product.isTaxable());
-            etimsProduct.setAmount(amount);
-            etimsProduct.setName(product.getName());
-            reportProducts.add(new JasperPDFService.ProductInfo(sold.getProductId(), sold.getQuantity(), request.getBuyerKRAPin(), amount));
-            etimsSales.add(etimsProduct);
-        }
-        etimReq.setSales(etimsSales);
+        EtimsTransactionDto etimReq = generateEtimsRequest(request, owner);
 
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -91,13 +72,12 @@ public class TaxController {
             TransactionResponse transactionResponse = objectMapper.readValue(response.getBody().toString(), TransactionResponse.class);
 
 
-
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
             headers.setContentDispositionFormData("attachment", "invoice.pdf");
             System.out.println("Generated PDF");
 
-            ByteArrayOutputStream reportArrayOutputStream = jasperPDFService.exportJasperReport(request,transactionResponse.getData());
+            ByteArrayOutputStream reportArrayOutputStream = jasperPDFService.exportJasperReport(request, transactionResponse.getData());
             System.out.println("Generated output Stream");
             byte[] reportBytes = reportArrayOutputStream.toByteArray();
             reportArrayOutputStream.close();
@@ -110,7 +90,6 @@ public class TaxController {
             return new ResponseEntity<>(reportBytes, responseHeaders, HttpStatus.CREATED);
 
         }
-
 
 
 //        if(response.getStatusCode()==HttpStatus.NOT_FOUND){
@@ -140,8 +119,32 @@ public class TaxController {
 //        responseHeaders.setContentLength(reportBytes.length);
 //        responseHeaders.setContentDispositionFormData("attachment", "receipt.pdf");
 
-        return  ResponseEntity.ok( "Good");
+        return ResponseEntity.ok("Good");
 
+    }
+
+    @NotNull
+    private EtimsTransactionDto generateEtimsRequest(TransactionRequest request, Owner owner) {
+        List<JasperPDFService.ProductInfo> reportProducts = new ArrayList<>();
+
+        EtimsTransactionDto etimReq = new EtimsTransactionDto();
+        etimReq.setOwnerPin(owner.getKRAPin());
+        etimReq.setBussinessPin(owner.getBusinessKRAPin());
+        etimReq.setBuyerPin(request.getBuyerKRAPin());
+        List<EtimsProduct> etimsSales = new ArrayList<>();
+
+        for (TransactionProduct sold : request.getSales()) {
+            Product product = productService.findById(sold.getProductId());
+            double amount = product.getUnitPrice() * sold.getQuantity();
+            EtimsProduct etimsProduct = new EtimsProduct();
+            etimsProduct.setTaxable(product.isTaxable());
+            etimsProduct.setAmount(amount);
+            etimsProduct.setName(product.getName());
+            reportProducts.add(new JasperPDFService.ProductInfo(sold.getProductId(), sold.getQuantity(), request.getBuyerKRAPin(), amount));
+            etimsSales.add(etimsProduct);
+        }
+        etimReq.setSales(etimsSales);
+        return etimReq;
     }
 
     @Data
