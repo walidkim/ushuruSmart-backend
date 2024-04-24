@@ -1,6 +1,7 @@
 package com.emtech.ushurusmart.transactions.service;
 
-import com.emtech.ushurusmart.transactions.controller.TransactionController;
+
+import com.emtech.ushurusmart.transactions.controller.TaxController;
 import com.emtech.ushurusmart.transactions.entity.Product;
 import com.itextpdf.io.font.FontProgram;
 import com.itextpdf.io.font.FontProgramFactory;
@@ -29,7 +30,7 @@ public class InvoiceService {
  @Autowired
  private ProductService productService;
 
-    public byte[] generateInvoice(String buyerPin, List<ProductInfo> products, TransactionController.TransactionData product) throws IOException {
+    public byte[] generateInvoice(String buyerPin, List<ProductInfo> products, TaxController.TransactionData product) throws IOException {
 
        String currency= "Kshs ";
        int counter=1;

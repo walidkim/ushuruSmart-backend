@@ -1,6 +1,5 @@
 package com.emtech.ushurusmart.payments.entity;
 
-import com.emtech.ushurusmart.Etims.entity.Etims;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -16,9 +15,6 @@ public class PaymentEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "business_name", referencedColumnName = "businessName", nullable = false)
-    private Etims etims;
 
     @Column(name = "e_slip_number", nullable = false)
     private Long eSlipNumber;

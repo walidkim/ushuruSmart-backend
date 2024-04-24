@@ -1,5 +1,7 @@
 package com.emtech.ushurusmart.transactions.Dto;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,8 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TransactionRequest {
-    private String buyerKRAPin;
-    private long productId;
-    private int quantity;
-    private double amount;
+        private String buyerKRAPin;
+        private List<TransactionProduct> products;
 }
+
+

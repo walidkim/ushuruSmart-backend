@@ -1,8 +1,11 @@
 package com.emtech.ushurusmart.transactions.controller;
 
-import com.emtech.ushurusmart.Etims.Dtos.controller.TransactionDto;
-import com.emtech.ushurusmart.Etims.controller.EtimTransactionController;
+
 import com.emtech.ushurusmart.Etims.service.TaxCalculator;
+import com.emtech.ushurusmart.etims_middleware.TransactionMiddleware;
+import com.emtech.ushurusmart.transactions.Dto.EtimsProduct;
+import com.emtech.ushurusmart.transactions.Dto.EtimsTransactionDto;
+import com.emtech.ushurusmart.transactions.Dto.TransactionProduct;
 import com.emtech.ushurusmart.transactions.Dto.TransactionRequest;
 import com.emtech.ushurusmart.transactions.entity.Product;
 import com.emtech.ushurusmart.transactions.service.JasperPDFService;
@@ -10,7 +13,6 @@ import com.emtech.ushurusmart.transactions.service.ProductService;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
 import com.emtech.ushurusmart.usermanagement.service.OwnerService;
 import com.emtech.ushurusmart.usermanagement.utils.AuthUtils;
-import com.emtech.ushurusmart.utils.controller.ResContructor;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Data;
 import net.sf.jasperreports.engine.JRException;
@@ -28,53 +30,70 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 
 @RestController
 @RequestMapping("/api/v1/tax")
-public class TransactionController {
+public class TaxController {
     @Autowired
     private TaxCalculator taxCalculatorService;
+
+    @Autowired
+    private TransactionMiddleware transactionMiddleware;
 
     @Autowired
     private OwnerService ownerService;
 
     @Autowired
     private ProductService productService;
-    @Autowired
-    private EtimTransactionController etimTransactionController;
 
     @Autowired
     private JasperPDFService jasperPDFService;
 
 
     @PostMapping("/make-transaction")
-    public ResponseEntity<?> makeTransaction(@RequestBody TransactionRequest data, HttpServletResponse responses) throws IOException, JRException {
-        TransactionDto etimReq = new TransactionDto();
+    public ResponseEntity<?> makeTransaction(@RequestBody TransactionRequest request, HttpServletResponse responses) throws IOException, JRException {
+        System.out.println(" The data is " + request);
+  
         Owner owner = ownerService.findByEmail(AuthUtils.getCurrentlyLoggedInPerson());
-        Product product = productService.findById(data.getProductId());
+
+        List<JasperPDFService.ProductInfo> reportProducts = new ArrayList<>();
+
+        EtimsTransactionDto etimReq = new EtimsTransactionDto();
         etimReq.setOwnerPin(owner.getKRAPin());
-        etimReq.setTaxable(product.isTaxable());
-        etimReq.setAmount(product.getUnitPrice() * data.getQuantity());
         etimReq.setBussinessPin(owner.getBusinessKRAPin());
-        etimReq.setBuyerPin(data.getBuyerKRAPin());
-        ResponseEntity<ResContructor> response = etimTransactionController.makeTransaction(etimReq);
+        List<EtimsProduct> etimsProducts = new ArrayList<>();
 
-        System.out.println("Fetched" + response);
+        for(TransactionProduct sold:  request.getProducts()){
+            Product product= productService.findById(sold.getProductId());
+            double amount= product.getUnitPrice() * sold.getQuantity();
+            EtimsProduct etimsProduct = new EtimsProduct();
+            etimsProduct.setTaxable(product.isTaxable());
+            etimsProduct.setAmount(amount);
+         
+          
+            reportProducts.add(new JasperPDFService.ProductInfo(sold.getProductId(), sold.getQuantity(), request.getBuyerKRAPin(), amount));
 
-        if(response.getStatusCode()==HttpStatus.NOT_FOUND){
-            return response;
         }
-        TransactionData parsed= new TransactionData(Objects.requireNonNull(response.getBody()).getData().toString());
-        List<JasperPDFService.ProductInfo> products = new ArrayList<>();
-        products.add(new JasperPDFService.ProductInfo(data.getProductId(), data.getQuantity(), data.getBuyerKRAPin(), data.getAmount()));
+        System.out.println(etimReq.toString());
+
+        ResponseEntity<?> response = transactionMiddleware.makeTransaction();
+//        if(response.getStatusCode()==HttpStatus.NOT_FOUND){
+//            return response;
+//        }
+//        TransactionData parsed= new TransactionData(Objects.requireNonNull(response.getBody()).getData().toString());
+//
+//
+//
+
+     
+      
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);
         headers.setContentDispositionFormData("attachment", "invoice.pdf");
         System.out.println("Generated PDF");
 
-        ByteArrayOutputStream reportArrayOutputStream = jasperPDFService.exportJasperReport(responses, data.getBuyerKRAPin(), products, parsed);
+        ByteArrayOutputStream reportArrayOutputStream = jasperPDFService.exportJasperReport(responses, request.getBuyerKRAPin(), reportProducts, null);
         System.out.println("Generated output Stream");
         byte[] reportBytes = reportArrayOutputStream.toByteArray();
         reportArrayOutputStream.close();

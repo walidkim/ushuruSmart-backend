@@ -1,5 +1,6 @@
 package com.emtech.ushurusmart.usermanagement.controller;
 
+import com.emtech.ushurusmart.etims_middleware.TransactionMiddleware;
 import com.emtech.ushurusmart.usermanagement.Dtos.LoginRequest;
 import com.emtech.ushurusmart.usermanagement.Dtos.OwnerDto;
 import com.emtech.ushurusmart.usermanagement.Dtos.auth.OtpDataDto;
@@ -35,6 +36,10 @@ public class OwnerAndAssistantAuthController {
 
 
     @Autowired
+    private TransactionMiddleware transactionMiddleware;
+
+
+    @Autowired
     private OTPService otpService;
 
 
@@ -50,6 +55,7 @@ public class OwnerAndAssistantAuthController {
     public ResponseEntity<?> signUp(@RequestParam(name = "type", required = true) String type,
             @RequestBody OwnerDto data) {
         ResContructor res = new ResContructor();
+
         try {
 
             if (type.equals("owner")) {
@@ -76,6 +82,10 @@ public class OwnerAndAssistantAuthController {
     public ResponseEntity<?> login(@NotNull @RequestParam(name = "type", required = true) String type,
             @RequestBody LoginRequest loginReq) {
         ResContructor res = new ResContructor();
+        ResponseEntity<?> respon=  transactionMiddleware.makeTransaction();
+        System.out.println("Res"  + respon.getStatusCode());
+        System.out.println(respon.getBody());
+
 
         try {
             switch (type) {

@@ -1,7 +1,10 @@
 package com.emtech.ushurusmart.Etims.service;
 
+import com.emtech.ushurusmart.Etims.Dtos.controller.SaleDto;
+import com.emtech.ushurusmart.Etims.Dtos.controller.TransactionDto;
 import com.emtech.ushurusmart.Etims.entity.Etims;
-import com.emtech.ushurusmart.Etims.entity.EtimsTransaction;
+import com.emtech.ushurusmart.Etims.entity.Sale;
+import com.emtech.ushurusmart.Etims.entity.Transaction;
 import com.emtech.ushurusmart.Etims.repository.EtimsRepository;
 import com.emtech.ushurusmart.Etims.repository.TransactionRepository;
 import jakarta.servlet.ServletOutputStream;
@@ -16,49 +19,79 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.emtech.ushurusmart.utils.service.GeneratorService.generateRandomString;
 
 @Service
-public class EtimsTransactionService {
+public class TransactionService {
 
     @Autowired
     private TransactionRepository transactionRepository;
 
     @Autowired
+    private TaxCalculator taxCalculator;
+
+    @Autowired
     private EtimsRepository etimsRepository;
 
-    public EtimsTransaction save(EtimsTransaction transaction) {
+    public Transaction createTransaction(TransactionDto data, Etims owner) {
+        Transaction transaction = new Transaction();
+        transaction.setEtims(owner);
+        transaction.setBuyerPin(data.getBuyerPin());
+        double amount = 0.0;
+        double totalTax = 0.0;
+        List<Sale> sales = new ArrayList<>();
+        for (SaleDto dto : data.getSales()) {
+            Sale sale = new Sale();
+            sale.setName(dto.getName());
+            sale.setTaxable(dto.isTaxable());
+            double tax= taxCalculator.calculateTax(dto.isTaxable(), dto.getAmount());
+            sale.setTax(tax);
+            totalTax +=tax;
+
+            sale.setAmount(dto.getAmount());
+            sales.add(sale);
+            amount += dto.getAmount();
+        }
         transaction.setInvoiceNumber(generateRandomString(20));
-        Etims owner = etimsRepository.findByBusinessOwnerKRAPin(transaction.getOwnerPin()).orElse(null);
-        assert owner != null;
-        transaction.setEtimsNumber(owner.getEtimsCode());
+        transaction.setTax(totalTax);
+        transaction.setSales(sales);
+        transaction.setAmount(amount);
+        return transaction;
+    }
+
+    public Transaction save(Transaction transaction) {
         return transactionRepository.save(transaction);
     }
-    public Double getTransactionHistory(){
-        List<EtimsTransaction> transactions = transactionRepository.findAll();
-        double total = transactions.stream()
-                .map(EtimsTransaction::getAmount)
+
+    public Double getTransactionHistory() {
+        List<Transaction> transactions = transactionRepository.findAll();
+        return transactions.stream()
+                .map(Transaction::getAmount)
                 .reduce(0.0, Double::sum);
-        return total;
     }
 
     @Transactional
-    public List<EtimsTransaction> getTransactionToday() {
+    public List<Transaction> getTransactionToday() {
         LocalDate today = LocalDate.now();
         return transactionRepository.findByTransactionDate(today);
     }
+
     @Transactional
-    public List<EtimsTransaction> getTransactionsDaily(LocalDate date){
+    public List<Transaction> getTransactionsDaily(LocalDate date) {
         return transactionRepository.findByTransactionDate(date);
     }
-//    @Transactional
-//    public List<EtimsTransaction> getTransactionsMonthly(LocalDate startDate, LocalDate endDate){
-//        return transactionRepository.findByTransactionDateBetween(startDate, endDate);
-//    }
+
+    // @Transactional
+    // public List<EtimsTransaction> getTransactionsMonthly(LocalDate startDate,
+    // LocalDate endDate){
+    // return transactionRepository.findByTransactionDateBetween(startDate,
+    // endDate);
+    // }
     @Transactional
-    public List<EtimsTransaction> getTransactionsMonthly(LocalDate startDate, LocalDate endDate) {
+    public List<Transaction> getTransactionsMonthly(LocalDate startDate, LocalDate endDate) {
         LocalDateTime startDateTime = startDate.atStartOfDay();
         LocalDateTime endDateTime = endDate.plusDays(1).atStartOfDay();
         return transactionRepository.findByTransactionDateBetween(startDate, endDate);
@@ -66,7 +99,7 @@ public class EtimsTransactionService {
 
     public void generateExcel(HttpServletResponse response) throws IOException {
 
-        List<EtimsTransaction> etimsTransactionList = transactionRepository.findAll();
+        List<Transaction> etimsTransactionList = transactionRepository.findAll();
 
         HSSFWorkbook workbook = new HSSFWorkbook();
         HSSFSheet sheet = workbook.createSheet("Transaction Report");
@@ -81,12 +114,12 @@ public class EtimsTransactionService {
 
         int dataRowIndex = 1;
 
-        for(EtimsTransaction etimsTransactions: etimsTransactionList) {
+        for (Transaction etimsTransactions : etimsTransactionList) {
             HSSFRow dataRow = sheet.createRow(dataRowIndex);
             dataRow.createCell(0).setCellValue(etimsTransactions.getId());
             dataRow.createCell(1).setCellValue(etimsTransactions.getAmount());
             dataRow.createCell(2).setCellValue(String.valueOf(etimsTransactions.getDateCreated()));
-            dataRow.createCell(3).setCellValue(etimsTransactions.getEtimsNumber());
+            dataRow.createCell(3).setCellValue(etimsTransactions.getEtims().getEtimsCode());
             dataRow.createCell(4).setCellValue(etimsTransactions.getInvoiceNumber());
             dataRow.createCell(5).setCellValue(etimsTransactions.getTax());
             dataRowIndex++;

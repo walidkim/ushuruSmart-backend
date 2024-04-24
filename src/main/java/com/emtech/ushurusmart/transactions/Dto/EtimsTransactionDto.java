@@ -1,18 +1,17 @@
-package com.emtech.ushurusmart.Etims.Dtos.controller;
+package com.emtech.ushurusmart.transactions.Dto;
 
 import java.util.List;
-
 
 import lombok.Data;
 
 @Data
-public class TransactionDto {
+public class EtimsTransactionDto {
 
    private String ownerPin;
 
    private String buyerPin;
 
    private String bussinessPin;
-   private List<SaleDto> sales;
+   private List<EtimsProduct> products;
 
 }
