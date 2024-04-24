@@ -39,9 +39,7 @@ public class TransactionController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
             }
             Transaction transaction = transactionService.createTransaction(data, owner);
-
             Transaction saved = transactionService.save(transaction);
-
             res.setData(saved);
             return ResponseEntity.status(HttpStatus.CREATED).body(res);
         } catch (Exception e) {

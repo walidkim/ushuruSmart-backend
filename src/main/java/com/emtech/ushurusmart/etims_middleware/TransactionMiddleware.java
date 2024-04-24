@@ -13,9 +13,6 @@ public class TransactionMiddleware {
     @Value("${server.port}")
      private String serverPort;
     public  ResponseEntity<?> makeTransaction(String data){
-        System.out.println("The server port=" + serverPort);
-
-        System.out.println(data);
 
         WebClient webClient = WebClient.create("http://localhost:" + serverPort);
 

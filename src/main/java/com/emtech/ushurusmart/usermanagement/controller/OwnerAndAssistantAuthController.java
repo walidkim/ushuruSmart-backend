@@ -181,8 +181,7 @@ public class OwnerAndAssistantAuthController {
                     if(assistant==null){
                         throw new BadCredentialsException("Invalid assistant");
                     }
-
-                    System.out.println(assistant);
+                    
 
 
                     String token = jwtUtil.createToken(assistant);

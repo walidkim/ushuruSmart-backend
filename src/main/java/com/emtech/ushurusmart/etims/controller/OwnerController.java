@@ -1,9 +1,10 @@
 package com.emtech.ushurusmart.etims.controller;
 
+import com.emtech.ushurusmart.etims.Dtos.controller.VerificationRequest;
 import com.emtech.ushurusmart.etims.entity.Etims;
-
 import com.emtech.ushurusmart.etims.service.EtimsOwnerService;
 import com.emtech.ushurusmart.utils.controller.ResContructor;
+import com.emtech.ushurusmart.utils.controller.Responses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,28 @@ public class OwnerController {
 
     @Autowired
     private EtimsOwnerService ownerService;
+
+    @PostMapping("/verify")
+    public ResponseEntity<?> verifyBussiness(@RequestBody VerificationRequest data) {
+        ResContructor res = new ResContructor();
+        try {
+            Etims details = ownerService.findByBusinessKRAPin(data.getBusinessKRAPIN());
+            if(details==null){
+                res.setMessage("This business is not registered by KRA.");
+                res.setData(false);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
+            }
+            else{
+                res.setMessage("Business registered by KRA.");
+                res.setData(details);
+                return ResponseEntity.status(HttpStatus.FOUND).body(res);
+            }
+
+        } catch (Exception e) {
+            return Responses.create500Response(e);
+        }
+    }
+
 
     @PostMapping("/create")
     public ResponseEntity<?> etimsSave(@RequestBody Etims data) {
@@ -33,10 +56,8 @@ public class OwnerController {
 
     @PutMapping("/update/{businessOwnerKRAPin}")
     public ResponseEntity<?> etimsUpdate(@PathVariable String businessOwnerKRAPin, @RequestBody Etims data) {
-        System.out.println(businessOwnerKRAPin);
         ResContructor res = new ResContructor();
         try {
-            System.out.println();
             if (ownerService.findByBusinessOwnerKRAPin(businessOwnerKRAPin) == null) {
                 res.setMessage("No business owner with those details exists.");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
