@@ -1,7 +1,7 @@
 package com.emtech.ushurusmart.usermanagement.service;
 
-import com.emtech.ushurusmart.Etims.entity.Etims;
-import com.emtech.ushurusmart.Etims.service.EtimsOwnerService;
+import com.emtech.ushurusmart.etims.entity.Etims;
+import com.emtech.ushurusmart.etims.service.EtimsOwnerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;

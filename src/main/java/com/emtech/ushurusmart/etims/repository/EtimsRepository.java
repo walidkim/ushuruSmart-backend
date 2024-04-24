@@ -1,11 +1,11 @@
-package com.emtech.ushurusmart.Etims.repository;
+package com.emtech.ushurusmart.etims.repository;
 
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.emtech.ushurusmart.Etims.entity.Etims;
+import com.emtech.ushurusmart.etims.entity.Etims;
 
 import jakarta.transaction.Transactional;
 

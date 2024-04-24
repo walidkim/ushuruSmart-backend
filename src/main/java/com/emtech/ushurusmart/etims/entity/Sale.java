@@ -1,4 +1,4 @@
-package com.emtech.ushurusmart.Etims.entity;
+package com.emtech.ushurusmart.etims.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

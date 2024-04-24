@@ -1,7 +1,7 @@
 package com.emtech.ushurusmart.transactions.controller;
 
 
-import com.emtech.ushurusmart.Etims.service.TaxCalculator;
+import com.emtech.ushurusmart.etims.service.TaxCalculator;
 import com.emtech.ushurusmart.etims_middleware.TransactionMiddleware;
 import com.emtech.ushurusmart.transactions.Dto.EtimsProduct;
 import com.emtech.ushurusmart.transactions.Dto.EtimsTransactionDto;
@@ -13,6 +13,7 @@ import com.emtech.ushurusmart.transactions.service.ProductService;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
 import com.emtech.ushurusmart.usermanagement.service.OwnerService;
 import com.emtech.ushurusmart.usermanagement.utils.AuthUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Data;
 import net.sf.jasperreports.engine.JRException;
@@ -62,22 +63,33 @@ public class TaxController {
         EtimsTransactionDto etimReq = new EtimsTransactionDto();
         etimReq.setOwnerPin(owner.getKRAPin());
         etimReq.setBussinessPin(owner.getBusinessKRAPin());
-        List<EtimsProduct> etimsProducts = new ArrayList<>();
+        etimReq.setBuyerPin(request.getBuyerKRAPin());
+        List<EtimsProduct> etimsSales = new ArrayList<>();
 
-        for(TransactionProduct sold:  request.getProducts()){
+        for(TransactionProduct sold:  request.getSales()){
             Product product= productService.findById(sold.getProductId());
             double amount= product.getUnitPrice() * sold.getQuantity();
             EtimsProduct etimsProduct = new EtimsProduct();
             etimsProduct.setTaxable(product.isTaxable());
             etimsProduct.setAmount(amount);
-         
-          
+            etimsProduct.setName(product.getName());
             reportProducts.add(new JasperPDFService.ProductInfo(sold.getProductId(), sold.getQuantity(), request.getBuyerKRAPin(), amount));
-
+            etimsSales.add(etimsProduct);
         }
+        etimReq.setSales(etimsSales);
         System.out.println(etimReq.toString());
 
-        ResponseEntity<?> response = transactionMiddleware.makeTransaction();
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonString = objectMapper.writeValueAsString(etimReq);
+        System.out.println(jsonString);
+
+        ResponseEntity<?> response = transactionMiddleware.makeTransaction(jsonString);
+
+
+        System.out.println(response.getBody());
+        System.out.println(response.getStatusCode().value());
+
+
 //        if(response.getStatusCode()==HttpStatus.NOT_FOUND){
 //            return response;
 //        }

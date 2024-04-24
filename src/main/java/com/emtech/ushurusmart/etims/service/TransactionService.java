@@ -1,12 +1,13 @@
-package com.emtech.ushurusmart.Etims.service;
+package com.emtech.ushurusmart.etims.service;
 
-import com.emtech.ushurusmart.Etims.Dtos.controller.SaleDto;
-import com.emtech.ushurusmart.Etims.Dtos.controller.TransactionDto;
-import com.emtech.ushurusmart.Etims.entity.Etims;
-import com.emtech.ushurusmart.Etims.entity.Sale;
-import com.emtech.ushurusmart.Etims.entity.Transaction;
-import com.emtech.ushurusmart.Etims.repository.EtimsRepository;
-import com.emtech.ushurusmart.Etims.repository.TransactionRepository;
+import com.emtech.ushurusmart.etims.Dtos.controller.SaleDto;
+import com.emtech.ushurusmart.etims.Dtos.controller.TransactionDto;
+import com.emtech.ushurusmart.etims.entity.Etims;
+import com.emtech.ushurusmart.etims.entity.Sale;
+import com.emtech.ushurusmart.etims.entity.Transaction;
+import com.emtech.ushurusmart.etims.repository.EtimsRepository;
+import com.emtech.ushurusmart.etims.repository.SalesRepository;
+import com.emtech.ushurusmart.etims.repository.TransactionRepository;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
@@ -31,6 +32,9 @@ public class TransactionService {
     private TransactionRepository transactionRepository;
 
     @Autowired
+    private SalesRepository salesRepository;
+
+    @Autowired
     private TaxCalculator taxCalculator;
 
     @Autowired
@@ -52,6 +56,7 @@ public class TransactionService {
             totalTax +=tax;
 
             sale.setAmount(dto.getAmount());
+            salesRepository.save(sale);
             sales.add(sale);
             amount += dto.getAmount();
         }

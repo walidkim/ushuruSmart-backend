@@ -14,9 +14,9 @@ public class OtpEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @Column(nullable = false)
-    private String userTag="";
+    private String userTag;
     @Column(nullable = false)
-    private String otpCode="";
+    private String otpCode;
     private LocalDateTime validUntil;
 
 }

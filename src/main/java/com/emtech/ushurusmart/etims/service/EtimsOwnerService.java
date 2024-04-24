@@ -1,7 +1,7 @@
-package com.emtech.ushurusmart.Etims.service;
+package com.emtech.ushurusmart.etims.service;
 
-import com.emtech.ushurusmart.Etims.entity.Etims;
-import com.emtech.ushurusmart.Etims.repository.EtimsRepository;
+import com.emtech.ushurusmart.etims.entity.Etims;
+import com.emtech.ushurusmart.etims.repository.EtimsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

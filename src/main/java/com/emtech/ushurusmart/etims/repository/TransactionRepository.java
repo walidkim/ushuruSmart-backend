@@ -1,7 +1,7 @@
-package com.emtech.ushurusmart.Etims.repository;
+package com.emtech.ushurusmart.etims.repository;
 
 
-import com.emtech.ushurusmart.Etims.entity.Transaction;
+import com.emtech.ushurusmart.etims.entity.Transaction;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

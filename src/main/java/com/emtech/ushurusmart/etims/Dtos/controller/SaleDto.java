@@ -1,4 +1,4 @@
-package com.emtech.ushurusmart.Etims.Dtos.controller;
+package com.emtech.ushurusmart.etims.Dtos.controller;
 
 import lombok.Data;
 

@@ -1,4 +1,4 @@
-package com.emtech.ushurusmart.Etims.service;
+package com.emtech.ushurusmart.etims.service;
 
 import com.emtech.ushurusmart.transactions.service.TaxCalculatortInt;
 import org.springframework.stereotype.Service;

@@ -1,8 +1,8 @@
-package com.emtech.ushurusmart.Etims.controller;
+package com.emtech.ushurusmart.etims.controller;
 
-import com.emtech.ushurusmart.Etims.entity.Etims;
+import com.emtech.ushurusmart.etims.entity.Etims;
 
-import com.emtech.ushurusmart.Etims.service.EtimsOwnerService;
+import com.emtech.ushurusmart.etims.service.EtimsOwnerService;
 import com.emtech.ushurusmart.utils.controller.ResContructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

@@ -41,7 +41,7 @@ public class JasperPDFService {
             data.put("unitPrice", currency + prod.getUnitPrice());
             data.put("quantity", info.getQuantity());
             data.put("unitOfMeasure", prod.getUnitOfMeasure());
-            data.put("tax", currency + product.getTax());
+            data.put("tax",23);
             data.put("amount", info.getAmount());
             dataList.add(data);
             counter++;

@@ -1,10 +1,10 @@
-package com.emtech.ushurusmart.Etims.controller;
+package com.emtech.ushurusmart.etims.controller;
 
-import com.emtech.ushurusmart.Etims.Dtos.controller.TransactionDto;
-import com.emtech.ushurusmart.Etims.entity.Etims;
-import com.emtech.ushurusmart.Etims.entity.Transaction;
-import com.emtech.ushurusmart.Etims.service.EtimsOwnerService;
-import com.emtech.ushurusmart.Etims.service.TransactionService;
+import com.emtech.ushurusmart.etims.Dtos.controller.TransactionDto;
+import com.emtech.ushurusmart.etims.entity.Etims;
+import com.emtech.ushurusmart.etims.entity.Transaction;
+import com.emtech.ushurusmart.etims.service.EtimsOwnerService;
+import com.emtech.ushurusmart.etims.service.TransactionService;
 import com.emtech.ushurusmart.utils.controller.ResContructor;
 import com.emtech.ushurusmart.utils.controller.Responses;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,7 +19,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/etims/tax")
+@RequestMapping("/api/v1/etims/tax")
 public class TransactionController {
 
     @Autowired
@@ -30,11 +30,10 @@ public class TransactionController {
 
     @PostMapping("/make-transaction")
     public ResponseEntity<ResContructor> makeTransaction(@RequestBody TransactionDto data) {
-        System.out.println(data);
         try {
             ResContructor res = new ResContructor();
             Etims owner = etimsOwnerService.findByBusinessKRAPin(data.getBussinessPin());
-            res.setMessage("Registered the owner successfully.");
+            res.setMessage("Transaction recorded successfully.");
             if (owner == null) {
                 res.setMessage("Business is not registered by Etims.");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);

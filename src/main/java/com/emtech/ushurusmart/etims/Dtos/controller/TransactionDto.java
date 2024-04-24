@@ -1,9 +1,8 @@
-package com.emtech.ushurusmart.Etims.Dtos.controller;
-
-import java.util.List;
-
+package com.emtech.ushurusmart.etims.Dtos.controller;
 
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class TransactionDto {

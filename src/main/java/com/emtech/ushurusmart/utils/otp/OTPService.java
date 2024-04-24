@@ -19,6 +19,7 @@ public class OTPService {
         otpEntity.setUserTag(usertag);
         otpEntity.setOtpCode(otpcode);
         otpEntity.setValidUntil(LocalDateTime.now().plusMinutes(10) );
+        System.out.println(otpEntity);
         otpRepository.save(otpEntity);
     }
 

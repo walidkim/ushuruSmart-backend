@@ -1,6 +1,7 @@
 package com.emtech.ushurusmart.etims_middleware;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.ClientResponse;
@@ -11,18 +12,17 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class TransactionMiddleware {
     @Value("${server.port}")
      private String serverPort;
-    public  ResponseEntity<?> makeTransaction(){
+    public  ResponseEntity<?> makeTransaction(String data){
+        System.out.println("The server port=" + serverPort);
 
+        System.out.println(data);
 
         WebClient webClient = WebClient.create("http://localhost:" + serverPort);
 
-        // Assuming you want to send a JSON body
-        String jsonBody = "{\"key\":\"value\"}"; // Replace this with your actual JSON body
-
-        // Make the POST request and get the ClientResponse
         ClientResponse clientResponse = webClient.post()
-                .uri("/api/v1/admin/add")
-                .bodyValue(jsonBody)
+                .uri("/api/v1/etims/tax/make-transaction")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(data)
                 .exchange()
                 .block(); // Block to wait for the response
 

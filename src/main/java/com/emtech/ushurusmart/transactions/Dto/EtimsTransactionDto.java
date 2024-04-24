@@ -1,8 +1,8 @@
 package com.emtech.ushurusmart.transactions.Dto;
 
-import java.util.List;
-
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class EtimsTransactionDto {
@@ -12,6 +12,6 @@ public class EtimsTransactionDto {
    private String buyerPin;
 
    private String bussinessPin;
-   private List<EtimsProduct> products;
+   private List<EtimsProduct> sales;
 
 }

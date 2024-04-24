@@ -82,9 +82,6 @@ public class OwnerAndAssistantAuthController {
     public ResponseEntity<?> login(@NotNull @RequestParam(name = "type", required = true) String type,
             @RequestBody LoginRequest loginReq) {
         ResContructor res = new ResContructor();
-        ResponseEntity<?> respon=  transactionMiddleware.makeTransaction();
-        System.out.println("Res"  + respon.getStatusCode());
-        System.out.println(respon.getBody());
 
 
         try {

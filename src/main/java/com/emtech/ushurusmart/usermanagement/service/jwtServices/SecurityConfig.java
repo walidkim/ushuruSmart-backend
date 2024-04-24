@@ -24,10 +24,6 @@ public class SecurityConfig {
     private final JwtAuthorizationFilter jwtAuthorizationFilter;
 
     @Autowired
-    public void configureAuth(AuthenticationManagerBuilder auth) throws Exception {
-    }
-
-    @Autowired
     public SecurityConfig(CustomUserDetailsService customUserDetailsService,
                           JwtAuthorizationFilter jwtAuthorizationFilter) {
         this.userDetailsService = customUserDetailsService;
@@ -35,7 +31,9 @@ public class SecurityConfig {
 
     }
 
-
+    @Autowired
+    public void configureAuth(AuthenticationManagerBuilder auth) throws Exception {
+    }
 
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http, PasswordEncoder passwordEncoder)
@@ -54,6 +52,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth.requestMatchers(
                                         "/v2/api-docs",
                                         "/api/v1/auth/**",
+                                        "/api/v1/etims/**",
                                         "/api-docs",
                                         "/api-docs/**",
                                         "/v3/api-docs",
@@ -69,7 +68,7 @@ public class SecurityConfig {
                                         "/swagger-ui.html",
                                         "/swagger-resources/configuration/ui",
                                         "/swagger-ui/index.html",
-                        "/error/**"
+                                        "/error/**"
                                 ).permitAll()
                                 .anyRequest().authenticated()
                 )
@@ -78,6 +77,7 @@ public class SecurityConfig {
 
         return http.build();
     }
+
     @Bean
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

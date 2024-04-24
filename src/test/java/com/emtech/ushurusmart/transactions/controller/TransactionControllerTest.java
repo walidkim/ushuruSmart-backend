@@ -1,8 +1,8 @@
 package com.emtech.ushurusmart.transactions.controller;
 
-import com.emtech.ushurusmart.Etims.repository.EtimsRepository;
-import com.emtech.ushurusmart.Etims.repository.TransactionRepository;
 import com.emtech.ushurusmart.UshuruSmartApplication;
+import com.emtech.ushurusmart.etims.repository.EtimsRepository;
+import com.emtech.ushurusmart.etims.repository.TransactionRepository;
 import com.emtech.ushurusmart.transactions.entity.Product;
 import com.emtech.ushurusmart.transactions.factory.EntityFactory;
 import com.emtech.ushurusmart.transactions.repository.ProductRepository;
@@ -14,6 +14,7 @@ import com.emtech.ushurusmart.usermanagement.repository.AssistantRepository;
 import com.emtech.ushurusmart.usermanagement.repository.OwnerRepository;
 import com.emtech.ushurusmart.usermanagement.service.OwnerService;
 import com.emtech.ushurusmart.usermanagement.service.SampleDataInitializer;
+import com.emtech.ushurusmart.utils.otp.OtpRepository;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,7 +28,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.context.TestPropertySource;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -42,8 +42,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,classes = UshuruSmartApplication.class)
-@TestPropertySource(locations = "")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,classes = UshuruSmartApplication.class)
 public class TransactionControllerTest {
     @Autowired
     private ProductRepository productRepository;
@@ -67,22 +66,34 @@ public class TransactionControllerTest {
     private SampleDataInitializer sampleDataInitializer;
 
 
+    @Autowired
+    private OtpRepository otpRepository;
+
+
     @LocalServerPort
     private int port;
 
     private String token;
 
-    private String signUpUrl;
-
     private String loginUrl;
+
+    private String verifyOtpUrl;
+
 
     @BeforeEach
     public void setup() throws IOException {
-
+        transactionRepository.deleteAll();
+        etimsRepository.deleteAll();
+        productRepository.deleteAll();
+        assistantRepository.deleteAll();
         ownerRepository.deleteAll();
 
-        signUpUrl = "http://localhost:" + port + "/api/v1/auth/sign-up?type=owner";
-        loginUrl = "http://localhost:" + port + "/api/v1/auth/login?type=owner";
+
+
+
+
+       loginUrl = "http://localhost:" + port + "/api/v1/auth/login?type=owner";
+        verifyOtpUrl = "http://localhost:" + port + "/api/v1/auth/verify-otp";
         loginAndGetToken();
         sampleDataInitializer.initSampleData();
 
@@ -90,8 +101,10 @@ public class TransactionControllerTest {
 
     @AfterEach
     public void tearDown() {
-        etimsRepository.deleteAll();
         transactionRepository.deleteAll();
+        etimsRepository.deleteAll();
+        productRepository.deleteAll();
+        assistantRepository.deleteAll();
         ownerRepository.deleteAll();
     }
 
@@ -111,10 +124,21 @@ public class TransactionControllerTest {
         ValidatableResponse res = given().header("Content-Type", "application/json").body(loginJson).when()
                 .post(loginUrl)
                 .then()
-                .statusCode(is(201)).body(containsString("Bearer "));
+                .statusCode(is(201));
+        String otpCode= otpRepository.findAll().get(0).getOtpCode();
+        String verifyOtp= "{\n" +
+                " \"phoneNumber\": \"25489898989\",\n" +
+                " \"type\": \"owner\",\n" +
+                " \"otpCode\": \""+otpCode+"\"\n" +
+                "}";
+        res = given().header("Content-Type", "application/json").body(verifyOtp).when()
+                .post(verifyOtpUrl)
+                .then()
+                .statusCode(is(201));
+
+
 
         String jsonString = res.body(containsString("")).extract().response().getBody().asString();
-
         JsonNode jsonNode = new ObjectMapper().readTree(jsonString);
         token = jsonNode.get("data").get("token").asText();
     }
@@ -125,13 +149,21 @@ public class TransactionControllerTest {
     public void shouldMakeATransaction() {
         Product prod= addProduct("test1");
         String url = ("http://localhost:" + port + "/api/v1/tax/make-transaction");
-        String payload = "{\"buyerKRAPin\":\"123456789\",\"productId\":\""+prod.getId()+"\",\"quantity\":20}";
+        String payload = "{\n" +
+                " \"buyerKRAPin\": \"A12345678H\",\n" +
+                " \"sales\": [\n" +
+                "    {\n" +
+                "      \"productId\": \""+prod.getId()+ "\",\n" +
+                "      \"quantity\": 20\n" +
+                "    }\n" +
+                " ]\n" +
+                "}";
         ValidatableResponse res = given().header("Content-Type", "application/json").header("Authorization", token).body(payload).when()
                 .post(url)
                 .then()
-                .statusCode(is(201));
+                .statusCode(is(400));
         ResponseBody jsonString = res.body(containsString("")).extract().response().getBody();
-        System.out.println("res"+jsonString);
+
 
         byte[] pdfBytes = jsonString.asByteArray();
 
