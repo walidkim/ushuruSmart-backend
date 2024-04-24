@@ -204,7 +204,7 @@ public class TransactionControllerTest {
 
     @Transactional
     private Product addProduct(String name) {
-        Product prod = EntityFactory.createProduct(new ProductDto("test desc", name, (int) Math.ceil(Math.random() * 1000), false, "Electronics", "kg",100));
+        Product prod = EntityFactory.createProduct(new ProductDto("test desc", name, (int) Math.ceil(Math.random() * 100), false, "Electronics", "kg",100));
         prod.setTaxable(true);
         prod = productRepository.save(prod);
         Owner owner = ownerRepository.findAll().get(0);
