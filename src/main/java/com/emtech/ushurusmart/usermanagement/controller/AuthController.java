@@ -5,13 +5,13 @@ import com.emtech.ushurusmart.usermanagement.Dtos.LoginRequest;
 import com.emtech.ushurusmart.usermanagement.Dtos.OwnerDto;
 import com.emtech.ushurusmart.usermanagement.Dtos.auth.OtpDataDto;
 import com.emtech.ushurusmart.usermanagement.Dtos.auth.OwnerLoginRes;
-import com.emtech.ushurusmart.usermanagement.factory.EntityFactory;
 import com.emtech.ushurusmart.usermanagement.model.Assistant;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
 import com.emtech.ushurusmart.usermanagement.service.AssistantService;
 import com.emtech.ushurusmart.usermanagement.service.OwnerService;
 import com.emtech.ushurusmart.usermanagement.service.jwtServices.JwtTokenUtil;
 import com.emtech.ushurusmart.utils.controller.ResContructor;
+import com.emtech.ushurusmart.utils.controller.Responses;
 import com.emtech.ushurusmart.utils.otp.OTPService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/auth")
-public class OwnerAndAssistantAuthController {
+public class AuthController {
 
     @Autowired
     private OwnerService ownerService;
@@ -55,28 +55,20 @@ public class OwnerAndAssistantAuthController {
     public ResponseEntity<?> signUp(@RequestParam(name = "type", required = true) String type,
             @RequestBody OwnerDto data) {
         ResContructor res = new ResContructor();
-
         try {
-
             if (type.equals("owner")) {
-                if (ownerService.findByEmail(data.getEmail()) != null) {
-                    res.setMessage(HelperUtil.capitalizeFirst(type) + " with that email exists!");
-                    return ResponseEntity.badRequest().body(res);
-                }
-                Owner owner = EntityFactory.createOwner(data);
-                res.setMessage(HelperUtil.capitalizeFirst(type) + " created successfully!");
-                res.setData( ownerService.save(owner));
-                return ResponseEntity.status(HttpStatus.CREATED).body(res);
+                return ownerService.validateAndCreateUser(type, data, res);
             }
             res.setMessage(HelperUtil.capitalizeFirst(type) + " is invalid.");
             return ResponseEntity.badRequest().body(res);
 
         }catch (Exception e){
-            res.setMessage("Error " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
+            System.out.println(e.getMessage());
+            return Responses.create500Response(e);
         }
 
     }
+
 
     @PostMapping(value = "/login")
     public ResponseEntity<?> login(@NotNull @RequestParam(name = "type", required = true) String type,
@@ -87,25 +79,9 @@ public class OwnerAndAssistantAuthController {
         try {
             switch (type) {
                 case "owner": {
-                    Owner owner = ownerService.findByEmail(loginReq.getEmail());
-                    if (owner == null) {
-                        res.setMessage("No " + HelperUtil.capitalizeFirst(type) + " by that email exists.");
+                    return ownerService.loginOwner(type, loginReq, res);
 
-                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
-                    }
-
-                    Authentication authentication = authenticationManager
-                            .authenticate(new UsernamePasswordAuthenticationToken(loginReq.getEmail(),
-                                    loginReq.getPassword(),owner.getAuthorities() != null ? owner.getAuthorities() : Collections.emptyList()));
-                    otpService.sendOTP(owner.getPhoneNumber());
-                    res.setMessage("Sent an otp short code to your phone for verification");
-                    Map<String,String> resBody= new HashMap<>();
-                    resBody.put("type", type);
-                    resBody.put("phoneNumber", owner.getPhoneNumber());
-                    res.setData(resBody);
-                    return ResponseEntity.status(HttpStatus.CREATED).body(res);
-
-              }
+                }
                 case "assistant": {
 
                     Assistant assistant = assistantService.findByEmail(loginReq.getEmail());
@@ -140,6 +116,9 @@ public class OwnerAndAssistantAuthController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
         }
     }
+
+    @NotNull
+
 
 
     @PostMapping(value = "/verify-otp")
@@ -181,7 +160,7 @@ public class OwnerAndAssistantAuthController {
                     if(assistant==null){
                         throw new BadCredentialsException("Invalid assistant");
                     }
-                    
+
 
 
                     String token = jwtUtil.createToken(assistant);
