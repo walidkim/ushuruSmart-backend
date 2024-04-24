@@ -11,7 +11,6 @@ import com.emtech.ushurusmart.usermanagement.service.OwnerService;
 import com.emtech.ushurusmart.usermanagement.utils.AuthUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.Data;
 import net.sf.jasperreports.engine.JRException;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -137,59 +136,6 @@ public class TaxController {
         return etimReq;
     }
 
-    @Data
-    public static class TransactionData {
-
-        private long id;
-        private double totalAmount;
-        private double tax;
-        private String ownerPin;
-        private String buyerPin;
-        private boolean taxable;
-        private String invoiceNumber;
-        private String etimsNumber;
-        private String dateCreated;
-
-        public TransactionData(String data) {
-            String trimmedData = data.substring(12, data.length() - 1); // Remove "Transaction(" and ")"
-            String[] fields = trimmedData.split(","); // Split by comma
-            for (String field : fields) {
-                String[] keyValue = field.trim().split("="); // Split by equal sign
-                switch (keyValue[0]) {
-                    case "id":
-                        this.id = Long.parseLong(keyValue[1]);
-                        break;
-                    case "totalAmount":
-                        this.totalAmount = Double.parseDouble(keyValue[1]);
-                        break;
-                    case "tax":
-                        this.tax = Double.parseDouble(keyValue[1]);
-                        break;
-                    case "ownerPin":
-                        this.ownerPin = keyValue[1];
-                        break;
-                    case "buyerPin":
-                        this.buyerPin = keyValue[1];
-                        break;
-                    case "taxable":
-                        this.taxable = Boolean.parseBoolean(keyValue[1]);
-                        break;
-                    case "invoiceNumber":
-                        this.invoiceNumber = keyValue[1];
-                        break;
-                    case "etimsNumber":
-                        this.etimsNumber = keyValue[1];
-                        break;
-                    case "dateCreated":
-                        this.dateCreated = keyValue[1];
-                        break;
-                    default:
-                        // Handle unknown fields (optional)
-                        System.out.println("Ignoring unknown field: " + field);
-                }
-            }
-        }
-    }
 
 
 }
