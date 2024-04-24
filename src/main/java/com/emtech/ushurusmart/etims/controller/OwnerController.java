@@ -33,7 +33,6 @@ public class OwnerController {
 
     @PutMapping("/update/{businessOwnerKRAPin}")
     public ResponseEntity<?> etimsUpdate(@PathVariable String businessOwnerKRAPin, @RequestBody Etims data) {
-        System.out.println(businessOwnerKRAPin);
         ResContructor res = new ResContructor();
         try {
             System.out.println();

@@ -19,7 +19,6 @@ public class OTPService {
         otpEntity.setUserTag(usertag);
         otpEntity.setOtpCode(otpcode);
         otpEntity.setValidUntil(LocalDateTime.now().plusMinutes(10) );
-        System.out.println(otpEntity);
         otpRepository.save(otpEntity);
     }
 
@@ -32,11 +31,10 @@ public class OTPService {
     }
 
     @SuppressWarnings("null")
-    public String sendOTP(String phoneNo) {
+    public String sendOTP(String phoneNo) throws Exception {
 
         if (phoneNo.isEmpty()) {
-            System.out.println("User tag or Phone number is missing");
-            return "Enter both fields";
+            throw new Exception("User tag or Phone number is missing");
         } else {
 
             if(otpRepository.findByUserTag(phoneNo)!=null){
@@ -60,7 +58,7 @@ public class OTPService {
 
             } catch (TwilioException e) {
                 System.out.println("twillio" + e);
-                return "Failed to send OTP!";
+                throw  new Exception("Failed to send OTP!");
             }
         }
 

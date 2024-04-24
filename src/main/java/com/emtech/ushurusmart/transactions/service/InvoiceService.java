@@ -1,7 +1,9 @@
 package com.emtech.ushurusmart.transactions.service;
 
 
-import com.emtech.ushurusmart.transactions.controller.TaxController;
+import com.emtech.ushurusmart.transactions.Dto.EtimsResponses;
+import com.emtech.ushurusmart.transactions.Dto.TransactionProduct;
+import com.emtech.ushurusmart.transactions.Dto.TransactionRequest;
 import com.emtech.ushurusmart.transactions.entity.Product;
 import com.itextpdf.io.font.FontProgram;
 import com.itextpdf.io.font.FontProgramFactory;
@@ -30,7 +32,7 @@ public class InvoiceService {
  @Autowired
  private ProductService productService;
 
-    public byte[] generateInvoice(String buyerPin, List<ProductInfo> products, TaxController.TransactionData product) throws IOException {
+    public byte[] generateInvoice(EtimsResponses.TransactionResponse.TransactionData transactionData, TransactionRequest request) throws IOException {
 
        String currency= "Kshs ";
        int counter=1;
@@ -66,34 +68,43 @@ public class InvoiceService {
      productTable.addHeaderCell(new Cell().setBackgroundColor(new DeviceRgb(220, 220, 220))
              .setFont(boldFont).add(new Paragraph("Total Tax:")).setTextAlignment(TextAlignment.CENTER));
 
+     List<EtimsResponses.TransactionResponse.Sale> etimsSales= transactionData.getSales();
         // Add product details as a table row
-     for(ProductInfo info: products){
-      Product prod= productService.getById(info.getProductId());
+     for(TransactionProduct sale: request.getSales()){
+
+      Product product= productService.findById(sale.getProductId());
+      EtimsResponses.TransactionResponse.Sale etimsSale=findSaleByName(etimsSales,product.getName());
+
       productTable.addCell(new Cell().setFont(normalFont).add(new Paragraph(String.valueOf(counter))));
-      productTable.addCell(new Cell().setFont(normalFont).add(new Paragraph(String.valueOf(prod.getName()))));
-      productTable.addCell(new Cell().setFont(normalFont).add(new Paragraph(String.valueOf(prod.isTaxable()?"Taxable":"Tax Exempted"))));
-      productTable.addCell(new Cell().setFont(normalFont).add(new Paragraph(currency + (prod.getUnitPrice()))));
-      productTable.addCell(new Cell().setFont(normalFont).add(new Paragraph( ""+(info.getQuantity())+" "+prod.getUnitOfMeasure())));
-      productTable.addCell(new Cell().setFont(normalFont).add(new Paragraph(currency + (prod.getUnitPrice() * info.getQuantity()))));
-      productTable.addCell(new Cell().setFont(normalFont).add(new Paragraph(currency + (product.getTax()))));
+      productTable.addCell(new Cell().setFont(normalFont).add(new Paragraph(String.valueOf(etimsSale.getName()))));
+      productTable.addCell(new Cell().setFont(normalFont).add(new Paragraph(String.valueOf(etimsSale.isTaxable()?"Taxable":"Tax Exempted"))));
+      productTable.addCell(new Cell().setFont(normalFont).add(new Paragraph(currency + (product.getUnitPrice()))));
+      productTable.addCell(new Cell().setFont(normalFont).add(new Paragraph( " "+(sale.getQuantity())+" "+product.getUnitOfMeasure())));
+      productTable.addCell(new Cell().setFont(normalFont).add(new Paragraph(currency + (etimsSale.getAmount()))));
+      productTable.addCell(new Cell().setFont(normalFont).add(new Paragraph(currency + (etimsSale.getTax()))));
       counter ++;
      }
         // Add table to document
        Paragraph paragraph=  new Paragraph("Buyer KRA PIN: ").setFont(boldFont);
-        Paragraph buyer= new Paragraph(buyerPin).setFont(normalFont).setMarginBottom(10.0f);
+        Paragraph buyer= new Paragraph(transactionData.getBuyerPin()).setFont(normalFont).setMarginBottom(10.0f);
        document.add(paragraph.add(buyer));
         document.add(productTable);
 
         // Owner details with some formatting
         Paragraph details = new Paragraph();
-        details.add("Owner KRA Pin: ").setFont(boldFont).add(new Paragraph(product.getOwnerPin()).setFont(normalFont));
+        details.add("Owner KRA Pin: ").setFont(boldFont).add(new Paragraph(transactionData.getEtims().getBusinessOwnerKRAPin()).setFont(normalFont));
         details.add("\n");
-        details.add("Etims Code: ").setFont(boldFont).add(new Paragraph(product.getEtimsNumber()).setFont(normalFont));
+        details.add("Etims Code: ").setFont(boldFont).add(new Paragraph(transactionData.getEtims().getEtimsCode()).setFont(normalFont));
         details.add("\n");
-        details.add("Invoice Number: ").setFont(boldFont).add(new Paragraph(product.getInvoiceNumber()).setFont(normalFont));
+        details.add("Invoice Number: ").setFont(boldFont).add(new Paragraph(transactionData.getInvoiceNumber()).setFont(normalFont));
         details.setMarginTop(10);
         details.add("\n");
-        details.add("Total: ").setFont(boldFont).add(new Paragraph(currency + (product.getTax() + product.getTotalAmount())).setFont(normalFont));
+        details.add("Total Tax: ").setFont(boldFont).add(new Paragraph(currency + (transactionData.getTax())).setFont(normalFont));
+        details.add("\n");
+        details.add("Total Amount: ").setFont(boldFont).add(new Paragraph(currency + (transactionData.getAmount())).setFont(normalFont));
+        details.add("\n");
+
+        details.add("Net Total: ").setFont(boldFont).add(new Paragraph(currency + (transactionData.getAmount() + transactionData.getTax())).setFont(normalFont));
         details.add("\n");
 
         document.add(details.setMarginTop(10));
@@ -104,6 +115,12 @@ public class InvoiceService {
         return outputStream.toByteArray();
     }
 
+
+ public static EtimsResponses.TransactionResponse.Sale findSaleByName(List<EtimsResponses.TransactionResponse.Sale> sales, String name) {
+  return sales.stream()
+          .filter(element -> element.getName().equals(name))
+          .findFirst().orElse(null);
+ }
 
 
  @Data

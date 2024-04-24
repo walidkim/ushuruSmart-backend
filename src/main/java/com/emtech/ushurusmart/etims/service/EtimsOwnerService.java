@@ -28,7 +28,6 @@ public class EtimsOwnerService {
     public Etims save(Etims data) {
         data.setEtimsCode(generateRandomString(32));
         Etims res = etimsRepository.save(data);
-        System.out.println(res);
        return res;
     }
 
@@ -45,7 +44,6 @@ public class EtimsOwnerService {
             return true;
 
         } catch (Exception e) {
-            System.out.println(e.getLocalizedMessage());
             return false;
         }
 

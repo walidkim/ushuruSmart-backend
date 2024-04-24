@@ -74,8 +74,6 @@ public abstract class TrackingEntity {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication != null) {
-            System.out.println("Current Tracking User>>>>>: " + authentication.getName());
-
             if (authentication.getPrincipal() instanceof User) {
                 return (User) authentication.getPrincipal();
             }

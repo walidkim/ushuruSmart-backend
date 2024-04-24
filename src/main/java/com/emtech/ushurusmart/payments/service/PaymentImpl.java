@@ -1,23 +1,18 @@
 package com.emtech.ushurusmart.payments.service;
 
+import com.emtech.ushurusmart.config.PaymentConfig;
+import com.emtech.ushurusmart.payments.Utils.HelperUtility;
+import com.emtech.ushurusmart.payments.dtos.AccessTokenResponse;
 import com.emtech.ushurusmart.payments.dtos.callback.StkCallBack;
 import com.emtech.ushurusmart.payments.dtos.callback.StkCallbackRequest;
-import com.emtech.ushurusmart.payments.dtos.AccessTokenResponse;
 import com.emtech.ushurusmart.payments.dtos.errorPushResponse;
 import com.emtech.ushurusmart.payments.dtos.okPushResponse;
-import com.emtech.ushurusmart.payments.Utils.HelperUtility;
-import com.emtech.ushurusmart.config.PaymentConfig;
-import com.emtech.ushurusmart.payments.entity.PaymentDetails;
-import com.emtech.ushurusmart.payments.repository.PaymentRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Slf4j
 @Service
@@ -87,7 +82,6 @@ public class PaymentImpl implements Payment {
 
             if (response.isSuccessful()) {
                 okPushResponse okPushResponse = objectMapper.readValue(responseBody, okPushResponse.class);
-                System.out.println(okPushResponse.getResponseCode());
                 if ("0".equals(okPushResponse.getResponseCode())) {
                     return ResponseEntity.ok().body("STK Push successful:  " + okPushResponse.toString());
                 } else {
@@ -121,10 +115,6 @@ public class PaymentImpl implements Payment {
         // Now you can access the parsed data
 
         StkCallBack stkCallBack= StkCallbackRequest.getBody().getStkCallback();
-
-        System.out.println("Merchant Request ID: " + stkCallBack.getMerchantRequestId());
-        System.out.println("Checkout Request ID: " + stkCallBack.getCheckoutRequestId());
-
     }
 
 }
