@@ -6,6 +6,7 @@ import com.emtech.ushurusmart.transactions.service.ProductService;
 import com.emtech.ushurusmart.usermanagement.Dtos.entity.ProductDto;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
 import com.emtech.ushurusmart.usermanagement.repository.OwnerRepository;
+import com.emtech.ushurusmart.usermanagement.service.AssistantService;
 import com.emtech.ushurusmart.usermanagement.service.OwnerService;
 import com.emtech.ushurusmart.usermanagement.utils.AuthUtils;
 import com.emtech.ushurusmart.utils.controller.ResContructor;
@@ -30,7 +31,8 @@ public class ProductController {
     @Autowired
     private OwnerService ownerService;
 
-
+    @Autowired
+    private AssistantService assistantService;
 
     @Autowired
     private Responses responses;
@@ -39,8 +41,13 @@ public class ProductController {
     public ResponseEntity<ResContructor> getAllProduct(){
         try {
             ResContructor res= new ResContructor();
-            long id= ownerService.findByEmail(AuthUtils.getCurrentlyLoggedInPerson()).getId();
-            res.setData(productService.findAllByOwnerId(id));
+
+            String email= AuthUtils.getCurrentlyLoggedInPerson();
+            Owner owner= ownerService.findByEmail(email);
+            if(owner==null){
+                owner= assistantService.findByEmail(email).getOwner();
+            }
+            res.setData(productService.findAllByOwnerId(owner.getId()));
             res.setMessage("Products fetched successfully.");
             return  ResponseEntity.status(HttpStatus.OK).body(res);
         }catch (Exception e){
@@ -58,7 +65,13 @@ public class ProductController {
                res.setMessage("No product with that Id exists");
                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
            }
-           long ownerId= ownerService.findByEmail(AuthUtils.getCurrentlyLoggedInPerson()).getId();
+
+           String email= AuthUtils.getCurrentlyLoggedInPerson();
+           Owner owner= ownerService.findByEmail(email);
+           if(owner==null){
+               owner= assistantService.findByEmail(email).getOwner();
+           }
+           long ownerId = owner.getId();
            if(ownerId != product.getOwner().getId()){
                res.setMessage("You are not allowed to view this product.");
                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
@@ -72,19 +85,38 @@ public class ProductController {
 
     }
     @GetMapping("/product")
-    public ResponseEntity<Product> getProductByName(@RequestParam(name = "name", required = true) String name){
+    public ResponseEntity<ResContructor> getProductByName(@RequestParam(name = "name", required = true) String name){
+        ResContructor res= new ResContructor();
+        String email= AuthUtils.getCurrentlyLoggedInPerson();
+        Owner owner= ownerService.findByEmail(email);
+        if(owner==null){
+            owner= assistantService.findByEmail(email).getOwner();
+        }
+
         Product product = productService.getByName(name);
+
+        if(owner.getId() != product.getOwner().getId()){
+             res.setMessage("You don't own this product hence you can't view it.");
+             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
+        }
         if (product == null) {
-            return new ResponseEntity<Product>(HttpStatus.NOT_FOUND);
+            res.setMessage("No product by  that name exists");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
 
         }
-        return new ResponseEntity<Product>(product, HttpStatus.OK);
+        res.setMessage("Product fetched successfully.");
+        res.setData(product);
+        return ResponseEntity.status(HttpStatus.OK).body(res);
     }
     @PostMapping("product/create")
     public ResponseEntity<ResContructor> addProduct(@RequestBody ProductDto prod){
         ResContructor res= new ResContructor();
         try {
-            Owner owner= ownerService.findByEmail(AuthUtils.getCurrentlyLoggedInPerson());
+            String email= AuthUtils.getCurrentlyLoggedInPerson();
+            Owner owner= ownerService.findByEmail(email);
+            if(owner==null){
+                owner= assistantService.findByEmail(email).getOwner();
+            }
             Product product= EntityFactory.createProduct(prod);
             product.setOwner(owner);
             res.setMessage("Product created successfully!");
@@ -99,7 +131,11 @@ public class ProductController {
         ResContructor res= new ResContructor();
        try {
            Product currentProduct = productService.getById(id);
-           Owner owner= ownerService.findByEmail(AuthUtils.getCurrentlyLoggedInPerson());
+           String email= AuthUtils.getCurrentlyLoggedInPerson();
+           Owner owner= ownerService.findByEmail(email);
+           if(owner==null){
+               owner= assistantService.findByEmail(email).getOwner();
+           }
            if (currentProduct == null){
                res.setMessage("No product with that id exists.");
                return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
@@ -120,7 +156,11 @@ public class ProductController {
     public ResponseEntity<?> deleteProduct(@PathVariable int id) {
       try {
           ResContructor res= new ResContructor();
-          Owner owner= ownerService.findByEmail(AuthUtils.getCurrentlyLoggedInPerson());
+          String email= AuthUtils.getCurrentlyLoggedInPerson();
+          Owner owner= ownerService.findByEmail(email);
+          if(owner==null){
+              owner= assistantService.findByEmail(email).getOwner();
+          }
           if(productService.getById(id).getOwner().getId() != owner.getId()){
               res.setMessage("You are not authorized to delete this product.");
               return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
