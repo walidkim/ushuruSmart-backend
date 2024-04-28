@@ -108,7 +108,6 @@ public class OwnerAuthControllerTest {
                 .then()
                 .statusCode(is(201));
         String jsonString = res.body(containsString("")).extract().response().getBody().asString();
-        System.out.println(jsonString);
         SignUpResponse response=  Utils.parseJsonString(jsonString,SignUpResponse.class);
         assert response != null;
         assertEquals(response.getMessage(),"Owner created successfully!");

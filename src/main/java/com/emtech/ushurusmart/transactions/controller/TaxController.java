@@ -128,7 +128,6 @@ public class TaxController  extends LoggerSingleton {
         for (TransactionProduct sold : request.getSales()) {
             Product product = productService.findById(sold.getProductId());
             double amount = product.getUnitPrice() * sold.getQuantity();
-            System.out.println(product + " " + sold.getQuantity() + " " + amount);
             EtimsProduct etimsProduct = new EtimsProduct();
             etimsProduct.setTaxable(product.isTaxable());
             etimsProduct.setAmount(amount);

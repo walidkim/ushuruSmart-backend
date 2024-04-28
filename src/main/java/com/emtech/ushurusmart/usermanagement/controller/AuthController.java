@@ -146,7 +146,6 @@ public class AuthController {
                 }
 
                 case "assistant":{
-                    System.out.println(req);
                     Assistant assistant = assistantService.findByPhoneNumber(req.getPhoneNumber());
                     if(assistant==null){
                         throw new BadCredentialsException("Invalid assistant");

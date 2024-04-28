@@ -1,5 +1,6 @@
 package com.emtech.ushurusmart.utils.otp;
 
+import com.emtech.ushurusmart.config.LoggerSingleton;
 import com.twilio.exception.TwilioException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -10,7 +11,7 @@ import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Service
-public class OTPService {
+public class OTPService extends LoggerSingleton {
     @Autowired
     private OtpRepository otpRepository;
 
@@ -52,12 +53,12 @@ public class OTPService {
 //                        messageBody)
 //                        .create();
 //                System.out.println(message);
-                System.out.println(otpCode + " " + phoneNo);
+                logger.info(otpCode + " " + phoneNo);
                 saveOtp(phoneNo, otpCode);
                 return true;
 
             } catch (TwilioException e) {
-                System.out.println("twillio" + e);
+                logger.error("twillio" + e);
                 return false;
             }
         }
@@ -73,7 +74,7 @@ public class OTPService {
                 otpRepository.deleteByUserTag(phoneNumber);
                 return true;
             } catch (Exception e) {
-                System.out.println("Error while deleting" + phoneNumber + " : " + e);
+                logger.error("Error while deleting" + phoneNumber + " : " + e);
                 return false;
             }
 

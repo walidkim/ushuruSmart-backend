@@ -65,7 +65,6 @@ public class OwnerService extends LoggerSingleton {
         }
         ResponseEntity<?> response= etimsMiddleware.verifyBusinessKRAPin(data.getBusinessKRAPin());
         if(response.getStatusCode()==HttpStatus.FOUND){
-            System.out.println(res.toString());
             Owner owner = EntityFactory.createOwner(data);
 
             res.setMessage(HelperUtil.capitalizeFirst(type) + " created successfully!");

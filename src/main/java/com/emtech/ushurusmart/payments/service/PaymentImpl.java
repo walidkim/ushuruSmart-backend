@@ -1,5 +1,6 @@
 package com.emtech.ushurusmart.payments.service;
 
+import com.emtech.ushurusmart.config.LoggerSingleton;
 import com.emtech.ushurusmart.config.PaymentConfig;
 import com.emtech.ushurusmart.payments.Utils.HelperUtility;
 import com.emtech.ushurusmart.payments.dtos.AccessTokenResponse;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-public class PaymentImpl implements Payment {
+public class PaymentImpl extends LoggerSingleton implements Payment {
     private final OkHttpClient okHttpClient = new OkHttpClient();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -39,8 +40,7 @@ public class PaymentImpl implements Payment {
                     AccessTokenResponse.class);
             return accessTokenResponse.getAccessToken();
         } catch (Exception e) {
-            log.error(String.format("Could not get access token. -> %s", e.getLocalizedMessage()));
-            System.out.println("Could not get access token: " + e);
+            logger.error(String.format("Could not get access token. -> %s", e.getLocalizedMessage()));
             return null;
         }
     }
