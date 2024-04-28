@@ -1,15 +1,23 @@
 package com.emtech.ushurusmart.usermanagement.service;
 
+import com.emtech.ushurusmart.usermanagement.Dtos.LoginRequest;
 import com.emtech.ushurusmart.usermanagement.model.Assistant;
 import com.emtech.ushurusmart.usermanagement.repository.AssistantRepository;
+import com.emtech.ushurusmart.utils.controller.ResContructor;
+import com.emtech.ushurusmart.utils.otp.OTPService;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 @Service
 public class AssistantService {
@@ -18,6 +26,14 @@ public class AssistantService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private OTPService otpService;
 
 
     public Assistant findByEmail(String email) {
@@ -40,6 +56,32 @@ public class AssistantService {
         }
 
         return password.toString();
+    }
+
+
+    public ResponseEntity<ResContructor> loginAssistant(@NotNull LoginRequest loginReq, ResContructor res) throws Exception {
+       try{
+           Assistant assistant = findByEmail(loginReq.getEmail());
+
+           if (assistant == null) {
+               throw new BadCredentialsException(" ");
+           }
+           Authentication authentication = authenticationManager
+                   .authenticate(new UsernamePasswordAuthenticationToken(loginReq.getEmail(),
+                           loginReq.getPassword(),assistant.getAuthorities() != null ? assistant.getAuthorities() : Collections.emptyList()));
+           otpService.sendOTP(assistant.getPhoneNumber());
+           res.setMessage("A short code has been sent to your phone for verification");
+           Map<String,String> resBody= new HashMap<>();
+           resBody.put("type", "assistant");
+           resBody.put("phoneNumber", assistant.getPhoneNumber());
+           res.setData(resBody);
+           return ResponseEntity.status(HttpStatus.CREATED).body(res);
+       }
+       catch (BadCredentialsException e){
+           res.setMessage("Invalid email or password.");
+           return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
+       }
+
     }
 
     public String createEmailBody(String name, String email, String password ) {

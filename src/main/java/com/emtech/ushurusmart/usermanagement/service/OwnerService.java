@@ -70,7 +70,7 @@ public class OwnerService extends LoggerSingleton {
 
             res.setMessage(HelperUtil.capitalizeFirst(type) + " created successfully!");
             save(owner);
-            RequestDtos.OwnerResponse resOwner = ResponseFactory.createOwnerResponse(owner);
+            RequestDtos.UserResponse resOwner = ResponseFactory.createOwnerResponse(owner);
             logger.info(resOwner.toString());
             res.setData(resOwner);
             return ResponseEntity.status(HttpStatus.CREATED).body(res);
