@@ -7,6 +7,7 @@ import com.emtech.ushurusmart.usermanagement.model.Role;
 import com.emtech.ushurusmart.usermanagement.repository.AssistantRepository;
 import com.emtech.ushurusmart.usermanagement.repository.OwnerRepository;
 import com.emtech.ushurusmart.usermanagement.service.OwnerService;
+import com.emtech.ushurusmart.utils.otp.OtpRepository;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,7 +27,7 @@ import java.util.List;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.Is.is;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
@@ -42,6 +43,10 @@ public class OwnerActionTest {
     @Autowired
     private OwnerService ownerService;
 
+
+    @Autowired
+    private OtpRepository otpRepository;
+
     @Autowired
     private AssistantRepository assistantRepository;
 
@@ -55,11 +60,13 @@ public class OwnerActionTest {
 
     private String loginUrl;
 
+    private String verifyOtpUrl;
+
     @BeforeEach
     public void setup() throws IOException {
 
         ownerRepository.deleteAll();
-
+        verifyOtpUrl = "http://localhost:" + port + "/api/v1/auth/verify-otp";
         signUpUrl = "http://localhost:" + port + "/api/v1/auth/sign-up?type=owner";
         loginUrl = "http://localhost:" + port + "/api/v1/auth/login?type=owner";
         loginAndGetToken();
@@ -78,6 +85,8 @@ public class OwnerActionTest {
             owner.setEmail("test@test.com");
             owner.setPassword("test");
             owner.setPhoneNumber("25489898989");
+            owner.setKRAPin("A012345678B");
+            owner.setBusinessKRAPin("P012345678Z");
             owner.setRole(Role.owner);
             ownerService.save(owner);
         }
@@ -85,10 +94,20 @@ public class OwnerActionTest {
         ValidatableResponse res = given().header("Content-Type", "application/json").body(loginJson).when()
                 .post(loginUrl)
                 .then()
-                .statusCode(is(201)).body(containsString("Bearer "));
+                .statusCode(is(201));
+        String otpCode = otpRepository.findAll().get(0).getOtpCode();
+        String verifyOtp = "{\n" +
+                " \"phoneNumber\": \"25489898989\",\n" +
+                " \"type\": \"owner\",\n" +
+                " \"otpCode\": \"" + otpCode + "\"\n" +
+                "}";
+        res = given().header("Content-Type", "application/json").body(verifyOtp).when()
+                .post(verifyOtpUrl)
+                .then()
+                .statusCode(is(201));
+
 
         String jsonString = res.body(containsString("")).extract().response().getBody().asString();
-
         JsonNode jsonNode = new ObjectMapper().readTree(jsonString);
         token = jsonNode.get("data").get("token").asText();
     }
