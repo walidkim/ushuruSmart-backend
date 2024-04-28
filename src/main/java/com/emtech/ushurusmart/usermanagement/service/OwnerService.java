@@ -5,6 +5,7 @@ import com.emtech.ushurusmart.usermanagement.Dtos.LoginRequest;
 import com.emtech.ushurusmart.usermanagement.Dtos.OwnerDto;
 import com.emtech.ushurusmart.usermanagement.controller.HelperUtil;
 import com.emtech.ushurusmart.usermanagement.factory.EntityFactory;
+import com.emtech.ushurusmart.usermanagement.factory.ResponseFactory;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
 import com.emtech.ushurusmart.usermanagement.repository.OwnerRepository;
 import com.emtech.ushurusmart.utils.controller.ResContructor;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -54,20 +56,24 @@ public class OwnerService {
     }
 
 
-    public ResponseEntity<ResContructor> validateAndCreateUser(String type, OwnerDto data, ResContructor res) {
+    public ResponseEntity<ResContructor> validateAndCreateOwner(String type, OwnerDto data, ResContructor res) {
         if (findByEmail(data.getEmail()) != null) {
             res.setMessage(HelperUtil.capitalizeFirst(type) + " with that email exists!");
             return ResponseEntity.badRequest().body(res);
         }
         ResponseEntity<?> response= etimsMiddleware.verifyBusinessKRAPin(data.getBusinessKRAPin());
-        System.out.println(response);
         if(response.getStatusCode()==HttpStatus.FOUND){
+            System.out.println(res.toString());
             Owner owner = EntityFactory.createOwner(data);
+
             res.setMessage(HelperUtil.capitalizeFirst(type) + " created successfully!");
-            res.setData(save(owner));
+            save(owner);
+
+            res.setData(ResponseFactory.createOwnerResponse(owner));
             return ResponseEntity.status(HttpStatus.CREATED).body(res);
         }
         else{
+
             res.setMessage(HelperUtil.capitalizeFirst(type) + " can not be onboarded. Business is not registered by KRA!");
             return ResponseEntity.status(HttpStatus.UNAVAILABLE_FOR_LEGAL_REASONS).body(res);
         }
@@ -75,23 +81,28 @@ public class OwnerService {
 
 
     public ResponseEntity<ResContructor> loginOwner(@NotNull String type, LoginRequest loginReq, ResContructor res) throws Exception {
-        Owner owner = findByEmail(loginReq.getEmail());
-        if (owner == null) {
-            res.setMessage("No " + HelperUtil.capitalizeFirst(type) + " by that email exists.");
+       try {
+           Owner owner = findByEmail(loginReq.getEmail());
+           if (owner == null) {
+                throw new BadCredentialsException("Invalid email or password");
+           }
 
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
+           Authentication authentication = authenticationManager
+                   .authenticate(new UsernamePasswordAuthenticationToken(loginReq.getEmail(),
+                           loginReq.getPassword(),owner.getAuthorities() != null ? owner.getAuthorities() : Collections.emptyList()));
+           otpService.sendOTP(owner.getPhoneNumber());
+           res.setMessage("A short code has been sent to your phone for verification");
+           Map<String,String> resBody= new HashMap<>();
+           resBody.put("type", type);
+           resBody.put("phoneNumber", owner.getPhoneNumber());
+           res.setData(resBody);
+           return ResponseEntity.status(HttpStatus.CREATED).body(res);
+       }
+
+         catch (BadCredentialsException e) {
+            res.setMessage("Invalid email or password.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
         }
-
-        Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(loginReq.getEmail(),
-                        loginReq.getPassword(),owner.getAuthorities() != null ? owner.getAuthorities() : Collections.emptyList()));
-        otpService.sendOTP(owner.getPhoneNumber());
-        res.setMessage("A short code has been sent to your phone for verification");
-        Map<String,String> resBody= new HashMap<>();
-        resBody.put("type", type);
-        resBody.put("phoneNumber", owner.getPhoneNumber());
-        res.setData(resBody);
-        return ResponseEntity.status(HttpStatus.CREATED).body(res);
     }
 
     public Owner deleteByEmail(String email) {
@@ -101,4 +112,6 @@ public class OwnerService {
     public Owner findByPhoneNumber(String phoneNumber) {
         return ownerRepository.findByPhoneNumber(phoneNumber);
     }
+
+
 }

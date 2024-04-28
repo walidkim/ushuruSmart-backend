@@ -4,7 +4,8 @@ import com.emtech.ushurusmart.etims_middleware.TransactionMiddleware;
 import com.emtech.ushurusmart.usermanagement.Dtos.LoginRequest;
 import com.emtech.ushurusmart.usermanagement.Dtos.OwnerDto;
 import com.emtech.ushurusmart.usermanagement.Dtos.auth.OtpDataDto;
-import com.emtech.ushurusmart.usermanagement.Dtos.auth.OwnerLoginRes;
+import com.emtech.ushurusmart.usermanagement.Dtos.controller.RequestDtos;
+import com.emtech.ushurusmart.usermanagement.factory.ResponseFactory;
 import com.emtech.ushurusmart.usermanagement.model.Assistant;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
 import com.emtech.ushurusmart.usermanagement.service.AssistantService;
@@ -55,15 +56,15 @@ public class AuthController {
     public ResponseEntity<?> signUp(@RequestParam(name = "type", required = true) String type,
             @RequestBody OwnerDto data) {
         ResContructor res = new ResContructor();
+
         try {
             if (type.equals("owner")) {
-                return ownerService.validateAndCreateUser(type, data, res);
+               return ownerService.validateAndCreateOwner(type, data, res);
             }
-            res.setMessage(HelperUtil.capitalizeFirst(type) + " is invalid.");
+            res.setMessage(HelperUtil.capitalizeFirst(type) + " is an invalid type!");
             return ResponseEntity.badRequest().body(res);
 
         }catch (Exception e){
-            System.out.println(e.getMessage());
             return Responses.create500Response(e);
         }
 
@@ -102,14 +103,11 @@ public class AuthController {
                     return ResponseEntity.status(HttpStatus.CREATED).body(res);
                 }
                 default:
-                    res.setMessage(HelperUtil.capitalizeFirst(type) + " is invalid");
+                    res.setMessage(HelperUtil.capitalizeFirst(type) + " is and invalid type!");
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
 
             }
 
-        } catch (BadCredentialsException e) {
-            res.setMessage("Invalid email or password.");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
         } catch (Exception e) {
             res.setMessage("Error  234343" + e.getLocalizedMessage());
             System.out.println(e.toString());
@@ -126,7 +124,7 @@ public class AuthController {
         ResContructor res = new ResContructor();
         try {
             if(!otpService.verifyOTP(req.getPhoneNumber(),req.getOtpCode())){
-                throw new BadCredentialsException("Invalid otpCode");
+                throw new BadCredentialsException("Invalid OTP code");
             }
 
             switch (req.getType()){
@@ -135,14 +133,7 @@ public class AuthController {
                     if(owner==null){
                         throw new BadCredentialsException("Invalid owner");
                     }
-                    OwnerLoginRes resData= new OwnerLoginRes();
-                    resData.setName(owner.getName());
-                    resData.setId(owner.getId());
-                    resData.setEmail(owner.getEmail());
-                    resData.setBusinessKRAPin(owner.getBusinessKRAPin());
-                    resData.setBusinessOwnerKRAPin(owner.getBusinessKRAPin());
-                    resData.setPhoneNumber(owner.getPhoneNumber());
-
+                    RequestDtos.OwnerResponse resData= ResponseFactory.createOwnerResponse(owner);
                     String token = jwtUtil.createToken(owner);
                     Map<String, Object> responseData = new HashMap<>();
                     responseData.put("owner", resData);
@@ -150,8 +141,6 @@ public class AuthController {
                     res.setData(responseData);
                     res.setMessage("Login successful!");
                     return ResponseEntity.status(HttpStatus.CREATED).body(res);
-
-
                 }
 
                 case "assistant":{

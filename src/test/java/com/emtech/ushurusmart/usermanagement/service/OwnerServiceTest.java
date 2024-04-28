@@ -9,7 +9,6 @@ import com.emtech.ushurusmart.usermanagement.model.Role;
 import com.emtech.ushurusmart.usermanagement.repository.OwnerRepository;
 import com.emtech.ushurusmart.utils.controller.ResContructor;
 import com.emtech.ushurusmart.utils.otp.OTPService;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,6 +18,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -33,7 +33,7 @@ import static org.mockito.Mockito.*;
 class OwnerServiceTest {
 
     @Mock
-    private OwnerRepository userRepository; // Assuming you have a repository for user operations
+    private OwnerRepository userRepository;
 
     @Mock
     private EtimsMiddleware etimsMiddleware;
@@ -48,7 +48,7 @@ class OwnerServiceTest {
     private AuthenticationManager authenticationManager;
 
     @InjectMocks
-    private OwnerService userService; // Assuming your validateAndCreateUser method is in a UserService class
+    private OwnerService userService;
 
     @BeforeEach
     void setUp() {
@@ -62,9 +62,9 @@ class OwnerServiceTest {
         ownerDto.setEmail(email);
         ResContructor res = new ResContructor();
 
-        when(userRepository.findByEmail(email)).thenReturn(new Owner()); // Assuming Owner is the entity class
+        when(userRepository.findByEmail(email)).thenReturn(new Owner());
 
-        ResponseEntity<ResContructor> response = userService.validateAndCreateUser("owner", ownerDto, res);
+        ResponseEntity<ResContructor> response = userService.validateAndCreateOwner("owner", ownerDto, res);
         verify(userRepository, never()).save(any(Owner.class));
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertTrue(Objects.requireNonNull(response.getBody()).getMessage().contains("Owner with that email exists!"));
@@ -81,7 +81,7 @@ class OwnerServiceTest {
         when(etimsMiddleware.verifyBusinessKRAPin(any()))
                 .thenReturn(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
 
-        ResponseEntity<ResContructor> response = userService.validateAndCreateUser("owner", ownerDto, res);
+        ResponseEntity<ResContructor> response = userService.validateAndCreateOwner("owner", ownerDto, res);
         verify(userRepository, never()).save(any(Owner.class));
         assertEquals(HttpStatus.UNAVAILABLE_FOR_LEGAL_REASONS, response.getStatusCode());
         assertTrue(Objects.requireNonNull(response.getBody()).getMessage()
@@ -94,66 +94,93 @@ class OwnerServiceTest {
         OwnerDto ownerDto = new OwnerDto();
         ownerDto.setEmail(email);
         ResContructor res = new ResContructor();
-        Owner owner = new Owner(); // Assuming Owner is the entity class
+        Owner owner = new Owner();
 
         when(userRepository.findByEmail(email)).thenReturn(null);
         when(etimsMiddleware.verifyBusinessKRAPin(any())).thenReturn(ResponseEntity.status(HttpStatus.FOUND).build());
         when(passwordEncoder.encode(any())).thenReturn("test");
         when(userRepository.save(any())).thenReturn(owner);
 
-        ResponseEntity<ResContructor> response = userService.validateAndCreateUser("owner", ownerDto, res);
+        ResponseEntity<ResContructor> response = userService.validateAndCreateOwner("owner", ownerDto, res);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         verify(userRepository, times(1)).save(any(Owner.class));
         assertTrue(Objects.requireNonNull(response.getBody()).getMessage().contains("Owner created successfully!"));
     }
 
-//     @Test
-//     void testLoginOwner_Success() throws Exception {
-//         // Arrange
-//         String email = "test@example.com";
-//         String password = "password";
-//         String type = "owner";
-//         LoginRequest loginReq = new LoginRequest(email, password);
-//         ResContructor res = new ResContructor();
-//         Owner owner = new Owner();
-//         owner.setEmail(email);
-//         owner.setPhoneNumber("1234567890");
+    @Test
+    void testLoginOwner_Success() throws Exception {
+        String email = "test@example.com";
+        String password = "password";
+        String type = "owner";
+        LoginRequest loginReq = new LoginRequest(email, password);
+        ResContructor res = new ResContructor();
+        Owner owner = new Owner();
+        owner.setEmail(email);
+        owner.setPhoneNumber("1234567890");
+        owner.setRole(Role.owner);
 
-//         owner.setRole(Role.owner);
-//         when(userService.findByEmail(email)).thenReturn(owner);
-//         when(authenticationManager.authenticate(any()))
-//                 .thenReturn(new UsernamePasswordAuthenticationToken(email, password, Collections.emptyList()));
+        when(userService.findByEmail(email)).thenReturn(owner);
+        when(authenticationManager.authenticate(any()))
+                .thenReturn(new UsernamePasswordAuthenticationToken(email, password, Collections.emptyList()));
 
-//         // Act
-//         ResponseEntity<ResContructor> response = userService.loginOwner(type, loginReq, res);
-//         LoginRes parsed= Utils.parseJsonString(Objects.requireNonNull(response.getBody().()), LoginRes.class);
-//         // Assert
-//         assertEquals(HttpStatus.CREATED, response.getStatusCode());
-//         assertEquals(Objects.requireNonNull(response.getBody()).getMessage(),("A short code has been sent to your phone for verification"));
-//         assert parsed != null;
-//         assertEquals( parsed.getData().getType(), type);
-//         assertEquals( parsed.getData().getPhoneNumber(), "1234567890");
 
-// 
+        ResponseEntity<ResContructor> response = userService.loginOwner(type, loginReq, res);
 
-    @Data
-    public static class LoginRes {
-
-        @JsonProperty("message")
-        private String message;
-
-        @JsonProperty("Data")
-        private LoginDetails data;
-
-        @Data
-        public static class LoginDetails {
-            @JsonProperty("phoneNumber")
-            private String phoneNumber;
-
-            @JsonProperty("type")
-            private String type;
-        }
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals("A short code has been sent to your phone for verification", res.getMessage());
+        String dataString= Objects.requireNonNull(response.getBody()).getData().toString().replaceAll("(\\w+)=(\\w+)", "\"$1\":\"$2\"");
+        BodyData data= Utils.parseJsonString(dataString,BodyData.class);
+        assert data != null;
+        assertEquals(data.getType(), "owner");
+        assertEquals(data.getPhoneNumber(), "1234567890");
     }
 
+    @Test
+    void testLoginOwner_OwnerNotFound() throws Exception {
+        String email = "test@example.com";
+        String password = "password";
+        String type = "owner";
+        LoginRequest loginReq = new LoginRequest(email, password);
+        ResContructor res = new ResContructor();
+
+        when(userService.findByEmail(email)).thenReturn(null);
+
+        ResponseEntity<ResContructor> response = userService.loginOwner(type, loginReq, res);
+
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertEquals("Invalid email or password.", res.getMessage());
+    }
+
+    @Test
+    void testLoginOwner_WrongPassword() throws Exception {
+        String email = "test@example.com";
+        String password = "wrongPassword";
+        String type = "owner";
+        LoginRequest loginReq = new LoginRequest(email, password);
+        ResContructor res = new ResContructor();
+        Owner owner = new Owner();
+        owner.setEmail(email);
+        owner.setPhoneNumber("1234567890");
+        owner.setRole(Role.owner);
+
+        when(userService.findByEmail(email)).thenReturn(owner);
+        when(authenticationManager.authenticate(any()))
+                .thenThrow(new BadCredentialsException("Invalid email or password."));
+
+        ResponseEntity<ResContructor> response = userService.loginOwner(type, loginReq, res);
+
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertEquals("Invalid email or password.", res.getMessage());
+    }
+
+
+
+
+
+    @Data
+    public static class BodyData {
+        private String type;
+        private String phoneNumber;
+    }
 }

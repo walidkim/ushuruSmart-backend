@@ -7,7 +7,7 @@ import org.springframework.context.ApplicationContext;
 
 @SpringBootApplication
 public class  UshuruSmartApplication {
-	public static void main(String[] args) {
+	public static  void main(String[] args) {
 		ApplicationContext context = SpringApplication.run(UshuruSmartApplication.class, args);
 
 		// Now context is properly initialized, and you can use it to retrieve beans

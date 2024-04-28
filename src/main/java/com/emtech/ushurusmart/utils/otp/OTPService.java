@@ -11,14 +11,14 @@ import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 public class OTPService {
-@Autowired
- private OtpRepository otpRepository;
+    @Autowired
+    private OtpRepository otpRepository;
 
     private void saveOtp(String usertag, String otpcode) {
         OtpEntity otpEntity = new OtpEntity();
         otpEntity.setUserTag(usertag);
         otpEntity.setOtpCode(otpcode);
-        otpEntity.setValidUntil(LocalDateTime.now().plusMinutes(10) );
+        otpEntity.setValidUntil(LocalDateTime.now().plusMinutes(10));
         otpRepository.save(otpEntity);
     }
 
@@ -31,14 +31,14 @@ public class OTPService {
     }
 
     @SuppressWarnings("null")
-    public String sendOTP(String phoneNo) throws Exception {
+    public boolean sendOTP(String phoneNo) throws Exception {
 
         if (phoneNo.isEmpty()) {
             throw new Exception("User tag or Phone number is missing");
         } else {
 
-            if(otpRepository.findByUserTag(phoneNo)!=null){
-                 otpRepository.deleteByUserTag(phoneNo);
+            if (otpRepository.findByUserTag(phoneNo) != null) {
+                otpRepository.deleteByUserTag(phoneNo);
             }
             String otpCode = generateOTP();
 
@@ -52,13 +52,13 @@ public class OTPService {
 //                        messageBody)
 //                        .create();
 //                System.out.println(message);
-                System.out.println(otpCode + " "+phoneNo);
-                saveOtp(phoneNo,otpCode);
-                return "OTP sent successfully!";
+                System.out.println(otpCode + " " + phoneNo);
+                saveOtp(phoneNo, otpCode);
+                return true;
 
             } catch (TwilioException e) {
                 System.out.println("twillio" + e);
-                throw  new Exception("Failed to send OTP!");
+                return false;
             }
         }
 
@@ -74,7 +74,7 @@ public class OTPService {
                 return true;
             } catch (Exception e) {
                 System.out.println("Error while deleting" + phoneNumber + " : " + e);
-           return false;
+                return false;
             }
 
         } else {

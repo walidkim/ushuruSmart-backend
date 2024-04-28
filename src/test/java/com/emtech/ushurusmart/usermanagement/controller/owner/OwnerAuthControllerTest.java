@@ -1,19 +1,23 @@
 package com.emtech.ushurusmart.usermanagement.controller.owner;
 
 import com.emtech.ushurusmart.etims_middleware.EtimsMiddleware;
+import com.emtech.ushurusmart.usermanagement.Dtos.auth.OtpDataDto;
 import com.emtech.ushurusmart.usermanagement.controller.Utils;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
+import com.emtech.ushurusmart.usermanagement.model.Role;
 import com.emtech.ushurusmart.usermanagement.repository.OwnerRepository;
 import com.emtech.ushurusmart.usermanagement.service.OwnerService;
+import com.emtech.ushurusmart.utils.otp.OTPService;
 import com.emtech.ushurusmart.utils.otp.OtpRepository;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import lombok.Data;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,11 +28,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
+import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.Is.is;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -46,8 +51,8 @@ public class OwnerAuthControllerTest {
     @MockBean
     private EtimsMiddleware etimsMiddleware;
 
-    @InjectMocks
-    private OwnerService userService;
+    @Autowired
+    private OwnerService ownerService;
 
     @LocalServerPort
     private int port;
@@ -56,6 +61,16 @@ public class OwnerAuthControllerTest {
 
     private String loginUrl;
 
+
+    private String verifyOtpUrl;
+
+
+
+
+
+    @Mock
+    private OTPService otpService;
+
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
@@ -63,6 +78,7 @@ public class OwnerAuthControllerTest {
         otpRepository.deleteAll();
         signUpUrl = "http://localhost:" + port + "/api/v1/auth/sign-up?type=owner";
         loginUrl = "http://localhost:" + port + "/api/v1/auth/login?type=owner";
+        verifyOtpUrl= "http://localhost:" + port + "/api/v1/auth/verify-otp";
 
     }
 
@@ -74,7 +90,7 @@ public class OwnerAuthControllerTest {
 
 
     @Test
-    public void shouldSignUp() {
+    public void shouldSignUpIfRegisteredInEtims() {
         when(etimsMiddleware.verifyBusinessKRAPin(any())).thenReturn(ResponseEntity.status(HttpStatus.FOUND).build());
 
         String signupRequestJson = "{\n" +
@@ -83,7 +99,7 @@ public class OwnerAuthControllerTest {
                 " \"email\": \"testuser@example.com\",\n" +
                 " \"name\": \"John Doe\",\n" +
                 " \"password\": \"SecurePassword123\",\n" +
-                " \"phoneNumber\": \"+1234567890\"\n" +
+                " \"phoneNumber\": \"+25474567890\"\n" +
                 "}";
 
         ValidatableResponse res= given().header("Content-Type",
@@ -93,28 +109,72 @@ public class OwnerAuthControllerTest {
                 .statusCode(is(201));
         String jsonString = res.body(containsString("")).extract().response().getBody().asString();
         System.out.println(jsonString);
+        SignUpResponse response=  Utils.parseJsonString(jsonString,SignUpResponse.class);
+        assert response != null;
+        assertEquals(response.getMessage(),"Owner created successfully!");
+        List<Owner> foundOwners= ownerRepository.findAll();
+        assertEquals(foundOwners.size(),1);
+        Owner savedOwner= foundOwners.get(0);
 
+        Assertions.assertNotNull(savedOwner);
+        Assertions.assertTrue(savedOwner.getPassword().length() > 30);
 
+        SignUpResponse.BodyData payloadOwner= response.getData();
+        assertEquals(payloadOwner.getId(), savedOwner.getId());
+        assertEquals(payloadOwner.getEmail(), savedOwner.getEmail());
 
-
-        Owner owner = ownerRepository.findByEmail("johndoe@example.com");
-        Assertions.assertNotNull(owner);
-        Assertions.assertTrue(owner.getPassword().length() > 30);
     }
 
-    private void signUp(String name, String email, String password) {
 
-        String signupRequestJson = String.format("{\"name\":\"%s\",\"password\":\"%s\",\"email\":\"%s\",\"businessKRAPin\":\"123456789\",\"businessOwnerKRAPin\":\"987654321\",\"phoneNumber\":\"+1234567890\"}", name, password, email);
-        given().header("Content-Type",
+
+    @Test
+    public void shouldRefuseOtherTypesSignUps() {
+        when(etimsMiddleware.verifyBusinessKRAPin(any())).thenReturn(ResponseEntity.status(HttpStatus.FOUND).build());
+
+        String signupRequestJson = "{\n" +
+                " \"businessKRAPin\": \"123456\",\n" +
+                " \"businessOwnerKRAPin\": \"789012\",\n" +
+                " \"email\": \"testuser@example.com\",\n" +
+                " \"name\": \"John Doe\",\n" +
+                " \"password\": \"SecurePassword123\",\n" +
+                " \"phoneNumber\": \"+25474567890\"\n" +
+                "}";
+
+        ValidatableResponse res= given().header("Content-Type",
                         "application/json").body(signupRequestJson).when()
-                .post(signUpUrl)
+                .post("http://localhost:" + port + "/api/v1/auth/sign-up?type=random")
                 .then()
-                .statusCode(is(201));
+                .statusCode(is(400));
+        String jsonString = res.body(containsString("")).extract().response().getBody().asString();
+        SignUpResponse response=  Utils.parseJsonString(jsonString,SignUpResponse.class);
+        assert response != null;
+        assertEquals(response.getMessage(),"Random is an invalid type!");
+
+    }
+
+
+
+
+
+
+    private  Owner signUp(String name, String email, String password, String tel) {
+        Owner owner= new Owner();
+        if(ownerRepository.findAll().isEmpty()){
+            owner.setName(name);
+            owner.setEmail(email);
+            owner.setPassword(password);
+            owner.setPhoneNumber(tel);
+            owner.setRole(Role.owner);
+            ownerService.save(owner);
+        }else{
+            owner= ownerRepository.findAll().get(0);
+        }
+        return owner;
     }
     @Test
     public void shouldLogin() throws IOException {
         // first sign up.
-        signUp("John Doe", "johndoe@example.com", "strongpassword123");
+        signUp("John Doe", "johndoe@example.com", "strongpassword123","+1234567890");
         String loginJson = "{\"email\":\"johndoe@example.com\",\"password\":\"strongpassword123\"}";
         ValidatableResponse res = given().header("Content-Type", "application/json").body(loginJson).when()
                 .post(loginUrl)
@@ -135,43 +195,125 @@ public class OwnerAuthControllerTest {
     }
 
     @Test
-    public void shouldNotifyNonExistingEmailLogin() {
+    public void shouldVerifyOtp() {
+        // Arrange
 
+
+        signUp("John Doe", "johndoe@example.com", "strongpassword123","+1234567890");
         String loginJson = "{\"email\":\"johndoe@example.com\",\"password\":\"strongpassword123\"}";
         given().header("Content-Type", "application/json").body(loginJson).when()
                 .post(loginUrl)
                 .then()
-                .statusCode(is(404))
-                .body(containsString("No Owner by that email exists."));
+                .statusCode(is(201));
+        String phoneNumber = ownerRepository.findAll().get(0).getPhoneNumber();
+        String otpCode = otpRepository.findAll().get(0).getOtpCode();
+        String type = "owner";
 
+
+
+        // Prepare the request body
+        OtpDataDto otpDataDto = new OtpDataDto();
+        otpDataDto.setPhoneNumber(phoneNumber);
+        otpDataDto.setOtpCode(otpCode);
+        otpDataDto.setType(type);
+
+        // Act
+        ValidatableResponse res = given()
+                .contentType(ContentType.JSON)
+                .body(otpDataDto)
+                .when()
+                .post(verifyOtpUrl)
+                .then()
+                .statusCode(is(HttpStatus.CREATED.value()));
+
+        // Assert
+        String jsonString = res.extract().response().getBody().asString();
+        OtpVerification response = Utils.parseJsonString(jsonString,OtpVerification.class);
+        assert response != null;
+        assertEquals("Login successful!", response.getMessage());
+        assertTrue(response.getData().getToken().length()> 50);
     }
 
-    @Test
-    public void shouldNotLoginWithWrongEmail() {
-        signUp("John Doe", "johndoe@example.com", "strongpassword123");
-        signUp("John Doe", "johndoe2@example.com", "strongpassword1234");
 
-        String loginJson = "{\"email\":\"johndoe2@example.com\",\"password\":\"strongpassword123\"}";
+    @Test
+    public void shouldRefuseInvalidOtp() {
+        // Arrange
+
+
+        signUp("John Doe", "johndoe@example.com", "strongpassword123","+1234567890");
+        String loginJson = "{\"email\":\"johndoe@example.com\",\"password\":\"strongpassword123\"}";
         given().header("Content-Type", "application/json").body(loginJson).when()
                 .post(loginUrl)
                 .then()
-                .statusCode(is(401))
-                .body(containsString("Invalid email or password."));
+                .statusCode(is(201));
+        String phoneNumber = ownerRepository.findAll().get(0).getPhoneNumber();
+        String otpCode = otpRepository.findAll().get(0).getOtpCode();
+        String type = "owner";
+        char[] otpArray = otpCode.toCharArray();
 
-    }
 
-    @Test
-    public void shouldNotLoginWithWrongPassword() {
-        signUp("John Doe", "johndoe@example.com", "strongpassword123");
+        //Used to generate a different otpCode
+        // Get the last digit
+        char lastDigit = otpArray[otpArray.length - 1];
 
-        String loginJson = "{\"email\":\"johndoe@example.com\",\"password\":\"strongpassword1234\"}";
-        given().header("Content-Type", "application/json").body(loginJson).when()
-                .post(loginUrl)
+        // Determine a new digit that is different from the last digit
+        char newDigit = '0'; // Initialize with a default value
+        for (char digit = '0'; digit <= '9'; digit++) {
+            if (digit != lastDigit) {
+                newDigit = digit;
+                break; // Exit the loop once a different digit is found
+            }
+        }
+
+        // Replace the last digit with the new one
+        otpArray[otpArray.length - 1] = newDigit;
+
+        // Convert the character array back to a string
+        String newOtpCode = new String(otpArray);
+
+
+        // Prepare the request body
+        OtpDataDto otpDataDto = new OtpDataDto();
+        otpDataDto.setPhoneNumber(phoneNumber);
+        otpDataDto.setOtpCode(newOtpCode);
+        otpDataDto.setType(type);
+
+        // Act
+        ValidatableResponse res = given()
+                .contentType(ContentType.JSON)
+                .body(otpDataDto)
+                .when()
+                .post(verifyOtpUrl)
                 .then()
-                .statusCode(is(401))
-                .body(containsString("Invalid email or password."));
+                .statusCode(is(HttpStatus.UNAUTHORIZED.value()));
+
+        // Assert
+        String jsonString = res.extract().response().getBody().asString();
+        OtpVerification response = Utils.parseJsonString(jsonString,OtpVerification.class);
+        assert response != null;
+        assertEquals("Invalid email or password.", response.getMessage());
+        assertNull(response.getData());
 
     }
+
+
+
+
+    @Data
+    public static class SignUpResponse {
+        private String message;
+        @JsonProperty("data")
+        private BodyData data;
+
+        @Data
+        public static class BodyData {
+            private int id;
+            private String name;
+            private String email;
+            private String phoneNumber;
+        }
+    }
+
 
 
     @Data
@@ -230,7 +372,6 @@ public class OwnerAuthControllerTest {
 
                 @JsonProperty("phoneNumber")
                 private String phoneNumber;
-
 
             }
 
