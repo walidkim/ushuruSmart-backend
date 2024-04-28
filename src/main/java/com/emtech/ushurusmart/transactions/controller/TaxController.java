@@ -1,6 +1,7 @@
 package com.emtech.ushurusmart.transactions.controller;
 
 
+import com.emtech.ushurusmart.config.LoggerSingleton;
 import com.emtech.ushurusmart.etims_middleware.TransactionMiddleware;
 import com.emtech.ushurusmart.transactions.Dto.*;
 import com.emtech.ushurusmart.transactions.entity.Product;
@@ -31,7 +32,7 @@ import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/v1/tax")
-public class TaxController {
+public class TaxController  extends LoggerSingleton {
 
     @Autowired
     private InvoiceService invoiceService;
@@ -61,6 +62,8 @@ public class TaxController {
 
 
         ResponseEntity<?> response = transactionMiddleware.makeTransaction(jsonString);
+
+        logger.info(response.toString());
 
 
         if (response.getStatusCode() == HttpStatus.CREATED) {

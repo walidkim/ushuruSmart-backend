@@ -17,24 +17,27 @@ public class OwnerController {
     @Autowired
     private EtimsOwnerService ownerService;
 
+    @Autowired
+    private Responses responses;
+
+
     @PostMapping("/verify")
     public ResponseEntity<?> verifyBussiness(@RequestBody VerificationRequest data) {
         ResContructor res = new ResContructor();
         try {
             Etims details = ownerService.findByBusinessKRAPin(data.getBusinessKRAPIN());
-            if(details==null){
+            if (details == null) {
                 res.setMessage("This business is not registered by KRA.");
                 res.setData(false);
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
-            }
-            else{
+            } else {
                 res.setMessage("Business registered by KRA.");
                 res.setData(details);
                 return ResponseEntity.status(HttpStatus.FOUND).body(res);
             }
 
         } catch (Exception e) {
-            return Responses.create500Response(e);
+            return responses.create500Response(e);
         }
     }
 

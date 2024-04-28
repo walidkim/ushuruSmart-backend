@@ -1,8 +1,10 @@
 package com.emtech.ushurusmart.usermanagement.service;
 
+import com.emtech.ushurusmart.config.LoggerSingleton;
 import com.emtech.ushurusmart.etims_middleware.EtimsMiddleware;
 import com.emtech.ushurusmart.usermanagement.Dtos.LoginRequest;
 import com.emtech.ushurusmart.usermanagement.Dtos.OwnerDto;
+import com.emtech.ushurusmart.usermanagement.Dtos.controller.RequestDtos;
 import com.emtech.ushurusmart.usermanagement.controller.HelperUtil;
 import com.emtech.ushurusmart.usermanagement.factory.EntityFactory;
 import com.emtech.ushurusmart.usermanagement.factory.ResponseFactory;
@@ -26,7 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
-public class OwnerService {
+public class OwnerService extends LoggerSingleton {
     @Autowired
     private OwnerRepository ownerRepository;
 
@@ -68,8 +70,9 @@ public class OwnerService {
 
             res.setMessage(HelperUtil.capitalizeFirst(type) + " created successfully!");
             save(owner);
-
-            res.setData(ResponseFactory.createOwnerResponse(owner));
+            RequestDtos.OwnerResponse resOwner= ResponseFactory.createOwnerResponse(owner);
+            logger.info(resOwner.toString());
+            res.setData(resOwner);
             return ResponseEntity.status(HttpStatus.CREATED).body(res);
         }
         else{

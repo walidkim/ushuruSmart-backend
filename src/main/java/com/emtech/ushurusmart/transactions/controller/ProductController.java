@@ -30,6 +30,11 @@ public class ProductController {
     @Autowired
     private OwnerService ownerService;
 
+
+
+    @Autowired
+    private Responses responses;
+
     @GetMapping("/products")
     public ResponseEntity<ResContructor> getAllProduct(){
         try {
@@ -39,7 +44,7 @@ public class ProductController {
             res.setMessage("Products fetched successfully.");
             return  ResponseEntity.status(HttpStatus.OK).body(res);
         }catch (Exception e){
-            return Responses.create500Response(e);
+            return responses.create500Response(e);
         }
     }
 
@@ -62,7 +67,7 @@ public class ProductController {
            res.setData(product);
            return ResponseEntity.status(HttpStatus.OK).body(res);
        }catch (Exception e){
-         return Responses.create500Response(e);
+         return responses.create500Response(e);
        }
 
     }
@@ -86,7 +91,7 @@ public class ProductController {
             res.setData(productService.save(product));
             return ResponseEntity.status(HttpStatus.CREATED).body(res);
         }catch (Exception e){
-            return Responses.create500Response(e);
+            return responses.create500Response(e);
         }
     }
     @PutMapping("product/update/{id}")
@@ -108,7 +113,7 @@ public class ProductController {
            res.setData(currentProduct);
            return  ResponseEntity.status(HttpStatus.OK).body(res);
        } catch (Exception e){
-           return Responses.create500Response(e);
+           return responses.create500Response(e);
        }
     }
     @DeleteMapping("product/delete/{id}")
@@ -125,7 +130,7 @@ public class ProductController {
           res.setMessage("Product deleted successfully.");
           return ResponseEntity.status(HttpStatus.OK).body(res);
       }catch ( Exception e){
-          return Responses.create500Response(e);
+          return responses.create500Response(e);
       }
     }
 }

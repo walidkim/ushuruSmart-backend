@@ -28,6 +28,10 @@ public class TransactionController {
     @Autowired
     private EtimsOwnerService etimsOwnerService;
 
+
+    @Autowired
+    private Responses responses;
+
     @PostMapping("/make-transaction")
     public ResponseEntity<ResContructor> makeTransaction(@RequestBody TransactionDto data) {
         try {
@@ -43,7 +47,7 @@ public class TransactionController {
             res.setData(saved);
             return ResponseEntity.status(HttpStatus.CREATED).body(res);
         } catch (Exception e) {
-            return Responses.create500Response(e);
+            return responses.create500Response(e);
         }
     }
 
