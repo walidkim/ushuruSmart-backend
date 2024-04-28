@@ -10,6 +10,7 @@ import com.emtech.ushurusmart.usermanagement.model.Role;
 import com.emtech.ushurusmart.usermanagement.repository.AssistantRepository;
 import com.emtech.ushurusmart.usermanagement.repository.OwnerRepository;
 import com.emtech.ushurusmart.usermanagement.service.OwnerService;
+import com.emtech.ushurusmart.utils.otp.OtpRepository;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,7 +24,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.context.TestPropertySource;
 
 import java.io.IOException;
 import java.util.List;
@@ -37,11 +37,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource(locations = "")
+
 public class ProductControllerTest {
     @Autowired
     private ProductRepository productRepository;
 
+
+    @Autowired
+    private OtpRepository otpRepository;
     @Autowired
     private OwnerRepository ownerRepository;
 
@@ -65,13 +68,18 @@ public class ProductControllerTest {
 
     private String loginUrl;
 
+    private String verifyOtpUrl;
+
     @BeforeEach
     public void setup() throws IOException {
 
         ownerRepository.deleteAll();
+        productRepository.deleteAll();
 
         signUpUrl = "http://localhost:" + port + "/api/v1/auth/sign-up?type=owner";
         loginUrl = "http://localhost:" + port + "/api/v1/auth/login?type=owner";
+        verifyOtpUrl = "http://localhost:" + port + "/api/v1/auth/verify-otp";
+
         loginAndGetToken();
 
     }
@@ -79,6 +87,7 @@ public class ProductControllerTest {
     @AfterEach
     public void tearDown() {
         ownerRepository.deleteAll();
+        productRepository.deleteAll();
     }
 
     private void loginAndGetToken() throws IOException {
@@ -88,6 +97,8 @@ public class ProductControllerTest {
             owner.setEmail("test@test.com");
             owner.setPassword("test");
             owner.setPhoneNumber("25489898989");
+            owner.setKRAPin("A012345678B");
+            owner.setBusinessKRAPin("P012345678Z");
             owner.setRole(Role.owner);
             ownerService.save(owner);
         }
@@ -95,10 +106,20 @@ public class ProductControllerTest {
         ValidatableResponse res = given().header("Content-Type", "application/json").body(loginJson).when()
                 .post(loginUrl)
                 .then()
-                .statusCode(is(201)).body(containsString("Bearer "));
+                .statusCode(is(201));
+        String otpCode = otpRepository.findAll().get(0).getOtpCode();
+        String verifyOtp = "{\n" +
+                " \"phoneNumber\": \"25489898989\",\n" +
+                " \"type\": \"owner\",\n" +
+                " \"otpCode\": \"" + otpCode + "\"\n" +
+                "}";
+        res = given().header("Content-Type", "application/json").body(verifyOtp).when()
+                .post(verifyOtpUrl)
+                .then()
+                .statusCode(is(201));
+
 
         String jsonString = res.body(containsString("")).extract().response().getBody().asString();
-
         JsonNode jsonNode = new ObjectMapper().readTree(jsonString);
         token = jsonNode.get("data").get("token").asText();
     }

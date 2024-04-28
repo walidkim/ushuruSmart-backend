@@ -22,7 +22,7 @@ public class Assistant extends BaseAuth {
         private String branch;
 
         private boolean verified;
-        @ManyToOne(fetch = FetchType.LAZY)
+        @ManyToOne(fetch = FetchType.EAGER)
         @JoinColumn( nullable = false)
         @JsonBackReference
         private Owner owner;

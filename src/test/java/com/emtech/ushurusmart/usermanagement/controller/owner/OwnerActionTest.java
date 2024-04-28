@@ -140,7 +140,7 @@ public class OwnerActionTest {
 
         assertEquals(response.getMessage(),"Assistant added successfully!");
         assertEquals(response.getData().getName(),"John Doe");
-        assertEquals(response.getData().getEmail(),"johndoe@example.com");
+        assertEquals(response.getData().getEmail(),"samuelmayna@gmail.com");
 
     }
 

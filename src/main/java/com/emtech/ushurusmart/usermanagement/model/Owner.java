@@ -1,7 +1,6 @@
 package com.emtech.ushurusmart.usermanagement.model;
 
 import com.emtech.ushurusmart.payments.entity.PaymentDetails;
-import com.emtech.ushurusmart.payments.entity.PaymentEntity;
 import com.emtech.ushurusmart.transactions.entity.Product;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -23,18 +22,18 @@ public class Owner extends BaseAuth {
         private String businessKRAPin;
         private String KRAPin;
         private String phoneNumber;
-        @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+        @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
         @JsonManagedReference
         private List<Assistant> assistants;
 
         @JsonManagedReference
-        @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+        @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
         private List<PaymentDetails> paymentDetails;
 
 
         @JsonManagedReference
         @ToString.Exclude
-        @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch =  FetchType.EAGER)
+        @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch =  FetchType.LAZY)
         private List<Product> products;
 
 
