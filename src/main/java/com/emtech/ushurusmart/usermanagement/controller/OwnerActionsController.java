@@ -8,7 +8,9 @@ import com.emtech.ushurusmart.usermanagement.model.Owner;
 import com.emtech.ushurusmart.usermanagement.service.AssistantService;
 import com.emtech.ushurusmart.usermanagement.service.OwnerService;
 import com.emtech.ushurusmart.usermanagement.utils.AuthUtils;
+import com.emtech.ushurusmart.utils.EmailService;
 import com.emtech.ushurusmart.utils.controller.ResContructor;
+import com.emtech.ushurusmart.utils.controller.Responses;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,8 +23,16 @@ public class OwnerActionsController {
     @Autowired
     private OwnerService ownerService;
 
+
+    @Autowired
+    private EmailService emailService;
+
     @Autowired
     private AssistantService assistantService;
+
+
+    @Autowired
+    private Responses responses;
 
     @PostMapping(value = "/update-details")
     public ResponseEntity<?> updatedDetails(@RequestBody Owner newOwner) {
@@ -50,14 +60,16 @@ public class OwnerActionsController {
         try {
             String ownerEmail= AuthUtils.getCurrentlyLoggedInPerson();
             Owner owner = ownerService.findByEmail(ownerEmail);
-            Assistant assistant= EntityFactory.createAssistant(data);
+            String password= assistantService.generateRandomPassword(8);
+            String body= assistantService.createEmailBody(data.getName(),data.getEmail(),password);
+            emailService.sendEmail(data.getEmail(), "Welcome To Ushuru Smart", body);
+            Assistant assistant= EntityFactory.createAssistant(data, password);
             assistant.setOwner(owner);
             res.setMessage("Assistant added successfully!");
             res.setData(assistantService.save(assistant));
             return ResponseEntity.status(HttpStatus.CREATED).body(res);
         }catch ( Exception e){
-            res.setMessage("Something happened. Please try again later.");
-            return ResponseEntity.internalServerError().body(res);
+           return responses.create500Response(e);
         }
     }
 

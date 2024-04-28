@@ -5,7 +5,6 @@ import com.emtech.ushurusmart.usermanagement.Dtos.entity.AssistantDto;
 import com.emtech.ushurusmart.usermanagement.model.Assistant;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
 import com.emtech.ushurusmart.usermanagement.model.Role;
-import org.springframework.web.filter.OncePerRequestFilter;
 
 public class EntityFactory {
     public static Owner createOwner(OwnerDto data){
@@ -20,14 +19,14 @@ public class EntityFactory {
         return owner;
     }
 
-    public static Assistant createAssistant(AssistantDto data){
+    public static Assistant createAssistant(AssistantDto data, String password){
         Assistant assistant= new Assistant();
         assistant.setRole(Role.assistant);
         assistant.setPhoneNumber(data.getPhoneNumber());
         assistant.setName(data.getName());
         assistant.setEmail(data.getEmail());
         assistant.setBranch((data.getBranch()));
-        assistant.setPassword(data.getPassword());
+        assistant.setPassword(password);
         return assistant;
     }
 }

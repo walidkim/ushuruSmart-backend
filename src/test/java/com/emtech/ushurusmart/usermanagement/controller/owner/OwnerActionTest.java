@@ -117,8 +117,8 @@ public class OwnerActionTest {
     public void shouldAddAssistant() {
 
 
-        String url = ("http://localhost:" + port + "/api/v1/owner/add-assistant");
-        String payload = "{\"name\":\"John Doe\",\"password\":\"strongpassword123\",\"email\":\"johndoe@example.com\",\"phoneNumber\":\"254711516786\",\"branch\":\"test1\"}";
+        String url = ("http://localhost:" + port + "/api/v1/owner/create-assistant");
+        String payload = "{\"name\":\"John Doe\",\"password\":\"strongpassword123\",\"email\":\"samuelmayna@gmail.com\",\"phoneNumber\":\"254711516786\",\"branch\":\"test1\"}";
 
         ValidatableResponse res = given().header("Content-Type", "application/json").header("Authorization", token).body(payload).when()
                 .post(url)

@@ -68,9 +68,10 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.sendgrid</groupId>
-			<artifactId>sendgrid-java</artifactId>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
+
 
 		<dependency>
 			<groupId>ch.qos.logback</groupId>

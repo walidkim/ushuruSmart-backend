@@ -117,9 +117,89 @@ public class AuthController {
         }
     }
 
-    @NotNull
 
 
+//    @PostMapping(value = "/reset-password")
+//    public ResponseEntity<?> resetPassword(@NotNull @RequestParam(name = "type", required = true) String type,
+//                                   @RequestBody PasswordChange request) {
+//        ResContructor res = new ResContructor();
+//
+//
+//        try {
+//            switch (type) {
+//                case "owner": {
+//                    return ownerService.changePassword(type, request, res);
+//
+//                }
+//                case "assistant": {
+//
+//                    Assistant assistant = assistantService.findByEmail(loginReq.getEmail());
+//
+//                    if (assistant == null) {
+//                        res.setMessage("No " + HelperUtil.capitalizeFirst(type) + " by that email exists.");
+//                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
+//                    }
+//                    Authentication authentication = authenticationManager
+//                            .authenticate(new UsernamePasswordAuthenticationToken(loginReq.getEmail(),
+//                                    loginReq.getPassword(),assistant.getAuthorities() != null ? assistant.getAuthorities() : Collections.emptyList()));
+//                    otpService.sendOTP(assistant.getPhoneNumber());
+//                    res.setMessage("Sent an otp short code to your phone for verification");
+//                    Map<String,String> resBody= new HashMap<>();
+//                    resBody.put("type", type);
+//                    resBody.put("phoneNumber", assistant.getPhoneNumber());
+//                    res.setData(resBody);
+//                    return ResponseEntity.status(HttpStatus.CREATED).body(res);
+//                }
+//                default:
+//                    res.setMessage(HelperUtil.capitalizeFirst(type) + " is and invalid type!");
+//                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+//
+//            }
+//
+//        } catch (Exception e) {
+//            return responses.create500Response(e);
+//        }
+//    }    @PostMapping(value = "/reset-password")
+//    public ResponseEntity<?> resetPassword(@NotNull @RequestParam(name = "type", required = true) String type,
+//                                   @RequestBody PasswordChange request) {
+//        ResContructor res = new ResContructor();
+//
+//
+//        try {
+//            switch (type) {
+//                case "owner": {
+//                    return ownerService.changePassword(type, request, res);
+//
+//                }
+//                case "assistant": {
+//
+//                    Assistant assistant = assistantService.findByEmail(loginReq.getEmail());
+//
+//                    if (assistant == null) {
+//                        res.setMessage("No " + HelperUtil.capitalizeFirst(type) + " by that email exists.");
+//                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
+//                    }
+//                    Authentication authentication = authenticationManager
+//                            .authenticate(new UsernamePasswordAuthenticationToken(loginReq.getEmail(),
+//                                    loginReq.getPassword(),assistant.getAuthorities() != null ? assistant.getAuthorities() : Collections.emptyList()));
+//                    otpService.sendOTP(assistant.getPhoneNumber());
+//                    res.setMessage("Sent an otp short code to your phone for verification");
+//                    Map<String,String> resBody= new HashMap<>();
+//                    resBody.put("type", type);
+//                    resBody.put("phoneNumber", assistant.getPhoneNumber());
+//                    res.setData(resBody);
+//                    return ResponseEntity.status(HttpStatus.CREATED).body(res);
+//                }
+//                default:
+//                    res.setMessage(HelperUtil.capitalizeFirst(type) + " is and invalid type!");
+//                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+//
+//            }
+//
+//        } catch (Exception e) {
+//            return responses.create500Response(e);
+//        }
+//    }
 
     @PostMapping(value = "/verify-otp")
     public ResponseEntity<?> verifyOtp(@RequestBody OtpDataDto req) {

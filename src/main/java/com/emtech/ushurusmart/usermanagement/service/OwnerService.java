@@ -4,6 +4,7 @@ import com.emtech.ushurusmart.config.LoggerSingleton;
 import com.emtech.ushurusmart.etims_middleware.EtimsMiddleware;
 import com.emtech.ushurusmart.usermanagement.Dtos.LoginRequest;
 import com.emtech.ushurusmart.usermanagement.Dtos.OwnerDto;
+import com.emtech.ushurusmart.usermanagement.Dtos.controller.PasswordChange;
 import com.emtech.ushurusmart.usermanagement.Dtos.controller.RequestDtos;
 import com.emtech.ushurusmart.usermanagement.controller.HelperUtil;
 import com.emtech.ushurusmart.usermanagement.factory.EntityFactory;
@@ -63,18 +64,17 @@ public class OwnerService extends LoggerSingleton {
             res.setMessage(HelperUtil.capitalizeFirst(type) + " with that email exists!");
             return ResponseEntity.badRequest().body(res);
         }
-        ResponseEntity<?> response= etimsMiddleware.verifyBusinessKRAPin(data.getBusinessKRAPin());
-        if(response.getStatusCode()==HttpStatus.FOUND){
+        ResponseEntity<?> response = etimsMiddleware.verifyBusinessKRAPin(data.getBusinessKRAPin());
+        if (response.getStatusCode() == HttpStatus.FOUND) {
             Owner owner = EntityFactory.createOwner(data);
 
             res.setMessage(HelperUtil.capitalizeFirst(type) + " created successfully!");
             save(owner);
-            RequestDtos.OwnerResponse resOwner= ResponseFactory.createOwnerResponse(owner);
+            RequestDtos.OwnerResponse resOwner = ResponseFactory.createOwnerResponse(owner);
             logger.info(resOwner.toString());
             res.setData(resOwner);
             return ResponseEntity.status(HttpStatus.CREATED).body(res);
-        }
-        else{
+        } else {
 
             res.setMessage(HelperUtil.capitalizeFirst(type) + " can not be onboarded. Business is not registered by KRA!");
             return ResponseEntity.status(HttpStatus.UNAVAILABLE_FOR_LEGAL_REASONS).body(res);
@@ -83,25 +83,23 @@ public class OwnerService extends LoggerSingleton {
 
 
     public ResponseEntity<ResContructor> loginOwner(@NotNull String type, LoginRequest loginReq, ResContructor res) throws Exception {
-       try {
-           Owner owner = findByEmail(loginReq.getEmail());
-           if (owner == null) {
+        try {
+            Owner owner = findByEmail(loginReq.getEmail());
+            if (owner == null) {
                 throw new BadCredentialsException("Invalid email or password");
-           }
+            }
 
-           Authentication authentication = authenticationManager
-                   .authenticate(new UsernamePasswordAuthenticationToken(loginReq.getEmail(),
-                           loginReq.getPassword(),owner.getAuthorities() != null ? owner.getAuthorities() : Collections.emptyList()));
-           otpService.sendOTP(owner.getPhoneNumber());
-           res.setMessage("A short code has been sent to your phone for verification");
-           Map<String,String> resBody= new HashMap<>();
-           resBody.put("type", type);
-           resBody.put("phoneNumber", owner.getPhoneNumber());
-           res.setData(resBody);
-           return ResponseEntity.status(HttpStatus.CREATED).body(res);
-       }
-
-         catch (BadCredentialsException e) {
+            Authentication authentication = authenticationManager
+                    .authenticate(new UsernamePasswordAuthenticationToken(loginReq.getEmail(),
+                            loginReq.getPassword(), owner.getAuthorities() != null ? owner.getAuthorities() : Collections.emptyList()));
+            otpService.sendOTP(owner.getPhoneNumber());
+            res.setMessage("A short code has been sent to your phone for verification");
+            Map<String, String> resBody = new HashMap<>();
+            resBody.put("type", type);
+            resBody.put("phoneNumber", owner.getPhoneNumber());
+            res.setData(resBody);
+            return ResponseEntity.status(HttpStatus.CREATED).body(res);
+        } catch (BadCredentialsException e) {
             res.setMessage("Invalid email or password.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
         }
@@ -116,4 +114,8 @@ public class OwnerService extends LoggerSingleton {
     }
 
 
+    public ResponseEntity<ResContructor> changePassword(String type, PasswordChange request, ResContructor res) {
+
+        return null;
+    }
 }
