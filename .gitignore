@@ -24,8 +24,9 @@ application.properties
 # Ignore compiled classes
 *.class
 
-# Ignore application properties
-/application.properties
+
+
+
 
 # Ignore dependency directories
 /bin/

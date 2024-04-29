@@ -1,54 +1,86 @@
-package com.emtech.ushurusmart.usermanagement.controller.owner;
+package com.emtech.ushurusmart.transactions.controller.assistant;
 
-import com.emtech.ushurusmart.usermanagement.controller.Utils;
+
+import com.emtech.ushurusmart.UshuruSmartApplication;
+import com.emtech.ushurusmart.etims.repository.EtimsRepository;
+import com.emtech.ushurusmart.etims.repository.TransactionRepository;
+import com.emtech.ushurusmart.etims_middleware.TransactionMiddleware;
+import com.emtech.ushurusmart.transactions.entity.Product;
+import com.emtech.ushurusmart.transactions.factory.EntityFactory;
+import com.emtech.ushurusmart.transactions.repository.ProductRepository;
+import com.emtech.ushurusmart.usermanagement.Dtos.entity.ProductDto;
 import com.emtech.ushurusmart.usermanagement.model.Assistant;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
 import com.emtech.ushurusmart.usermanagement.model.Role;
 import com.emtech.ushurusmart.usermanagement.repository.AssistantRepository;
 import com.emtech.ushurusmart.usermanagement.repository.OwnerRepository;
+import com.emtech.ushurusmart.usermanagement.service.AssistantService;
 import com.emtech.ushurusmart.usermanagement.service.OwnerService;
+import com.emtech.ushurusmart.usermanagement.service.SampleDataInitializer;
 import com.emtech.ushurusmart.utils.otp.OtpRepository;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.restassured.response.ResponseBody;
 import io.restassured.response.ValidatableResponse;
+import jakarta.transaction.Transactional;
 import lombok.Data;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.Is.is;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 
-
-
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource(locations = "")
-public class OwnerActionTest {
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, classes = UshuruSmartApplication.class)
+public class AssistantTransactionControllerTests {
+    @Autowired
+    private ProductRepository productRepository;
 
     @Autowired
     private OwnerRepository ownerRepository;
 
+
+    @Autowired
+    private EtimsRepository etimsRepository;
+
+    @Autowired
+    private TransactionRepository transactionRepository;
+
     @Autowired
     private OwnerService ownerService;
+
+    @Autowired
+    private AssistantRepository assistantRepository;
+    @Autowired
+    private SampleDataInitializer sampleDataInitializer;
 
 
     @Autowired
     private OtpRepository otpRepository;
 
+
     @Autowired
-    private AssistantRepository assistantRepository;
+    private AssistantService assistantService;
+
+
+    @MockBean
+    private TransactionMiddleware transactionMiddleware;
 
 
     @LocalServerPort
@@ -56,49 +88,73 @@ public class OwnerActionTest {
 
     private String token;
 
-    private String signUpUrl;
-
     private String loginUrl;
 
     private String verifyOtpUrl;
 
+
+
+
     @BeforeEach
     public void setup() throws IOException {
-
+        transactionRepository.deleteAll();
+        etimsRepository.deleteAll();
+        productRepository.deleteAll();
+        assistantRepository.deleteAll();
         ownerRepository.deleteAll();
-        verifyOtpUrl = "http://localhost:" + port + "/api/v1/auth/verify-otp";
-        signUpUrl = "http://localhost:" + port + "/api/v1/auth/sign-up?type=owner";
-        loginUrl = "http://localhost:" + port + "/api/v1/auth/login?type=owner";
-        loginAndGetToken();
 
+
+        loginUrl = "http://localhost:" + port + "/api/v1/auth/login?type=assistant";
+        verifyOtpUrl = "http://localhost:" + port + "/api/v1/auth/verify-otp";
+        loginAndGetToken();
+        sampleDataInitializer.initSampleData();
+
+    }
+
+    @Transactional
+    private Product addProduct(String name){
+        Product prod= EntityFactory.createProduct(new ProductDto("test desc",name,34,false,"pcs","pcs",23.45));
+        prod= productRepository.save(prod);
+        Owner owner = ownerRepository.findAll().get(0);
+        prod.setOwner(owner);
+        return productRepository.save(prod);
     }
 
     @AfterEach
     public void tearDown() {
+        transactionRepository.deleteAll();
+        etimsRepository.deleteAll();
+        productRepository.deleteAll();
+        assistantRepository.deleteAll();
         ownerRepository.deleteAll();
     }
 
     private void loginAndGetToken() throws IOException {
-        Owner owner = new Owner();
+        Assistant assistant = new Assistant();
         if (ownerRepository.findAll().isEmpty()) {
-            owner.setName("test");
-            owner.setEmail("test@test.com");
-            owner.setPassword("test");
-            owner.setPhoneNumber("25489898989");
-            owner.setKRAPin("A012345678B");
-            owner.setBusinessKRAPin("P012345678Z");
-            owner.setRole(Role.owner);
-            ownerService.save(owner);
+            Owner owner= new Owner();
+            owner.setName("example");
+            owner.setEmail("test2sdfd@gmail.com");
+            owner.setPassword("test23");
+            owner= ownerService.save(owner);
+            assistant.setName("test");
+            assistant.setEmail("test@test.com");
+            assistant.setPassword("test");
+            assistant.setPhoneNumber("25489898989");
+            assistant.setRole(Role.owner);
+            assistant.setOwner(owner);
+            assistantService.save(assistant);
         }
         String loginJson = "{\"email\":\"test@test.com\",\"password\":\"test\"}";
         ValidatableResponse res = given().header("Content-Type", "application/json").body(loginJson).when()
                 .post(loginUrl)
                 .then()
                 .statusCode(is(201));
+
         String otpCode = otpRepository.findAll().get(0).getOtpCode();
         String verifyOtp = "{\n" +
                 " \"phoneNumber\": \"25489898989\",\n" +
-                " \"type\": \"owner\",\n" +
+                " \"type\": \"assistant\",\n" +
                 " \"otpCode\": \"" + otpCode + "\"\n" +
                 "}";
         res = given().header("Content-Type", "application/json").body(verifyOtp).when()
@@ -113,68 +169,84 @@ public class OwnerActionTest {
     }
 
 
+
     @Test
-    public void shouldAddAssistant() {
+    public void shouldMakeATransaction() {
+        when(transactionMiddleware.makeTransaction(any()))
+                .thenReturn(ResponseEntity.status(HttpStatus.CREATED).build());
+        Product prod = addProduct("test1");
+        Product prod2 = addProduct("test2");
 
-
-        String url = ("http://localhost:" + port + "/api/v1/owner/create-assistant");
-        String payload = "{\"name\":\"John Doe\",\"password\":\"strongpassword123\",\"email\":\"samuelmayna@gmail.com\",\"phoneNumber\":\"254711516786\",\"branch\":\"test1\"}";
-
+        String url = ("http://localhost:" + port + "/api/v1/tax/make-transaction");
+        String payload = "{\n" +
+                " \"buyerKRAPin\": \"A12345678H\",\n" +
+                " \"sales\": [\n" +
+                "    {\n" +
+                "      \"productId\": \"" + prod.getId() + "\",\n" +
+                "      \"quantity\": 20\n" +
+                "    },\n" +
+                " {\n" +
+                "      \"productId\": \"" + prod2.getId() + "\",\n" +
+                "      \"quantity\": 30\n" +
+                "    }\n" +
+                " ]\n" +
+                "}";
         ValidatableResponse res = given().header("Content-Type", "application/json").header("Authorization", token).body(payload).when()
                 .post(url)
                 .then()
                 .statusCode(is(201));
+        ResponseBody jsonString = res.body(containsString("")).extract().response().getBody();
 
-        String jsonString = res.body(containsString("")).extract().response().getBody().asString();
+        byte[] pdfBytes = jsonString.asByteArray();
 
-        AddAssistantResponse response = Utils.parseJsonString(jsonString,AddAssistantResponse.class);
-
-        Assistant savedAssistant = assistantRepository.findAll().get(0);
-
-        assertEquals(savedAssistant.getName(), "John Doe");
-        // ensure the tenant password is encrypted.
-        assertTrue(savedAssistant.getPassword().length() > 30);
-        Owner owner = ownerRepository.findAll().get(0);
-        //ensure there is linking.
-        assertEquals(owner.getEmail(), savedAssistant.getOwner().getEmail());
-
-        assertEquals(response.getMessage(),"Assistant added successfully!");
-        assertEquals(response.getData().getName(),"John Doe");
-        assertEquals(response.getData().getEmail(),"samuelmayna@gmail.com");
+        // Save the PDF to a file
+        try (OutputStream outputStream = new FileOutputStream("invoice-test.pdf")) {
+            outputStream.write(pdfBytes);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 
-
     @Test
-    public void deleteAssistant() {
+    public void shouldRefuseIfNotRegistered() {
+        Product prod = addProduct("test1");
+        Product prod2 = addProduct("test2");
 
+        when(transactionMiddleware.makeTransaction(any()))
+                .thenReturn(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
 
-        String url = ("http://localhost:" + port + "/api/v1/owner/create-assistant");
-        String payload = "{\"name\":\"John Doe\",\"password\":\"strongpassword123\",\"email\":\"samuelmayna@gmail.com\",\"phoneNumber\":\"254711516786\",\"branch\":\"test1\"}";
-
+        String url = ("http://localhost:" + port + "/api/v1/tax/make-transaction");
+        String payload = "{\n" +
+                " \"buyerKRAPin\": \"A12345678H\",\n" +
+                " \"sales\": [\n" +
+                "    {\n" +
+                "      \"productId\": \"" + prod.getId() + "\",\n" +
+                "      \"quantity\": 20\n" +
+                "    },\n" +
+                " {\n" +
+                "      \"productId\": \"" + prod2.getId() + "\",\n" +
+                "      \"quantity\": 30\n" +
+                "    }\n" +
+                " ]\n" +
+                "}";
         ValidatableResponse res = given().header("Content-Type", "application/json").header("Authorization", token).body(payload).when()
                 .post(url)
                 .then()
-                .statusCode(is(201));
+                .statusCode(is(404));
+        ResponseBody jsonString = res.body(containsString("")).extract().response().getBody();
 
-        String jsonString = res.body(containsString("")).extract().response().getBody().asString();
+        byte[] pdfBytes = jsonString.asByteArray();
 
-        AddAssistantResponse response = Utils.parseJsonString(jsonString,AddAssistantResponse.class);
-
-        Assistant savedAssistant = assistantRepository.findAll().get(0);
-
-        assertEquals(savedAssistant.getName(), "John Doe");
-        // ensure the tenant password is encrypted.
-        assertTrue(savedAssistant.getPassword().length() > 30);
-        Owner owner = ownerRepository.findAll().get(0);
-        //ensure there is linking.
-        assertEquals(owner.getEmail(), savedAssistant.getOwner().getEmail());
-
-        assertEquals(response.getMessage(),"Assistant added successfully!");
-        assertEquals(response.getData().getName(),"John Doe");
-        assertEquals(response.getData().getEmail(),"samuelmayna@gmail.com");
+        // Save the PDF to a file
+        try (OutputStream outputStream = new FileOutputStream("invoice-test.pdf")) {
+            outputStream.write(pdfBytes);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
+
 
 
 
@@ -279,16 +351,25 @@ public class OwnerActionTest {
 
 
     @Data
+    public static class AllProductResponse {
+        @JsonProperty("message")
+        private String message;
+        private List<com.emtech.ushurusmart.transactions.controller.owner.TransactionControllerTest.ProductResponse.ProductData> data;
 
-    public static class AddAssistantResponse {
+    }
+
+    @Data
+
+    public static class ProductResponse {
 
         @JsonProperty("message")
         private String message;
 
         @JsonProperty("data")
-        private AssistantData data;
+        private com.emtech.ushurusmart.transactions.controller.owner.TransactionControllerTest.ProductResponse.ProductData data;
+
         @Data
-        public static class AssistantData {
+        public static class ProductData {
 
             @JsonProperty("id")
             private Long id;
@@ -296,48 +377,53 @@ public class OwnerActionTest {
             @JsonProperty("name")
             private String name;
 
-            @JsonProperty("password") // Security risk to include password in response, consider removing
-            private String password;
+            @JsonProperty("unitPrice")
+            private double unitPrice;
 
-            @JsonProperty("email")
-            private String email;
+            @JsonProperty("unitOfMeasure")
+            private String unitOfMeasure;
 
-            @JsonProperty("role")
-            private String role;
+            @JsonProperty("taxExempted")
+            private boolean taxExempted;
 
-            @JsonProperty("phoneNumber")
-            private String phoneNumber;
+            @JsonProperty("quantity")
+            private int quantity;
 
-            @JsonProperty("branch")
-            private String branch;
+            @JsonProperty("description")
+            private String description;
 
-            @JsonProperty("verified")
-            private boolean verified;
+            @JsonProperty("type")
+            private String type;
 
-            @JsonProperty("enabled")
-            private boolean enabled;
-            @JsonProperty("authorities")
-            private List<Authority> authorities;
+            @JsonProperty("dateCreated")
+            private String dateCreated;
 
-            @Data
-            public static class Authority {
+            @JsonProperty("dateUpdated")
+            private String dateUpdated;
 
-                @JsonProperty("authority")
-                private String authority;
-            }
-
-            @JsonProperty("username")
-            private String username;
-
-            @JsonProperty("accountNonExpired")
-            private boolean accountNonExpired;
-
-            @JsonProperty("accountNonLocked")
-            private boolean accountNonLocked;
-
-            @JsonProperty("credentialsNonExpired")
-            private boolean credentialsNonExpired;
+            @JsonProperty("transactions")
+            private Object transactions; // Placeholder for potential transactions data
         }
     }
 
+
+    @Data
+    public static class ErrorResponse {
+
+        @JsonProperty("timestamp")
+        private String timestamp;
+
+        @JsonProperty("status")
+        private int status;
+
+        @JsonProperty("error")
+        private String error;
+
+        @JsonProperty("path")
+        private String path;
+    }
+
+
 }
+
+

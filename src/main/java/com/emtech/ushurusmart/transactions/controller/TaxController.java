@@ -8,6 +8,7 @@ import com.emtech.ushurusmart.transactions.entity.Product;
 import com.emtech.ushurusmart.transactions.service.InvoiceService;
 import com.emtech.ushurusmart.transactions.service.ProductService;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
+import com.emtech.ushurusmart.usermanagement.service.AssistantService;
 import com.emtech.ushurusmart.usermanagement.service.OwnerService;
 import com.emtech.ushurusmart.usermanagement.utils.AuthUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,6 +43,10 @@ public class TaxController  extends LoggerSingleton {
     @Autowired
     private OwnerService ownerService;
 
+
+    @Autowired
+    private AssistantService assistantService;
+
     @Autowired
     private ProductService productService;
 
@@ -52,7 +57,11 @@ public class TaxController  extends LoggerSingleton {
     @PostMapping("/make-transaction")
     public ResponseEntity<?> makeTransaction(@RequestBody TransactionRequest request, HttpServletResponse responses) throws IOException, JRException {
 
-        Owner owner = ownerService.findByEmail(AuthUtils.getCurrentlyLoggedInPerson());
+        String email= AuthUtils.getCurrentlyLoggedInPerson();
+        Owner owner= ownerService.findByEmail(email);
+        if(owner==null){
+            owner= assistantService.findByEmail(email).getOwner();
+        }
 
         EtimsTransactionDto etimReq = generateEtimsRequest(request, owner);
 
@@ -66,7 +75,8 @@ public class TaxController  extends LoggerSingleton {
         logger.info(response.toString());
 
 
-        if (response.getStatusCode() == HttpStatus.CREATED) {
+        if (response.getStatusCode() == HttpStatus.FOUND) {
+            System.out.println("Created");
             EtimsResponses.TransactionResponse transactionResponse = EtimsResponses.parseMakeTransactionResponse(Objects.requireNonNull(response.getBody()).toString());
 
             byte[] reportArrayOutputStream = invoiceService.generateInvoice(transactionResponse.getData(), request);
@@ -82,6 +92,9 @@ public class TaxController  extends LoggerSingleton {
             responseHeaders.setContentDispositionFormData("attachment", "receipt.pdf");
             return new ResponseEntity<>(reportArrayOutputStream, responseHeaders, HttpStatus.CREATED);
 
+        }
+        else{
+          return response;
         }
 
 
@@ -112,7 +125,6 @@ public class TaxController  extends LoggerSingleton {
 //        responseHeaders.setContentLength(reportBytes.length);
 //        responseHeaders.setContentDispositionFormData("attachment", "receipt.pdf");
 
-        return ResponseEntity.ok("Good");
 
     }
 

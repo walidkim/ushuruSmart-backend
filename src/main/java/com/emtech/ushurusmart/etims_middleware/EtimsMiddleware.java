@@ -12,14 +12,18 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class EtimsMiddleware {
     @Value("${server.port}")
     private String serverPort;
-    public ResponseEntity<?> verifyBusinessKRAPin(String data){
+    public ResponseEntity<?> verifyBusinessKRAPin(String businessKRAPIN){
 
         WebClient webClient = WebClient.create("http://localhost:" + serverPort);
+
+        String requestBody= String.format("{\n" +
+                " \"businessKRAPIN\": \"%s\"\n" +
+                "}", businessKRAPIN);
 
         ClientResponse clientResponse = webClient.post()
                 .uri("/api/v1/etims/verify")
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(data)
+                .bodyValue(requestBody)
                 .exchange()
                 .block(); // Block to wait for the response
 
