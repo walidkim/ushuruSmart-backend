@@ -84,14 +84,14 @@ public class AssistantService {
 
     }
 
-    public String createEmailBody(String name, String email, String password ) {
+    public String createEmailBody(String name, String ownerName, String email, String password ) {
         return "<!DOCTYPE html>\n" +
                 "<html>\n" +
                 "<head>\n" +
                 "    <title>Welcome to Ushuru Smart</title>\n" +
                 "    <style>\n" +
                 "        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }\n" +
-                "        .email-container { width: 80%; margin: 0 auto; background-color: #ffffff; padding: 20px; border-radius: 10px; }\n" +
+                "        .email-container { width: 90%; margin: 0 auto; background-color: #ffffff; padding: 20px; border-radius: 10px; }\n" +
                 "        .email-header { text-align: center; padding: 20px 0; background-color: #f32525; color: #ffffff; border-radius: 10px 10px 0 0; }\n" +
                 "        .email-body { padding: 20px; }\n" +
                 "        .email-footer { text-align: center; padding: 20px; background-color: #f32525; color: #ffffff; border-radius: 0 0 10px 10px; }\n" +
@@ -105,7 +105,7 @@ public class AssistantService {
                 "        </div>\n" +
                 "        <div class=\"email-body\">\n" +
                 "            <p>Dear "+name+",</p>\n" +
-                "            <p>We are excited to have you on Ushuru Smart! To get started, please use the following  email and  password to log in to your account:</p>\n" +
+                "            <p> You have been registered by "+ownerName + " to Ushuru Smart.  We are excited to have you on Ushuru Smart! To get started, please use the following  email and  password to log in to your account:</p>\n" +
                 "            <p><span> Email: <span> : <span> <strong>" + email + "</strong></span></p>\n" +
                 "            <p><span> Password: <span> : <span> <strong>" + password + "</strong></span></p>\n" +
                 "            <p>Please ensure to keep your password confidential and do not share it with anyone.</p>\n" +

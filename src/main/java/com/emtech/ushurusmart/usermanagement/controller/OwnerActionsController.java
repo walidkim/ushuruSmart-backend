@@ -61,7 +61,7 @@ public class OwnerActionsController {
             String ownerEmail= AuthUtils.getCurrentlyLoggedInPerson();
             Owner owner = ownerService.findByEmail(ownerEmail);
             String password= assistantService.generateRandomPassword(8);
-            String body= assistantService.createEmailBody(data.getName(),data.getEmail(),password);
+            String body= assistantService.createEmailBody(data.getName(),owner.getName(),data.getEmail(),password);
             emailService.sendEmail(data.getEmail(), "Welcome To Ushuru Smart", body);
             Assistant assistant= EntityFactory.createAssistant(data, password);
             assistant.setOwner(owner);

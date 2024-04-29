@@ -145,6 +145,39 @@ public class OwnerActionTest {
     }
 
 
+    @Test
+    public void deleteAssistant() {
+
+
+        String url = ("http://localhost:" + port + "/api/v1/owner/create-assistant");
+        String payload = "{\"name\":\"John Doe\",\"password\":\"strongpassword123\",\"email\":\"samuelmayna@gmail.com\",\"phoneNumber\":\"254711516786\",\"branch\":\"test1\"}";
+
+        ValidatableResponse res = given().header("Content-Type", "application/json").header("Authorization", token).body(payload).when()
+                .post(url)
+                .then()
+                .statusCode(is(201));
+
+        String jsonString = res.body(containsString("")).extract().response().getBody().asString();
+
+        AddAssistantResponse response = Utils.parseJsonString(jsonString,AddAssistantResponse.class);
+
+        Assistant savedAssistant = assistantRepository.findAll().get(0);
+
+        assertEquals(savedAssistant.getName(), "John Doe");
+        // ensure the tenant password is encrypted.
+        assertTrue(savedAssistant.getPassword().length() > 30);
+        Owner owner = ownerRepository.findAll().get(0);
+        //ensure there is linking.
+        assertEquals(owner.getEmail(), savedAssistant.getOwner().getEmail());
+
+        assertEquals(response.getMessage(),"Assistant added successfully!");
+        assertEquals(response.getData().getName(),"John Doe");
+        assertEquals(response.getData().getEmail(),"samuelmayna@gmail.com");
+
+    }
+
+
+
 //    @Test
 //    public void shouldRefuseTenantAdditionIflandlordDoesNotOwnUnit() throws IOException {
 //        addUnit("Eden", "A1", "pidddfd");

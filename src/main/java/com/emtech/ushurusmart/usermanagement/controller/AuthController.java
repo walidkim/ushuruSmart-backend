@@ -81,7 +81,6 @@ public class AuthController {
 
                 }
                 case "assistant": {
-
                     return assistantService.loginAssistant(loginReq, res);
                 }
                 default:
