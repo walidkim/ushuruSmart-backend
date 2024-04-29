@@ -5,6 +5,11 @@
 *.iml
 .idea/
 
+
+application.yml
+application.properties
+
+
 # Ignore Eclipse files
 .classpath
 .project

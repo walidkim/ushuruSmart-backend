@@ -1,13 +1,14 @@
 package com.emtech.ushurusmart;
 
+import com.emtech.ushurusmart.config.LoggerSingleton;
 import com.emtech.ushurusmart.usermanagement.service.SampleDataInitializer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 
 @SpringBootApplication
-public class  UshuruSmartApplication {
-	public static void main(String[] args) {
+public class  UshuruSmartApplication  extends LoggerSingleton {
+	public static  void main(String[] args) {
 		ApplicationContext context = SpringApplication.run(UshuruSmartApplication.class, args);
 
 		// Now context is properly initialized, and you can use it to retrieve beans

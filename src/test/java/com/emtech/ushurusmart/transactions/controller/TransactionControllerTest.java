@@ -1,8 +1,8 @@
 package com.emtech.ushurusmart.transactions.controller;
 
-import com.emtech.ushurusmart.Etims.repository.EtimsRepository;
-import com.emtech.ushurusmart.Etims.repository.TransactionRepository;
 import com.emtech.ushurusmart.UshuruSmartApplication;
+import com.emtech.ushurusmart.etims.repository.EtimsRepository;
+import com.emtech.ushurusmart.etims.repository.TransactionRepository;
 import com.emtech.ushurusmart.transactions.entity.Product;
 import com.emtech.ushurusmart.transactions.factory.EntityFactory;
 import com.emtech.ushurusmart.transactions.repository.ProductRepository;
@@ -14,6 +14,7 @@ import com.emtech.ushurusmart.usermanagement.repository.AssistantRepository;
 import com.emtech.ushurusmart.usermanagement.repository.OwnerRepository;
 import com.emtech.ushurusmart.usermanagement.service.OwnerService;
 import com.emtech.ushurusmart.usermanagement.service.SampleDataInitializer;
+import com.emtech.ushurusmart.utils.otp.OtpRepository;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,7 +28,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.context.TestPropertySource;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -40,10 +40,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.*;
 
 
-
-
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,classes = UshuruSmartApplication.class)
-@TestPropertySource(locations = "")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, classes = UshuruSmartApplication.class)
 public class TransactionControllerTest {
     @Autowired
     private ProductRepository productRepository;
@@ -67,22 +64,31 @@ public class TransactionControllerTest {
     private SampleDataInitializer sampleDataInitializer;
 
 
+    @Autowired
+    private OtpRepository otpRepository;
+
+
     @LocalServerPort
     private int port;
 
     private String token;
 
-    private String signUpUrl;
-
     private String loginUrl;
+
+    private String verifyOtpUrl;
+
 
     @BeforeEach
     public void setup() throws IOException {
-
+        transactionRepository.deleteAll();
+        etimsRepository.deleteAll();
+        productRepository.deleteAll();
+        assistantRepository.deleteAll();
         ownerRepository.deleteAll();
 
-        signUpUrl = "http://localhost:" + port + "/api/v1/auth/sign-up?type=owner";
+
         loginUrl = "http://localhost:" + port + "/api/v1/auth/login?type=owner";
+        verifyOtpUrl = "http://localhost:" + port + "/api/v1/auth/verify-otp";
         loginAndGetToken();
         sampleDataInitializer.initSampleData();
 
@@ -90,8 +96,10 @@ public class TransactionControllerTest {
 
     @AfterEach
     public void tearDown() {
-        etimsRepository.deleteAll();
         transactionRepository.deleteAll();
+        etimsRepository.deleteAll();
+        productRepository.deleteAll();
+        assistantRepository.deleteAll();
         ownerRepository.deleteAll();
     }
 
@@ -111,27 +119,49 @@ public class TransactionControllerTest {
         ValidatableResponse res = given().header("Content-Type", "application/json").body(loginJson).when()
                 .post(loginUrl)
                 .then()
-                .statusCode(is(201)).body(containsString("Bearer "));
+                .statusCode(is(201));
+        String otpCode = otpRepository.findAll().get(0).getOtpCode();
+        String verifyOtp = "{\n" +
+                " \"phoneNumber\": \"25489898989\",\n" +
+                " \"type\": \"owner\",\n" +
+                " \"otpCode\": \"" + otpCode + "\"\n" +
+                "}";
+        res = given().header("Content-Type", "application/json").body(verifyOtp).when()
+                .post(verifyOtpUrl)
+                .then()
+                .statusCode(is(201));
+
 
         String jsonString = res.body(containsString("")).extract().response().getBody().asString();
-
         JsonNode jsonNode = new ObjectMapper().readTree(jsonString);
         token = jsonNode.get("data").get("token").asText();
     }
 
 
-
     @Test
     public void shouldMakeATransaction() {
-        Product prod= addProduct("test1");
+        Product prod = addProduct("test1");
+        Product prod2 = addProduct("test2");
+
         String url = ("http://localhost:" + port + "/api/v1/tax/make-transaction");
-        String payload = "{\"buyerKRAPin\":\"123456789\",\"productId\":\""+prod.getId()+"\",\"quantity\":20}";
+        String payload = "{\n" +
+                " \"buyerKRAPin\": \"A12345678H\",\n" +
+                " \"sales\": [\n" +
+                "    {\n" +
+                "      \"productId\": \"" + prod.getId() + "\",\n" +
+                "      \"quantity\": 20\n" +
+                "    },\n" +
+                " {\n" +
+                "      \"productId\": \"" + prod2.getId() + "\",\n" +
+                "      \"quantity\": 30\n" +
+                "    }\n" +
+                " ]\n" +
+                "}";
         ValidatableResponse res = given().header("Content-Type", "application/json").header("Authorization", token).body(payload).when()
                 .post(url)
                 .then()
                 .statusCode(is(201));
         ResponseBody jsonString = res.body(containsString("")).extract().response().getBody();
-        System.out.println("res"+jsonString);
 
         byte[] pdfBytes = jsonString.asByteArray();
 
@@ -143,6 +173,7 @@ public class TransactionControllerTest {
         }
 
     }
+
     @Test
     public void shouldRefuseAddProductIfOwnerNotLoggedIn() {
         String url = ("http://localhost:" + port + "/api/v1/product/create");
@@ -153,39 +184,39 @@ public class TransactionControllerTest {
                 .statusCode(is(403));
 
         List<Product> saved = productRepository.findAll();
-        assertEquals(saved.size(),0);
+        assertEquals(saved.size(), 0);
 
         String jsonString = res.body(containsString("")).extract().response().getBody().asString();
-        ErrorResponse response = Utils.parseJsonString(jsonString,ErrorResponse.class);
+        ErrorResponse response = Utils.parseJsonString(jsonString, ErrorResponse.class);
         assertEquals(response.getError(), "Forbidden");
-        assertEquals(response.getPath(),"/api/v1/product/create");
+        assertEquals(response.getPath(), "/api/v1/product/create");
 
     }
+
     @Transactional
-    private Product addProduct(){
-        Product prod= EntityFactory.createProduct(new ProductDto("test desc","test",34,false,"pcs","pcs",23.45));
-        prod= productRepository.save(prod);
+    private Product addProduct() {
+        Product prod = EntityFactory.createProduct(new ProductDto("test desc", "test", 34, false, "pcs", "pcs", 23.45));
+        prod = productRepository.save(prod);
         Owner owner = ownerRepository.findAll().get(0);
         prod.setOwner(owner);
         return productRepository.save(prod);
     }
 
     @Transactional
-    private Product addProduct(String name){
-        Product prod= EntityFactory.createProduct(new ProductDto("test desc",name,34,false,"pcs","pcs",100));
+    private Product addProduct(String name) {
+        Product prod = EntityFactory.createProduct(new ProductDto("test desc", name, (int) Math.ceil(Math.random() * 100), false, "Electronics", "kg",100));
         prod.setTaxable(true);
-        prod= productRepository.save(prod);
+        prod = productRepository.save(prod);
         Owner owner = ownerRepository.findAll().get(0);
         prod.setOwner(owner);
         return productRepository.save(prod);
     }
-
 
 
     @Test
     public void shouldModifyProduct() {
-        Product prod= addProduct();
-        String url = ("http://localhost:" + port + "/api/v1/product/update/"+ prod.getId());
+        Product prod = addProduct();
+        String url = ("http://localhost:" + port + "/api/v1/product/update/" + prod.getId());
         String payload = "{\"description\": \"This is a product with a test description containing double quotes.\", \"name\": \"Amazing Product\", \"quantity\": 10, \"taxExempted\": false, \"type\": \"Gadget\", \"unitOfMeasure\": \"pcs\", \"unitPrice\": 19.99}";
         ValidatableResponse res = given().header("Content-Type", "application/json").header("Authorization", token).body(payload).when()
                 .put(url)
@@ -195,35 +226,35 @@ public class TransactionControllerTest {
         List<Product> saved = productRepository.findAll();
         assertEquals(1, saved.size());
         String jsonString = res.body(containsString("")).extract().response().getBody().asString();
-        ProductResponse response = Utils.parseJsonString(jsonString,ProductResponse.class);
+        ProductResponse response = Utils.parseJsonString(jsonString, ProductResponse.class);
         assertEquals(response.getMessage(), "Product updated successfully.");
-        ProductResponse.ProductData product= response.getData();
+        ProductResponse.ProductData product = response.getData();
         assertNotNull(product);
-        assertEquals(product.getName(),"Amazing Product");
+        assertEquals(product.getName(), "Amazing Product");
 
     }
 
 
     @Test
     public void refuseUpdationOnEmpytProductsOrNonExistentProductId() {
-        String url = ("http://localhost:" + port + "/api/v1/product/update/"+ 1);
+        String url = ("http://localhost:" + port + "/api/v1/product/update/" + 1);
         String payload = "{\"description\": \"This is a product with a test description containing double quotes.\", \"name\": \"Amazing Product\", \"quantity\": 10, \"taxExempted\": false, \"type\": \"Gadget\", \"unitOfMeasure\": \"pcs\", \"unitPrice\": 19.99}";
         ValidatableResponse res = given().header("Content-Type", "application/json").header("Authorization", token).body(payload).when()
                 .put(url)
                 .then()
                 .statusCode(is(404));
         String jsonString = res.body(containsString("")).extract().response().getBody().asString();
-        ProductResponse response = Utils.parseJsonString(jsonString,ProductResponse.class);
+        ProductResponse response = Utils.parseJsonString(jsonString, ProductResponse.class);
         assertEquals(response.getMessage(), "No product with that id exists.");
-        ProductResponse.ProductData product= response.getData();
+        ProductResponse.ProductData product = response.getData();
         assertNull(product);
 
     }
 
     @Test
     public void shouldRefuseIfOwnerDoesNotOwnProduct() {
-        Product prod= addProduct();
-        Owner owner= new Owner();
+        Product prod = addProduct();
+        Owner owner = new Owner();
         owner.setName("test2");
         owner.setEmail("test2@test.com");
         owner.setPassword("test2");
@@ -232,7 +263,7 @@ public class TransactionControllerTest {
         ownerService.save(owner);
         prod.setOwner(owner);
         productRepository.save(prod);
-        String url = ("http://localhost:" + port + "/api/v1/product/delete/"+ prod.getId());
+        String url = ("http://localhost:" + port + "/api/v1/product/delete/" + prod.getId());
         String payload = "{\"description\": \"This is a product with a test description containing double quotes.\", \"name\": \"Amazing Product\", \"quantity\": 10, \"taxExempted\": false, \"type\": \"Gadget\", \"unitOfMeasure\": \"pcs\", \"unitPrice\": 19.99}";
         ValidatableResponse res = given().header("Content-Type", "application/json").header("Authorization", token).body(payload).when()
                 .delete(url)
@@ -242,20 +273,20 @@ public class TransactionControllerTest {
         List<Product> saved = productRepository.findAll();
         assertEquals(1, saved.size());
         String jsonString = res.body(containsString("")).extract().response().getBody().asString();
-        ProductResponse response = Utils.parseJsonString(jsonString,ProductResponse.class);
+        ProductResponse response = Utils.parseJsonString(jsonString, ProductResponse.class);
         assertEquals(response.getMessage(), "You are not authorized to delete this product.");
-        ProductResponse.ProductData product= response.getData();
+        ProductResponse.ProductData product = response.getData();
         assertNull(product);
 
     }
 
     @Test
     public void shouldGetAllProducts() {
-        Product prod= addProduct("test1");
-        Product prod2= addProduct("test2");
-        Product prod3= addProduct("test3");
+        Product prod = addProduct("test1");
+        Product prod2 = addProduct("test2");
+        Product prod3 = addProduct("test3");
 
-        Owner owner= new Owner();
+        Owner owner = new Owner();
         owner.setName("test2");
         owner.setEmail("test2@test.com");
         owner.setPassword("test2");
@@ -270,10 +301,10 @@ public class TransactionControllerTest {
                 .then()
                 .statusCode(is(200));
         String jsonString = res.body(containsString("")).extract().response().getBody().asString();
-        AllProductResponse response = Utils.parseJsonString(jsonString,AllProductResponse.class);
+        AllProductResponse response = Utils.parseJsonString(jsonString, AllProductResponse.class);
         assertEquals(response.getMessage(), "Products fetched successfully.");
-        List<ProductResponse.ProductData> products= response.getData();
-        assertEquals(products.size(),2);
+        List<ProductResponse.ProductData> products = response.getData();
+        assertEquals(products.size(), 2);
         assertEquals(products.get(0).getName(), "test2");
 
     }
@@ -281,20 +312,20 @@ public class TransactionControllerTest {
 
     @Test
     public void shouldGetProductById() {
-        Product prod= addProduct("test1");
-        Product prod2= addProduct("test2");
-        Product prod3= addProduct("test3");
+        Product prod = addProduct("test1");
+        Product prod2 = addProduct("test2");
+        Product prod3 = addProduct("test3");
 
 
-        String url = ("http://localhost:" + port + "/api/v1/product/"+prod.getId());
+        String url = ("http://localhost:" + port + "/api/v1/product/" + prod.getId());
         ValidatableResponse res = given().header("Content-Type", "application/json").header("Authorization", token).when()
                 .get(url)
                 .then()
                 .statusCode(is(200));
         String jsonString = res.body(containsString("")).extract().response().getBody().asString();
-        ProductResponse response = Utils.parseJsonString(jsonString,ProductResponse.class);
+        ProductResponse response = Utils.parseJsonString(jsonString, ProductResponse.class);
         assertEquals(response.getMessage(), "Product fetched successfully.");
-        ProductResponse.ProductData product= response.getData();
+        ProductResponse.ProductData product = response.getData();
         assertEquals(product.getName(), "test1");
 
     }
@@ -302,10 +333,10 @@ public class TransactionControllerTest {
 
     @Test
     public void shouldRefuseIfOwnerDoesOwnProductID() {
-        Product prod= addProduct("test1");
-        Product prod2= addProduct("test2");
-        Product prod3= addProduct("test3");
-        Owner owner= new Owner();
+        Product prod = addProduct("test1");
+        Product prod2 = addProduct("test2");
+        Product prod3 = addProduct("test3");
+        Owner owner = new Owner();
         owner.setName("test2");
         owner.setEmail("test2@test.com");
         owner.setPassword("test2");
@@ -315,23 +346,23 @@ public class TransactionControllerTest {
         prod.setOwner(owner);
         productRepository.save(prod);
 
-        String url = ("http://localhost:" + port + "/api/v1/product/"+prod.getId());
+        String url = ("http://localhost:" + port + "/api/v1/product/" + prod.getId());
         ValidatableResponse res = given().header("Content-Type", "application/json").header("Authorization", token).when()
                 .get(url)
                 .then()
                 .statusCode(is(401));
         String jsonString = res.body(containsString("")).extract().response().getBody().asString();
-        ProductResponse response = Utils.parseJsonString(jsonString,ProductResponse.class);
+        ProductResponse response = Utils.parseJsonString(jsonString, ProductResponse.class);
         assertEquals(response.getMessage(), "You are not allowed to view this product.");
-        ProductResponse.ProductData product= response.getData();
+        ProductResponse.ProductData product = response.getData();
         assertNull(product);
 
     }
 
     @Test
     public void shouldDeleteProduct() {
-        Product prod= addProduct();
-        String url = ("http://localhost:" + port + "/api/v1/product/delete/"+ prod.getId());
+        Product prod = addProduct();
+        String url = ("http://localhost:" + port + "/api/v1/product/delete/" + prod.getId());
         ValidatableResponse res = given().header("Content-Type", "application/json").header("Authorization", token).when()
                 .delete(url)
                 .then()
@@ -340,18 +371,19 @@ public class TransactionControllerTest {
         List<Product> saved = productRepository.findAll();
         assertEquals(0, saved.size());
         String jsonString = res.body(containsString("")).extract().response().getBody().asString();
-        ProductResponse response = Utils.parseJsonString(jsonString,ProductResponse.class);
+        ProductResponse response = Utils.parseJsonString(jsonString, ProductResponse.class);
         assertEquals(response.getMessage(), "Product deleted successfully.");
-        ProductResponse.ProductData product= response.getData();
-        assertNull( product);
+        ProductResponse.ProductData product = response.getData();
+        assertNull(product);
 
     }
+
     @Test
     public void shouldRefuseDeletionIfProductDoesntBelongToOwner() {
-        Product prod= addProduct("test1");
-        Product prod2= addProduct("test2");
-        Product prod3= addProduct("test3");
-        Owner owner= new Owner();
+        Product prod = addProduct("test1");
+        Product prod2 = addProduct("test2");
+        Product prod3 = addProduct("test3");
+        Owner owner = new Owner();
         owner.setName("test2");
         owner.setEmail("test2@test.com");
         owner.setPassword("test2");
@@ -360,7 +392,7 @@ public class TransactionControllerTest {
         ownerService.save(owner);
         prod.setOwner(owner);
         productRepository.save(prod);
-        String url = ("http://localhost:" + port + "/api/v1/product/delete/"+ prod.getId());
+        String url = ("http://localhost:" + port + "/api/v1/product/delete/" + prod.getId());
         ValidatableResponse res = given().header("Content-Type", "application/json").header("Authorization", token).when()
                 .delete(url)
                 .then()
@@ -369,14 +401,12 @@ public class TransactionControllerTest {
         List<Product> saved = productRepository.findAll();
         assertEquals(3, saved.size());
         String jsonString = res.body(containsString("")).extract().response().getBody().asString();
-        ProductResponse response = Utils.parseJsonString(jsonString,ProductResponse.class);
+        ProductResponse response = Utils.parseJsonString(jsonString, ProductResponse.class);
         assertEquals(response.getMessage(), "You are not authorized to delete this product.");
-        ProductResponse.ProductData product= response.getData();
-        assertNull( product);
+        ProductResponse.ProductData product = response.getData();
+        assertNull(product);
 
     }
-
-
 
 
 //    @Test
@@ -479,14 +509,14 @@ public class TransactionControllerTest {
 //    }
 
 
-
     @Data
-    public static  class AllProductResponse{
+    public static class AllProductResponse {
         @JsonProperty("message")
         private String message;
         private List<ProductResponse.ProductData> data;
 
     }
+
     @Data
 
     public static class ProductResponse {
@@ -496,6 +526,7 @@ public class TransactionControllerTest {
 
         @JsonProperty("data")
         private ProductData data;
+
         @Data
         public static class ProductData {
 
@@ -536,7 +567,7 @@ public class TransactionControllerTest {
 
 
     @Data
-    public static  class ErrorResponse {
+    public static class ErrorResponse {
 
         @JsonProperty("timestamp")
         private String timestamp;

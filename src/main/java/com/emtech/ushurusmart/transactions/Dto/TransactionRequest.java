@@ -4,12 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class TransactionRequest {
-    private String buyerKRAPin;
-    private long productId;
-    private int quantity;
-    private double amount;
+        private String buyerKRAPin;
+        private List<TransactionProduct> sales;
 }
+
+

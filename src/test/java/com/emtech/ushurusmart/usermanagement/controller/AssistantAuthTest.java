@@ -1,6 +1,5 @@
 package com.emtech.ushurusmart.usermanagement.controller;
 
-import com.emtech.ushurusmart.usermanagement.controller.Utils;
 import com.emtech.ushurusmart.usermanagement.model.Assistant;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
 import com.emtech.ushurusmart.usermanagement.model.Role;
@@ -113,8 +112,8 @@ public class AssistantAuthTest {
 
 
         String jsonString = res.body(containsString("")).extract().response().getBody().asString();
-        System.out.println(jsonString);
         LoginResponse response = Utils.parseJsonString(jsonString, LoginResponse.class);
+        assert response != null;
         assertEquals(response.getMessage(), "Login successful!");
 
         LoginResponse.DataResponse resData = response.getData();
