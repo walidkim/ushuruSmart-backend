@@ -25,7 +25,7 @@ public class SecurityConfig {
 
     @Autowired
     public SecurityConfig(CustomUserDetailsService customUserDetailsService,
-                          JwtAuthorizationFilter jwtAuthorizationFilter) {
+            JwtAuthorizationFilter jwtAuthorizationFilter) {
         this.userDetailsService = customUserDetailsService;
         this.jwtAuthorizationFilter = jwtAuthorizationFilter;
 
@@ -50,28 +50,27 @@ public class SecurityConfig {
 
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth.requestMatchers(
-                                        "/v2/api-docs",
-                                        "/api/v1/auth/**",
-                                        "/api/v1/etims/**",
-                                        "/api-docs",
-                                        "/api-docs/**",
-                                        "/v3/api-docs",
-                                        "/v3/api-docs/**",
-                                        "/swagger-ui/**",
-                                        "v2/api-docs/**",
-                                        "/configuration/ui",
-                                        "/swagger-resources/**",
-                                        "/swagger-resources",
-                                        "/configuration/security",
-                                        "/swagger-ui/**",
-                                        "/webjars/**",
-                                        "/swagger-ui.html",
-                                        "/swagger-resources/configuration/ui",
-                                        "/swagger-ui/index.html",
-                                        "/error/**"
-                                ).permitAll()
-                                .anyRequest().authenticated()
-                )
+                        "/v2/api-docs",
+                        "/api/v1/auth/**",
+                        "/api/v1/etims/**",
+                        "/api-docs",
+                        "/api-docs/**",
+                        "/v3/api-docs",
+                        "/v3/api-docs/**",
+                        "/swagger-ui/**",
+                        "v2/api-docs/**",
+                        "/configuration/ui",
+                        "/swagger-resources/**",
+                        "/swagger-resources",
+                        "/configuration/security",
+                        "/swagger-ui/**",
+                        "/webjars/**",
+                        "/swagger-ui.html",
+                        "/swagger-resources/configuration/ui",
+                        "/swagger-ui/index.html",
+                        "/error/**",
+                        "/api/v1/payment/callback").permitAll()
+                        .anyRequest().authenticated())
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
 

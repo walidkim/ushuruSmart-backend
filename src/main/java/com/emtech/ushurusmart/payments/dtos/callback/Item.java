@@ -2,22 +2,36 @@ package com.emtech.ushurusmart.payments.dtos.callback;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Data;
-import lombok.SneakyThrows;
-@Data
+
 public class Item {
     @JsonProperty("Name")
     private String name;
-
     @JsonProperty("Value")
     private Object value;
 
-    @SneakyThrows
-    @Override
     public String toString() {
-
-        return new ObjectMapper().writeValueAsString(this);
+        try {
+            return (new ObjectMapper()).writeValueAsString(this);
+        } catch (Throwable var2) {
+            throw var2;
+        }
     }
-    // Getters and setters
-}
 
+    public String getName() {
+        return this.name;
+    }
+
+    public Object getValue() {
+        return this.value;
+    }
+
+    @JsonProperty("Name")
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+    @JsonProperty("Value")
+    public void setValue(final Object value) {
+        this.value = value;
+    }
+}

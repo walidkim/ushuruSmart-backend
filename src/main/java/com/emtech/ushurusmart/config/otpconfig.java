@@ -1,5 +1,6 @@
 package com.emtech.ushurusmart.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 import lombok.Data;
@@ -8,9 +9,12 @@ import lombok.Data;
 @Configuration
 public class otpconfig {
     // twilio configuration properties
-    public static final String ACCOUNT_SID = "ACc26c8aa04fa5255e88000124087eaee0";
-    public static final String AUTH_TOKEN = "f7f93b9cb4b4aff3a790a1803b076cf5";
-    public static final String TWILIO_PHONE_NUMBER = "+12515721303";
+    @Value("${app.twilio.accountSid}")
+    public String ACCOUNT_SID;
+    @Value("${app.twilio.authToken}")
+    public String AUTH_TOKEN;
+    @Value("${app.twilio.phoneNumber}")
+    public String TWILIO_PHONE_NUMBER;
 
     @Override
     public String toString() {
