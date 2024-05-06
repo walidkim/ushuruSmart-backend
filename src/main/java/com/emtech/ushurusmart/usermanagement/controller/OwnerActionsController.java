@@ -17,6 +17,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Objects;
+
 @RestController
 @RequestMapping("/api/v1/owner")
 public class OwnerActionsController {
@@ -81,10 +83,10 @@ public class OwnerActionsController {
         ResContructor res = new ResContructor();
 
         Assistant assistant = assistantService.findById(assistantId);
-//        if(!Objects.equals(owner.getEmail(), assistant.getOwner().getEmail())){
-//            res.setMessage("You are not authorized to delete this assistant ");
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
-//        }
+        if(!Objects.equals(owner.getEmail(), assistant.getOwner().getEmail())){
+            res.setMessage("You are not authorized to delete this assistant ");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
+        }
         assistantService.deleteById(assistantId);
 
         res.setMessage("Assistant deleted successfully!");

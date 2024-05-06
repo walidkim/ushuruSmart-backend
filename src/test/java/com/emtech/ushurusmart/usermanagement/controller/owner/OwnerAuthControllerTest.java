@@ -150,6 +150,29 @@ public class OwnerAuthControllerTest {
     }
 
 
+    @Test
+    public void shouldRefuseInvalidDataSignUps() {
+        when(etimsMiddleware.verifyBusinessKRAPin(any())).thenReturn(ResponseEntity.status(HttpStatus.FOUND).build());
+
+        String signupRequestJson = """
+                {
+                 "businessKRAPin": null,
+                 "businessOwnerKRAPin": "789012",
+                 "email": "testuser@example.com",
+                 "name": "John Doe",
+                 "password": "SecurePassword123",
+                 "phoneNumber": "+25474567890"
+                }""";
+
+        ValidatableResponse res= given().header("Content-Type",
+                        "application/json").body(signupRequestJson).when()
+                .post("http://localhost:" + port + "/api/v1/auth/sign-up?type=owner")
+                .then()
+                .statusCode(is(400));
+
+    }
+
+
 
 
 
