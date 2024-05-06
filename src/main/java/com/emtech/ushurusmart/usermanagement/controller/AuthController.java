@@ -107,10 +107,10 @@ public class AuthController {
         ResContructor res = new ResContructor();
         try {
 
-            System.out.println(req.toString());
+            String errMessage= "Invalid OTP!.";
 
             if (!otpService.verifyOTP(req.getPhoneNumber(), req.getOtpCode())) {
-                throw new BadCredentialsException("Invalid OTP code");
+                throw new BadCredentialsException(errMessage);
             }
 
 
@@ -118,12 +118,13 @@ public class AuthController {
                 case "owner": {
                     Owner owner = ownerService.findByPhoneNumber(req.getPhoneNumber());
                     if (owner == null) {
-                        throw new BadCredentialsException("Invalid owner");
+                        res.setMessage(errMessage);
+                        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
                     }
                     RequestDtos.UserResponse resData = ResponseFactory.createOwnerResponse(owner);
                     String token = jwtUtil.createToken(owner);
                     Map<String, Object> responseData = new HashMap<>();
-                    responseData.put("owner", resData);
+                    responseData.put("user", resData);
                     responseData.put("token", token);
                     res.setData(responseData);
                     res.setMessage("Login successful!");
@@ -131,24 +132,19 @@ public class AuthController {
                 }
 
                 case "assistant": {
-                    Assistant assistant = null;
-                    try {
-                        assistant = assistantService.findByPhoneNumber(req.getPhoneNumber());
-                        System.out.println("found assistant.");
-                    } catch (Exception e) {
-                        System.out.println(e.getMessage());
-                    }
+                    Assistant assistant = assistantService.findByPhoneNumber(req.getPhoneNumber());
 
 
                     if (assistant == null) {
-                        throw new BadCredentialsException("Invalid Email or Password.");
+                        res.setMessage(errMessage);
+                        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
                     }
 
 
                     String token = jwtUtil.createToken(assistant);
                     Map<String, Object> responseData = new HashMap<>();
                     RequestDtos.UserResponse resData = ResponseFactory.createAssistantResponse(assistant);
-                    responseData.put("assistant", resData);
+                    responseData.put("user", resData);
                     responseData.put("token", token);
                     res.setData(responseData);
                     res.setMessage("Login successful!");
@@ -164,7 +160,7 @@ public class AuthController {
             }
 
         } catch (BadCredentialsException e) {
-            res.setMessage("Invalid email or password.");
+            res.setMessage(e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
         } catch (Exception e) {
             return responses.create500Response(e);
