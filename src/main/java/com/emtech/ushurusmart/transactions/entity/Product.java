@@ -41,7 +41,7 @@ public class Product implements Serializable {
     @UpdateTimestamp
     private LocalDateTime dateUpdated;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JsonBackReference
     private Owner owner;
 }

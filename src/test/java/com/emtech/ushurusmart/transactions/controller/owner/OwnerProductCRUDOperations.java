@@ -340,6 +340,7 @@ public class OwnerProductCRUDOperations {
                 .statusCode(is(200));
 
         List<Product> saved = productRepository.findAll();
+        assertEquals(ownerRepository.findAll().size(), 1);
         assertEquals(0, saved.size());
         String jsonString = res.body(containsString("")).extract().response().getBody().asString();
         ProductResponse response = Utils.parseJsonString(jsonString,ProductResponse.class);
