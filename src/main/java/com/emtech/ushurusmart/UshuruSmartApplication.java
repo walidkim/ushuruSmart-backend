@@ -1,7 +1,7 @@
 package com.emtech.ushurusmart;
 
 import com.emtech.ushurusmart.config.LoggerSingleton;
-import com.emtech.ushurusmart.usermanagement.service.SampleDataInitializer;
+import com.emtech.ushurusmart.etims.service.SampleDataInitializer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;

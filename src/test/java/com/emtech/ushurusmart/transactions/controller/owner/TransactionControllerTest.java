@@ -13,7 +13,7 @@ import com.emtech.ushurusmart.usermanagement.model.Role;
 import com.emtech.ushurusmart.usermanagement.repository.AssistantRepository;
 import com.emtech.ushurusmart.usermanagement.repository.OwnerRepository;
 import com.emtech.ushurusmart.usermanagement.service.OwnerService;
-import com.emtech.ushurusmart.usermanagement.service.SampleDataInitializer;
+import com.emtech.ushurusmart.etims.service.SampleDataInitializer;
 import com.emtech.ushurusmart.utils.otp.OtpRepository;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;

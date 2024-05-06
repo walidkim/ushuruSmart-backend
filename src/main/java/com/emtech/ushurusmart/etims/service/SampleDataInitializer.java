@@ -1,4 +1,4 @@
-package com.emtech.ushurusmart.usermanagement.service;
+package com.emtech.ushurusmart.etims.service;
 
 import com.emtech.ushurusmart.etims.entity.Etims;
 import com.emtech.ushurusmart.etims.service.EtimsOwnerService;

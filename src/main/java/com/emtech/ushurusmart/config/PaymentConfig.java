@@ -9,11 +9,11 @@ public class PaymentConfig {
     public static String keySecret;
     public static String accessToken;
     @Value("${app.mpesa.shortCode}")
-    public String shortCode;
+    public static String shortCode;
     @Value("${app.mpesa.passkey}")
-    public String passkey;
+    public static String passkey;
     public static String stkPushURL = " https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest";
     @Value("${app.mpesa.callbackURL}")
-    public String callBackURL;
+    public static String callBackURL;
 
 }

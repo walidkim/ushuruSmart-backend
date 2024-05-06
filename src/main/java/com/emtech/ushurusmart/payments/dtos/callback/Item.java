@@ -1,6 +1,7 @@
 package com.emtech.ushurusmart.payments.dtos.callback;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Item {
@@ -13,7 +14,11 @@ public class Item {
         try {
             return (new ObjectMapper()).writeValueAsString(this);
         } catch (Throwable var2) {
-            throw var2;
+            try {
+                throw var2;
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

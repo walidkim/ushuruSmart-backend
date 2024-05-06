@@ -1,6 +1,6 @@
 package com.emtech.ushurusmart.usermanagement.model;
 
-import com.emtech.ushurusmart.payments.entity.PaymentDetails;
+import com.emtech.ushurusmart.payments.entity.PaymentEntity;
 import com.emtech.ushurusmart.transactions.entity.Product;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -19,54 +19,53 @@ import java.util.List;
 @Entity
 @Table(name = "owners")
 public class Owner extends BaseAuth {
-        private String businessKRAPin;
-        private String KRAPin;
-        private String phoneNumber;
-        @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-        @JsonManagedReference
-        private List<Assistant> assistants;
+    private String businessKRAPin;
+    private String KRAPin;
+    private String phoneNumber;
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<Assistant> assistants;
 
-        @JsonManagedReference
-        @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-        private List<PaymentDetails> paymentDetails;
-
-
-        @JsonManagedReference
-        @ToString.Exclude
-        @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch =  FetchType.LAZY)
-        private List<Product> products;
+    @JsonManagedReference
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<PaymentEntity> paymentDetails;
 
 
-        @Override
-        public Collection<? extends GrantedAuthority> getAuthorities() {
-                return getRole().getAuthorities();
-        }
+    @JsonManagedReference
+    @ToString.Exclude
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Product> products;
 
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return getRole().getAuthorities();
+    }
 
-        @Override
-        public String getUsername() {
-                return getEmail();
-        }
 
-        @Override
-        public boolean isAccountNonExpired() {
-                return true;
-        }
+    @Override
+    public String getUsername() {
+        return getEmail();
+    }
 
-        @Override
-        public boolean isAccountNonLocked() {
-                return true;
-        }
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
 
-        @Override
-        public boolean isCredentialsNonExpired() {
-                return false;
-        }
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
 
-        @Override
-        public boolean isEnabled() {
-                return true;
-        }
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 
 }
