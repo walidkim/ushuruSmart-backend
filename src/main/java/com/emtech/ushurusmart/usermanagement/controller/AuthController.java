@@ -14,6 +14,7 @@ import com.emtech.ushurusmart.usermanagement.service.jwtServices.JwtTokenUtil;
 import com.emtech.ushurusmart.utils.controller.ResContructor;
 import com.emtech.ushurusmart.utils.controller.Responses;
 import com.emtech.ushurusmart.utils.otp.OTPService;
+import jakarta.validation.Valid;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -50,9 +51,10 @@ public class AuthController {
     private JwtTokenUtil jwtUtil;
 
     @PostMapping(value = "/sign-up")
-    public ResponseEntity<?> signUp(@RequestParam(name = "type", required = true) String type,
+    public ResponseEntity<?> signUp(@RequestParam(name = "type", required = true) String type, @Valid
                                     @RequestBody OwnerDto data) {
         ResContructor res = new ResContructor();
+
 
         try {
             if (type.equals("owner")) {
