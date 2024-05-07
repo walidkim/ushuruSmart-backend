@@ -122,7 +122,6 @@ public class AuthController {
                         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
                     }
                     RequestDtos.UserResponse resData = ResponseFactory.createOwnerResponse(owner);
-                    System.out.println(owner);
                     String token = jwtUtil.createToken(owner);
                     Map<String, Object> responseData = new HashMap<>();
                     responseData.put("user", resData);
@@ -142,7 +141,8 @@ public class AuthController {
                     }
 
 
-                    String token = jwtUtil.createToken(assistant);
+                    String token = "weresdfd";
+                    //jwtUtil.createToken(assistant);
                     Map<String, Object> responseData = new HashMap<>();
                     RequestDtos.UserResponse resData = ResponseFactory.createAssistantResponse(assistant);
                     responseData.put("user", resData);

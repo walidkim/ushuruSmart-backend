@@ -152,7 +152,7 @@ public class TransactionControllerTest {
 
         String jsonString = res.body(containsString("")).extract().response().getBody().asString();
         JsonNode jsonNode = new ObjectMapper().readTree(jsonString);
-        token = jsonNode.get("data").get("token").asText();
+        token = "Bearer " + jsonNode.get("data").get("token").asText();
     }
 
 
