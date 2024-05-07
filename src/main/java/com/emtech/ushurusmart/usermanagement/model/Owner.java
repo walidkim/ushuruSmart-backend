@@ -4,21 +4,20 @@ import com.emtech.ushurusmart.payments.entity.PaymentEntity;
 import com.emtech.ushurusmart.transactions.entity.Product;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "owners")
-public class Owner extends BaseAuth {
+public class Owner extends BaseAuth implements Serializable {
     private String businessKRAPin;
     private String KRAPin;
     private String phoneNumber;

@@ -220,38 +220,40 @@ public class OwnerAuthControllerTest {
 
 
         signUp("John Doe", "johndoe@example.com", "strongpassword123","+1234567890");
-        String loginJson = "{\"email\":\"johndoe@example.com\",\"password\":\"strongpassword123\"}";
-        given().header("Content-Type", "application/json").body(loginJson).when()
-                .post(loginUrl)
-                .then()
-                .statusCode(is(201));
-        String phoneNumber = ownerRepository.findAll().get(0).getPhoneNumber();
-        String otpCode = otpRepository.findAll().get(0).getOtpCode();
-        String type = "owner";
+        for(int i= 0; i<=5; i++){
+            String loginJson = "{\"email\":\"johndoe@example.com\",\"password\":\"strongpassword123\"}";
+            given().header("Content-Type", "application/json").body(loginJson).when()
+                    .post(loginUrl)
+                    .then()
+                    .statusCode(is(201));
+            String phoneNumber = ownerRepository.findAll().get(0).getPhoneNumber();
+            String otpCode = otpRepository.findAll().get(0).getOtpCode();
+            String type = "owner";
 
 
 
-        // Prepare the request body
-        OtpDataDto otpDataDto = new OtpDataDto();
-        otpDataDto.setPhoneNumber(phoneNumber);
-        otpDataDto.setOtpCode(otpCode);
-        otpDataDto.setType(type);
+            // Prepare the request body
+            OtpDataDto otpDataDto = new OtpDataDto();
+            otpDataDto.setPhoneNumber(phoneNumber);
+            otpDataDto.setOtpCode(otpCode);
+            otpDataDto.setType(type);
 
-        // Act
-        ValidatableResponse res = given()
-                .contentType(ContentType.JSON)
-                .body(otpDataDto)
-                .when()
-                .post(verifyOtpUrl)
-                .then()
-                .statusCode(is(HttpStatus.CREATED.value()));
+            // Act
+            ValidatableResponse res = given()
+                    .contentType(ContentType.JSON)
+                    .body(otpDataDto)
+                    .when()
+                    .post(verifyOtpUrl)
+                    .then()
+                    .statusCode(is(HttpStatus.CREATED.value()));
 
-        // Assert
-        String jsonString = res.extract().response().getBody().asString();
-        OtpVerification response = Utils.parseJsonString(jsonString,OtpVerification.class);
-        assert response != null;
-        assertEquals("Login successful!", response.getMessage());
-        assertTrue(response.getData().getToken().length()> 50);
+            // Assert
+            String jsonString = res.extract().response().getBody().asString();
+            OtpVerification response = Utils.parseJsonString(jsonString,OtpVerification.class);
+            assert response != null;
+            assertEquals("Login successful!", response.getMessage());
+            assertTrue(response.getData().getToken().length()>50);
+        }
     }
 
 
@@ -366,7 +368,7 @@ public class OwnerAuthControllerTest {
         @Data
         public static class DataResponse {
 
-            @JsonProperty("owner")
+            @JsonProperty("user")
             private OwnerData owner;
 
             @JsonProperty("token")

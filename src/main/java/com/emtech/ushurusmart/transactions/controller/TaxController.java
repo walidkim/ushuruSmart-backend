@@ -75,7 +75,7 @@ public class TaxController  extends LoggerSingleton {
         logger.info(response.toString());
 
 
-        if (response.getStatusCode() == HttpStatus.FOUND) {
+        if (response.getStatusCode().value()== HttpStatus.CREATED.value()) {
             System.out.println("Created");
             EtimsResponses.TransactionResponse transactionResponse = EtimsResponses.parseMakeTransactionResponse(Objects.requireNonNull(response.getBody()).toString());
 

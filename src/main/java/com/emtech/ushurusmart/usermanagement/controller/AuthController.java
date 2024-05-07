@@ -122,6 +122,7 @@ public class AuthController {
                         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
                     }
                     RequestDtos.UserResponse resData = ResponseFactory.createOwnerResponse(owner);
+                    System.out.println(owner);
                     String token = jwtUtil.createToken(owner);
                     Map<String, Object> responseData = new HashMap<>();
                     responseData.put("user", resData);

@@ -139,7 +139,7 @@ public class TransactionControllerTest {
                 .then()
                 .statusCode(is(201));
         String otpCode = otpRepository.findAll().get(0).getOtpCode();
-        String verifyOtp = "{\n" +
+        String verifyOtp = " {\n" +
                 " \"phoneNumber\": \"25489898989\",\n" +
                 " \"type\": \"owner\",\n" +
                 " \"otpCode\": \"" + otpCode + "\"\n" +
@@ -164,7 +164,8 @@ public class TransactionControllerTest {
         Product prod2 = addProduct("test2");
 
         String url = ("http://localhost:" + port + "/api/v1/tax/make-transaction");
-        String payload = "{\n" +
+        String payload = "\n"+
+                "{ \n" +
                 " \"buyerKRAPin\": \"A12345678H\",\n" +
                 " \"sales\": [\n" +
                 "    {\n" +

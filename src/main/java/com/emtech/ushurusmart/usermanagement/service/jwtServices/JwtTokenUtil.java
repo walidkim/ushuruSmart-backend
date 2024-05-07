@@ -30,11 +30,12 @@ public class JwtTokenUtil {
 
     public String createToken(UserDetails userDetails) {
         Claims claims = Jwts.claims().setSubject(userDetails.getUsername());
-        claims.put("userDetails", userDetails);
+        claims.put("userDetails",userDetails);
+
         Date tokenCreateTime = new Date();
         Date tokenValidity = new Date(
                 tokenCreateTime.getTime() + TimeUnit.MINUTES.toMillis(validityInHours * 60));
-        return "Bearer " + Jwts.builder()
+        return  Jwts.builder()
                 .setClaims(claims)
                 .setExpiration(tokenValidity)
                 .signWith(SignatureAlgorithm.HS256, secret_key)
