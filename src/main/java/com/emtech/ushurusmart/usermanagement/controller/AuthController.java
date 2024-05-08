@@ -141,7 +141,8 @@ public class AuthController {
                     }
 
 
-                    String token = jwtUtil.createToken(assistant);
+                    String token = "weresdfd";
+                    //jwtUtil.createToken(assistant);
                     Map<String, Object> responseData = new HashMap<>();
                     RequestDtos.UserResponse resData = ResponseFactory.createAssistantResponse(assistant);
                     responseData.put("user", resData);

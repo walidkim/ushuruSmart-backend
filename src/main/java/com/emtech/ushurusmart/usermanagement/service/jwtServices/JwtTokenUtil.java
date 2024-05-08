@@ -6,39 +6,48 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Component
 public class JwtTokenUtil {
-    private String secret_key;
-
-    private long validityInHours;
-
     private final JwtParser jwtParser;
-
     private final String TOKEN_HEADER = "Authorization";
     private final String TOKEN_PREFIX = "Bearer ";
+    private String secret_key;
+    private long validityInHours;
 
     public JwtTokenUtil(@Value("${app.jwt.secret}") String secret_key,
-            @Value("${app.jwt.expiration-hours}") long validityInHours) {
+                        @Value("${app.jwt.expiration-hours}") long validityInHours) {
         this.jwtParser = Jwts.parser().setSigningKey(secret_key);
         this.secret_key = secret_key;
         this.validityInHours = validityInHours;
     }
 
+
     public String createToken(UserDetails userDetails) {
-        Claims claims = Jwts.claims().setSubject(userDetails.getUsername());
-        claims.put("userDetails", userDetails);
-        Date tokenCreateTime = new Date();
-        Date tokenValidity = new Date(
-                tokenCreateTime.getTime() + TimeUnit.MINUTES.toMillis(validityInHours * 60));
-        return "Bearer " + Jwts.builder()
-                .setClaims(claims)
-                .setExpiration(tokenValidity)
-                .signWith(SignatureAlgorithm.HS256, secret_key)
-                .compact();
+        try {
+            Claims claims = Jwts.claims().setSubject(userDetails.getUsername());
+
+//            claims.put("u", userDetails);
+
+
+            Date tokenCreateTime = new Date();
+            Date tokenValidity = new Date(
+                    tokenCreateTime.getTime() + TimeUnit.MINUTES.toMillis(validityInHours * 60));
+            return Jwts.builder()
+                    .setClaims(claims)
+                    .setExpiration(tokenValidity)
+                    .signWith(SignatureAlgorithm.HS256, secret_key)
+                    .compact();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return "";
+
+
+        }
     }
 
     private Claims parseJwtClaims(String token) {

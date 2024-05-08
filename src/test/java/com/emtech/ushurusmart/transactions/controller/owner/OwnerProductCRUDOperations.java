@@ -344,6 +344,7 @@ public class OwnerProductCRUDOperations {
         assertEquals(0, saved.size());
         String jsonString = res.body(containsString("")).extract().response().getBody().asString();
         ProductResponse response = Utils.parseJsonString(jsonString,ProductResponse.class);
+        assert response != null;
         assertEquals(response.getMessage(), "Product deleted successfully.");
         ProductResponse.ProductData product= response.getData();
         assertNull( product);
