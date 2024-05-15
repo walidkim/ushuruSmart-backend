@@ -2,6 +2,7 @@ package com.emtech.ushurusmart.transactions.controller;
 
 
 import com.emtech.ushurusmart.config.LoggerSingleton;
+import com.emtech.ushurusmart.etims.entity.Transaction;
 import com.emtech.ushurusmart.etims_middleware.TransactionMiddleware;
 import com.emtech.ushurusmart.transactions.Dto.*;
 import com.emtech.ushurusmart.transactions.entity.Product;
@@ -16,16 +17,15 @@ import jakarta.servlet.http.HttpServletResponse;
 import net.sf.jasperreports.engine.JRException;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -53,7 +53,16 @@ public class TaxController  extends LoggerSingleton {
 //    @Autowired
 //    private JasperPDFService jasperPDFService;
 
+    @GetMapping("/range")
+    public ResponseEntity<?> getTransactionsMonthly(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        System.out.println(startDate + " " + endDate);
+        ResponseEntity<?> response= transactionMiddleware.getRangeTransactions(startDate, endDate);
 
+        logger.info(response.toString());
+        return response;
+    }
     @PostMapping("/make-transaction")
     public ResponseEntity<?> makeTransaction(@RequestBody TransactionRequest request, HttpServletResponse responses) throws IOException, JRException {
 

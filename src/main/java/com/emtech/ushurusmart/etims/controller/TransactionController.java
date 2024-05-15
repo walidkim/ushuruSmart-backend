@@ -79,7 +79,7 @@ public class TransactionController {
         return transactionService.getTransactionsDaily(date);
     }
 
-    @GetMapping("/monthly")
+    @GetMapping("/range")
     public List<Transaction> getTransactionsMonthly(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
