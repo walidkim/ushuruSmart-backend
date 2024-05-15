@@ -28,7 +28,7 @@ public class SampleDataInitializer {
     public List<Etims> getEtimsSampleDataList() {
         if(ownerService.count() ==0 ){
             List<Etims> etimsSampleDataList = new ArrayList<>();
-            etimsSampleDataList.add(new Etims("P012345678Z", "A012345678B", "Green Energy Solutions Ltd"));
+            etimsSampleDataList.add(new Etims("g", "A012345678B", "Green Energy Solutions Ltd"));
             etimsSampleDataList.add(new Etims("P098765432Z", "A098765432B", "SolarTech Innovations Ltd"));
             etimsSampleDataList.add(new Etims("P045678912Z", "A045678912B", "WindPower Enterprises Ltd"));
             etimsSampleDataList.add(new Etims("P056789123Z", "A056789123B", "SunWorks Renewable Energy Ltd"));

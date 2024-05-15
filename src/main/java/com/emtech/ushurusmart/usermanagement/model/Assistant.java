@@ -59,4 +59,6 @@ public class Assistant extends BaseAuth implements Serializable {
         public boolean isEnabled() {
                 return true;
         }
+
+        private boolean loggedInStatus;
 }

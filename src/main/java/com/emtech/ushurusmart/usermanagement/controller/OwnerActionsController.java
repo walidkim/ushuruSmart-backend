@@ -126,4 +126,12 @@ public class OwnerActionsController {
 
 
     }
+
+   @GetMapping("/owner/assistants")
+   public int getLoggedInAssistantsCount() {
+       return ownerService.countLoggedInAssistants();
+
+   }
 }
+
+

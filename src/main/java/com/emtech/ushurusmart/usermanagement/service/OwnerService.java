@@ -10,6 +10,7 @@ import com.emtech.ushurusmart.usermanagement.controller.HelperUtil;
 import com.emtech.ushurusmart.usermanagement.factory.EntityFactory;
 import com.emtech.ushurusmart.usermanagement.factory.ResponseFactory;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
+import com.emtech.ushurusmart.usermanagement.repository.AssistantRepository;
 import com.emtech.ushurusmart.usermanagement.repository.OwnerRepository;
 import com.emtech.ushurusmart.utils.controller.ResContructor;
 import com.emtech.ushurusmart.utils.otp.OTPService;
@@ -24,6 +25,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,6 +38,9 @@ public class OwnerService extends LoggerSingleton {
 
     @Autowired
     private EtimsMiddleware etimsMiddleware;
+
+    @Autowired
+    private AssistantRepository userRepository;
 
 
     @Autowired
@@ -118,4 +123,10 @@ public class OwnerService extends LoggerSingleton {
 
         return null;
     }
+
+ public int countLoggedInAssistants() {
+        // Assistant Repository has a method to find logged-in users
+         return userRepository.countByLoggedInStatus(true);
+    }
+
 }
