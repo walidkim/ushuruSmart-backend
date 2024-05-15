@@ -6,7 +6,7 @@ tunnels:
     hostname: allowing-roughly-muskrat.ngrok-free.app
     subdomain: allowing-roughly-muskrat.ngrok-free.app/callback
     inspect: false
-    auth: 2cOEYSMwOpYtBtHY7Q3rejUnrjD_4qkJTaYK1Ksnx9nx8uXNw
+    auth: ##################################
     host_header: "localhost"
     start: true
     path: /callback
