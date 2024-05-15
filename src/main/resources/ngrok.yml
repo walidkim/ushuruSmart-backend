@@ -1,0 +1,12 @@
+tunnels:
+  callback:
+    addr: 8075  
+    proto: http
+    bind_tls: true
+    hostname: allowing-roughly-muskrat.ngrok-free.app
+    subdomain: allowing-roughly-muskrat.ngrok-free.app/callback
+    inspect: false
+    auth: ##################################
+    host_header: "localhost"
+    start: true
+    path: /callback

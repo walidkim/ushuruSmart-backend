@@ -38,16 +38,18 @@ public class PaymentImpl {
     private final OkHttpClient okHttpClient = new OkHttpClient();
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final PaymentRepository paymentRepo;
+
+    private final PaymentConfig paymentConfig;
     @Autowired
     private OwnerRepository ownerRepository;
 
-    @Autowired
-    public PaymentImpl(PaymentRepository paymentRepo) {
+    public PaymentImpl(PaymentRepository paymentRepo, PaymentConfig paymentConfig) {
         this.paymentRepo = paymentRepo;
+        this.paymentConfig = paymentConfig;
     }
 
     public String getAccessToken() {
-        String authheader = "Basic " + HelperUtility.toBase64String(PaymentConfig.keySecret);
+        String authheader = "Basic " + HelperUtility.toBase64String(paymentConfig.keySecret);
         Request request = (new Request.Builder()).url(PaymentConfig.authURL).get()
                 .addHeader("Authorization", authheader).addHeader("Content-Type", "application/json").build();
 
@@ -94,7 +96,7 @@ public class PaymentImpl {
             OkHttpClient client = new OkHttpClient();
             RequestBody requestBody = RequestBody.create(stkBody, MediaType.parse("application/json"));
             Request request = new Request.Builder()
-                    .url(PaymentConfig.stkPushURL)
+                    .url(paymentConfig.stkPushURL)
                     .post(requestBody)
                     .addHeader("Content-Type", "application/json")
                     .addHeader("Authorization", authHeader)
@@ -131,22 +133,22 @@ public class PaymentImpl {
 
     private String generatePassword() {
         String base64Password = HelperUtility
-                .toBase64String(PaymentConfig.shortCode + PaymentConfig.passkey + HelperUtility.getTimeStamp());
+                .toBase64String(paymentConfig.shortCode + paymentConfig.passkey + HelperUtility.getTimeStamp());
         return base64Password;
     }
 
     private String buildStkBody(String phoneNo, int amount, String eslipNo, String password) {
         JSONObject jsonObject = new JSONObject();
 
-        jsonObject.put("BusinessShortCode", PaymentConfig.shortCode);
+        jsonObject.put("BusinessShortCode", paymentConfig.shortCode);
         jsonObject.put("Password", password);
         jsonObject.put("Timestamp", HelperUtility.getTimeStamp());
         jsonObject.put("TransactionType", "CustomerPayBillOnline");
         jsonObject.put("Amount", amount);
         jsonObject.put("PartyA", phoneNo);
-        jsonObject.put("PartyB", PaymentConfig.shortCode);
+        jsonObject.put("PartyB", paymentConfig.shortCode);
         jsonObject.put("PhoneNumber", phoneNo);
-        jsonObject.put("CallBackURL", PaymentConfig.callBackURL);
+        jsonObject.put("CallBackURL", paymentConfig.callBackURL);
         jsonObject.put("AccountReference", "ushuru Smart-Tax Collection");
         jsonObject.put("TransactionDesc", "For Eslip:" + eslipNo);
 
