@@ -3,6 +3,7 @@ package com.emtech.ushurusmart.transactions.controller;
 
 import com.emtech.ushurusmart.config.LoggerSingleton;
 import com.emtech.ushurusmart.etims.entity.Transaction;
+import com.emtech.ushurusmart.etims.service.TaxCalculationService;
 import com.emtech.ushurusmart.etims_middleware.TransactionMiddleware;
 import com.emtech.ushurusmart.transactions.Dto.*;
 import com.emtech.ushurusmart.transactions.entity.Product;
@@ -49,6 +50,14 @@ public class TaxController  extends LoggerSingleton {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    TaxCalculationService taxCalculationService;
+
+    @GetMapping("/{startDate}/{endDate}")
+    public double getTotalTax(@PathVariable LocalDate startDate, @PathVariable LocalDate endDate) {
+        return taxCalculationService.calculateTotalTax(startDate, endDate);
+    }
 
 //    @Autowired
 //    private JasperPDFService jasperPDFService;

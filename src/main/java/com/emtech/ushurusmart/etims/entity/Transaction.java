@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,6 +20,7 @@ public class Transaction {
     @Column(nullable = false)
     private Double amount;
 
+    private LocalDate date;
 
 
     @Column(nullable = false)

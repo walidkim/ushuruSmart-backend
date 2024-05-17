@@ -118,7 +118,9 @@ public class OwnerActionsController {
     }
     @GetMapping(value = "/assistants")
     public ResponseEntity<?> getAllAssistants() {
-        String ownerEmail = AuthUtils.getCurrentlyLoggedInPerson();
+        String ownerEmail = AuthUtils.getCurrentlyLoggedInPerson(
+
+        );
         Owner owner = ownerService.findByEmail(ownerEmail);
         ResContructor res = new ResContructor();
         res.setData(owner.getAssistants());
