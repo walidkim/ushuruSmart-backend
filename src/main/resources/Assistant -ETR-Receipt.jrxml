@@ -7,19 +7,19 @@
 	<parameter name="invoiceDataset" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 	<parameter name="etimsNumber" class="java.lang.String"/>
 	<parameter name="invoiceNumber" class="java.lang.String"/>
-	<parameter name="name" class="java.lang.String"/>
-	<parameter name="unitPrice" class="java.lang.Double"/>
-	<parameter name="unitOfMeasure" class="java.lang.String"/>
-	<parameter name="quantity" class="java.lang.Integer"/>
-	<parameter name="taxable" class="java.lang.String"/>
-	<parameter name="currency" class="java.lang.String"/>
-	<parameter name="tax" class="java.lang.Double"/>
 	<parameter name="counter" class="java.lang.Integer"/>
+	<parameter name="tax" class="java.lang.Double"/>
+	<parameter name="currency" class="java.lang.String"/>
+	<parameter name="taxable" class="java.lang.String"/>
+	<parameter name="amount" class="java.lang.Double"/>
+	<parameter name="quantity" class="java.lang.Integer"/>
+	<parameter name="unitOfMeasure" class="java.lang.String"/>
+	<parameter name="unitPrice" class="java.lang.Double"/>
+	<parameter name="name" class="java.lang.String"/>
 	<parameter name="branch" class="java.lang.String"/>
 	<parameter name="bussinessPin" class="java.lang.String"/>
 	<parameter name="assistantName" class="java.lang.String"/>
 	<parameter name="ownerPin" class="java.lang.String"/>
-	<parameter name="amount" class="java.lang.Double"/>
 	<queryString>
 		<![CDATA[]]>
 	</queryString>
