@@ -77,6 +77,12 @@ public class TransactionService {
                 .map(Transaction::getAmount)
                 .reduce(0.0, Double::sum);
     }
+    public Double getTaxHistory(){
+        List<Transaction> transactions = transactionRepository.findAll();
+        return transactions.stream()
+                .map(Transaction::getTax)
+                .reduce(0.0,Double::sum);
+    }
 
     @Transactional
     public List<Transaction> getTransactionToday() {
@@ -89,12 +95,6 @@ public class TransactionService {
         return transactionRepository.findByTransactionDate(date);
     }
 
-    // @Transactional
-    // public List<EtimsTransaction> getTransactionsMonthly(LocalDate startDate,
-    // LocalDate endDate){
-    // return transactionRepository.findByTransactionDateBetween(startDate,
-    // endDate);
-    // }
     @Transactional
     public List<Transaction> getTransactionsMonthly(LocalDate startDate, LocalDate endDate) {
         LocalDateTime startDateTime = startDate.atStartOfDay();

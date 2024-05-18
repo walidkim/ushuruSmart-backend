@@ -67,6 +67,11 @@ public class TransactionController {
         Double total = transactionService.getTransactionHistory();
         return ResponseEntity.ok(total);
     }
+    @GetMapping("transaction-tax-history")
+    public ResponseEntity<Double> getTransactionTaxTotal() {
+        Double total = transactionService.getTaxHistory();
+        return ResponseEntity.ok(total);
+    }
 
     @GetMapping("/daily")
     public List<Transaction> getTransactionToday() {
