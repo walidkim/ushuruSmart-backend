@@ -18,7 +18,7 @@ public class TaxCalculationService {
     public double calculateTotalTax(LocalDate startDate, LocalDate endDate) {
         List<Transaction> transactions = transactionRepository.findByDateBetween(startDate, endDate);
         double totalAmount = transactions.stream().mapToDouble(Transaction::getAmount).sum();
-        double totalTax = totalAmount * 0.60; // Assuming a 16% tax rate
+        double totalTax = totalAmount * 0.16; // Assuming a 16% tax rate
         return totalTax;
     }
 }
