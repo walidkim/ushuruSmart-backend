@@ -8,19 +8,22 @@ import com.emtech.ushurusmart.etims.entity.Transaction;
 import com.emtech.ushurusmart.etims.repository.EtimsRepository;
 import com.emtech.ushurusmart.etims.repository.SalesRepository;
 import com.emtech.ushurusmart.etims.repository.TransactionRepository;
-import jakarta.servlet.ServletOutputStream;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static com.emtech.ushurusmart.utils.service.GeneratorService.generateRandomString;
@@ -35,7 +38,7 @@ public class TransactionService {
     private SalesRepository salesRepository;
 
     @Autowired
-    private TaxCalculator taxCalculator;
+    private com.emtech.ushurusmart.etims.service.TaxCalculator taxCalculator;
 
     @Autowired
     private EtimsRepository etimsRepository;
@@ -51,9 +54,9 @@ public class TransactionService {
             Sale sale = new Sale();
             sale.setName(dto.getName());
             sale.setTaxable(dto.isTaxable());
-            double tax= taxCalculator.calculateTax(dto.isTaxable(), dto.getAmount());
+            double tax = taxCalculator.calculateTax(dto.isTaxable(), dto.getAmount());
             sale.setTax(tax);
-            totalTax +=tax;
+            totalTax += tax;
 
             sale.setAmount(dto.getAmount());
             salesRepository.save(sale);
@@ -77,11 +80,12 @@ public class TransactionService {
                 .map(Transaction::getAmount)
                 .reduce(0.0, Double::sum);
     }
-    public Double getTaxHistory(){
+
+    public Double getTaxHistory() {
         List<Transaction> transactions = transactionRepository.findAll();
         return transactions.stream()
                 .map(Transaction::getTax)
-                .reduce(0.0,Double::sum);
+                .reduce(0.0, Double::sum);
     }
 
     @Transactional
@@ -102,38 +106,48 @@ public class TransactionService {
         return transactionRepository.findByTransactionDateBetween(startDate, endDate);
     }
 
-    public void generateExcel(HttpServletResponse response) throws IOException {
+    public byte[] generateExcel() throws IOException {
+        List<Transaction> transactions = transactionRepository.findAll();
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        XSSFSheet sheet = workbook.createSheet("Transaction Report");
+        XSSFRow headerRow = sheet.createRow(0);
 
-        List<Transaction> etimsTransactionList = transactionRepository.findAll();
-
-        HSSFWorkbook workbook = new HSSFWorkbook();
-        HSSFSheet sheet = workbook.createSheet("Transaction Report");
-        HSSFRow row = sheet.createRow(0);
-
-        row.createCell(0).setCellValue("ID");
-        row.createCell(1).setCellValue("Amount");
-        row.createCell(2).setCellValue("Date Created");
-        row.createCell(3).setCellValue("ETIMS Number");
-        row.createCell(4).setCellValue("INVOICE Number");
-        row.createCell(5).setCellValue("TAX");
-
-        int dataRowIndex = 1;
-
-        for (Transaction etimsTransactions : etimsTransactionList) {
-            HSSFRow dataRow = sheet.createRow(dataRowIndex);
-            dataRow.createCell(0).setCellValue(etimsTransactions.getId());
-            dataRow.createCell(1).setCellValue(etimsTransactions.getAmount());
-            dataRow.createCell(2).setCellValue(String.valueOf(etimsTransactions.getDateCreated()));
-            dataRow.createCell(3).setCellValue(etimsTransactions.getEtims().getEtimsCode());
-            dataRow.createCell(4).setCellValue(etimsTransactions.getInvoiceNumber());
-            dataRow.createCell(5).setCellValue(etimsTransactions.getTax());
-            dataRowIndex++;
-
+        // Set headers
+        String[] headers = {"ID", "Amount", "Date Created", "ETIMS Number", "INVOICE Number", "TAX"};
+        for (int i = 0; i < headers.length; i++) {
+            headerRow.createCell(i).setCellValue(headers[i]);
         }
 
-        ServletOutputStream outputStream = response.getOutputStream();
+        int rowIndex = 1;
+        for (Transaction transaction : transactions) {
+            XSSFRow dataRow = sheet.createRow(rowIndex++);
+            setCellData(dataRow, 0, transaction.getId());
+            setCellData(dataRow, 1, transaction.getAmount());
+            setCellData(dataRow, 2, String.valueOf(transaction.getDateCreated()));
+            setCellData(dataRow, 3, transaction.getInvoiceNumber());
+            setCellData(dataRow, 4, transaction.getTax());
+        }
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         workbook.write(outputStream);
         workbook.close();
-        outputStream.close();
+        return outputStream.toByteArray();
+    }
+
+    private void setCellData(XSSFRow row, int column, Object value) {
+        if (value!= null) {
+            CellStyle style = row.getRowStyle(); // Get the default style for the row
+            if (value instanceof Date) { // Check if the value is a Date object
+                SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy"); // Define the date format
+                String dateString = dateFormat.format((Date) value); // Format the date
+                row.createCell(column).setCellValue(dateString); // Set the formatted date string
+            } else if (value instanceof Double || value instanceof Float) { // Check if the value is a number
+                DecimalFormat decimalFormat = new DecimalFormat("#,##0.00"); // Define the number format
+                String numberString = decimalFormat.format((Double) value); // Format the number
+                row.createCell(column).setCellValue(numberString); // Set the formatted number string
+            } else {
+                row.createCell(column).setCellValue(value.toString()); // Default case for other types
+            }
+        }
     }
 }
