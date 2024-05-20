@@ -11,6 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 public class TransactionRequest {
         private String buyerKRAPin;
+        private Double salesAmount;
         private List<TransactionProduct> sales;
 }
 
