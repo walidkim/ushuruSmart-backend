@@ -10,6 +10,7 @@ import com.emtech.ushurusmart.utils.controller.Responses;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -51,15 +52,14 @@ public class TransactionController {
         }
     }
 
-    @GetMapping("/generate-TransactionXLS-report")
-    public void generateExcelReport(HttpServletResponse response) throws IOException {
-
-        response.setContentType("application/octet-stream");
-
-        String headerKey = "Content-Disposition";
-        String headerValue = "attachment; filename = transactionReport.xls";
-        response.setHeader(headerKey, headerValue);
-        transactionService.generateExcel(response);
+    @GetMapping("/excel")
+    public ResponseEntity<byte[]> downloadExcelReport(HttpServletResponse response) throws IOException {
+        byte[] excelData = transactionService.generateExcel();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=transaction_report.xlsx");
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(excelData);
     }
 
     @GetMapping("transaction-amount-history")
