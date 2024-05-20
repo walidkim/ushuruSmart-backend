@@ -55,7 +55,7 @@ public class JasperPDFService {
             parameters.put("ownerPin", transactionData.getEtims().getBusinessOwnerKRAPin());
             parameters.put("etimsNumber", transactionData.getEtims().getEtimsCode());
             parameters.put("invoiceNumber", transactionData.getInvoiceNumber());
-            parameters.put("amount", transactionData.getAmount());
+            parameters.put("amount", request.getSalesAmount());
             parameters.put("currency", CURRENCY);
             parameters.put("unitPrice", product.getUnitPrice());
             parameters.put("quantity", sale.getQuantity());
@@ -67,7 +67,6 @@ public class JasperPDFService {
 
         }
 
-        // JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(productService.findAll());
 
 
         File reportTemplate = ResourceUtils.getFile("classpath:" + REPORT_TEMPLATE);
@@ -92,13 +91,6 @@ public class JasperPDFService {
                 .findFirst().orElse(null);
     }
 
-    @Data
-    @AllArgsConstructor
-    public static class ProductInfo {
-        private long productId;
-        private int quantity;
-        private double amount;
-    }
 
     public ByteArrayOutputStream assistantGenerateReport(EtimsResponses.TransactionResponse.TransactionData transactionAssistantData, TransactionRequest assistantRequest) throws JRException, IOException, SQLException {
         Map<String, Object> parameters = new HashMap<>();
@@ -121,7 +113,7 @@ public class JasperPDFService {
             parameters.put("tax", etimsAssistantSale.getTax());
             parameters.put("currency", CURRENCY);
             parameters.put("taxable", etimsAssistantSale.isTaxable()? "Taxable" : "Tax Exemptet");
-            parameters.put("amount", transactionAssistantData.getAmount());
+            parameters.put("amount", assistantRequest.getSalesAmount());
             parameters.put("quantity", assistantSale.getQuantity());
             parameters.put("unitOfMeasure", assistantProduct.getUnitOfMeasure());
             parameters.put("unitPrice", assistantProduct.getUnitPrice());
