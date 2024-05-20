@@ -51,6 +51,7 @@ public class JasperPDFService {
             EtimsResponses.TransactionResponse.Sale etimsSale = findSaleByName(etimsSales, product.getName());
 
             parameters.put("buyerKRAPin", transactionData.getBuyerPin());
+            parameters.put("businessPin", transactionData.getEtims().getBusinessKRAPin());
             parameters.put("ownerPin", transactionData.getEtims().getBusinessOwnerKRAPin());
             parameters.put("etimsNumber", transactionData.getEtims().getEtimsCode());
             parameters.put("invoiceNumber", transactionData.getInvoiceNumber());
@@ -114,6 +115,7 @@ public class JasperPDFService {
 
             parameters.put("buyerKRAPin", transactionAssistantData.getBuyerPin());
             parameters.put("etimsNumber", transactionAssistantData.getEtims().getBusinessOwnerKRAPin());
+//            parameters.put("businessPin", transactionAssistantData.getEtims().getBusinessKRAPin());
             parameters.put("invoiceNumber", transactionAssistantData.getEtims().getEtimsCode());
             parameters.put("counter", COUNTER);
             parameters.put("tax", etimsAssistantSale.getTax());

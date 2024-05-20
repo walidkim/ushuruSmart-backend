@@ -17,7 +17,7 @@
 	<parameter name="unitPrice" class="java.lang.Double"/>
 	<parameter name="name" class="java.lang.String"/>
 	<parameter name="branch" class="java.lang.String"/>
-	<parameter name="bussinessPin" class="java.lang.String"/>
+	<parameter name="businessPin" class="java.lang.String"/>
 	<parameter name="assistantName" class="java.lang.String"/>
 	<parameter name="ownerPin" class="java.lang.String"/>
 	<queryString>
@@ -112,7 +112,7 @@
 					<textElement>
 						<font size="14" isBold="true"/>
 					</textElement>
-					<textFieldExpression><![CDATA["Business KRA PIN: " +" "+ $P{bussinessPin}]]></textFieldExpression>
+					<textFieldExpression><![CDATA["Business KRA PIN: " +" "+ $P{businessPin}]]></textFieldExpression>
 				</textField>
 			</frame>
 			<frame>
