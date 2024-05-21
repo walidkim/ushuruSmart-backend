@@ -88,9 +88,10 @@ public class TransactionService {
 
     public Double getTaxHistory() {
         List<Transaction> transactions = transactionRepository.findAll();
-        return transactions.stream()
+        double sum = transactions.stream()
                 .map(Transaction::getTax)
                 .reduce(0.0, Double::sum);
+        return Math.round(sum * 100.0) / 100.0;
     }
     public Long getTransactionCount() {
         List<Transaction> transactions = transactionRepository.findAll();
