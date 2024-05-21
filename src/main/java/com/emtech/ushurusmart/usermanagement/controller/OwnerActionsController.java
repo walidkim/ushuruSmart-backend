@@ -75,6 +75,20 @@ public class OwnerActionsController {
         }
     }
 
+    @GetMapping(value = "/assistant-count")
+    public ResponseEntity<?> assistantsCount() {
+        ResContructor res = new ResContructor();
+        try {
+            String ownerEmail= AuthUtils.getCurrentlyLoggedInPerson();
+            Owner owner = ownerService.findByEmail(ownerEmail);
+            res.setMessage("Assistant count fetched successfully!");
+            res.setData(owner.getAssistants().size());
+            return ResponseEntity.status(HttpStatus.OK).body(res);
+        }catch ( Exception e){
+            return responses.create500Response(e);
+        }
+    }
+
     @DeleteMapping(value = "/delete-assistant")
     public ResponseEntity<?> deleteAssistant(@RequestParam(name = "assistant_id", required = true) long assistantId) {
         String ownerEmail = AuthUtils.getCurrentlyLoggedInPerson();
