@@ -29,7 +29,7 @@ public class Transaction {
 
     private double tax;
     @CreationTimestamp
-    private LocalDateTime dateCreated;
+    private LocalDate dateCreated;
 
     @OneToMany(fetch = FetchType.LAZY)
     private List<Sale> sales;
