@@ -52,7 +52,7 @@ public class TransactionController {
         }
     }
 
-    @GetMapping("/excel")
+    @GetMapping("/generate-excel-monthly-transactions")
     public ResponseEntity<byte[]> downloadExcelReport(HttpServletResponse response) throws IOException {
         byte[] excelData = transactionService.generateExcel();
         HttpHeaders headers = new HttpHeaders();
@@ -61,13 +61,17 @@ public class TransactionController {
                 .headers(headers)
                 .body(excelData);
     }
+    @GetMapping("/transactions/count")
+    public Long getTransactionCount() {
+        return transactionService.getTransactionCount();
+    }
 
-    @GetMapping("transaction-amount-history")
+    @GetMapping("get-total-amount-transacted")
     public ResponseEntity<Double> getTransactionAmountTotal() {
         Double total = transactionService.getTransactionHistory();
         return ResponseEntity.ok(total);
     }
-    @GetMapping("transaction-tax-history")
+    @GetMapping("get-total-tax-transacted")
     public ResponseEntity<Double> getTransactionTaxTotal() {
         Double total = transactionService.getTaxHistory();
         return ResponseEntity.ok(total);
@@ -84,7 +88,7 @@ public class TransactionController {
         return transactionService.getTransactionsDaily(date);
     }
 
-    @GetMapping("/range")
+    @GetMapping("/get-monthly-transaction-by-date")
     public List<Transaction> getTransactionsMonthly(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {

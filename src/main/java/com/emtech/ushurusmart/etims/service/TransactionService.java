@@ -9,7 +9,10 @@ import com.emtech.ushurusmart.etims.repository.EtimsRepository;
 import com.emtech.ushurusmart.etims.repository.SalesRepository;
 import com.emtech.ushurusmart.etims.repository.TransactionRepository;
 import jakarta.transaction.Transactional;
+import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -25,6 +28,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import org.apache.poi.xssf.usermodel.*;
 
 import static com.emtech.ushurusmart.utils.service.GeneratorService.generateRandomString;
 
@@ -87,6 +92,10 @@ public class TransactionService {
                 .map(Transaction::getTax)
                 .reduce(0.0, Double::sum);
     }
+    public Long getTransactionCount() {
+        List<Transaction> transactions = transactionRepository.findAll();
+        return (long) transactions.size();
+    }
 
     @Transactional
     public List<Transaction> getTransactionToday() {
@@ -112,20 +121,42 @@ public class TransactionService {
         XSSFSheet sheet = workbook.createSheet("Transaction Report");
         XSSFRow headerRow = sheet.createRow(0);
 
+        // Create a cell style for headers with bold font
+        XSSFFont headerFont = workbook.createFont();
+        headerFont.setBold(true);
+        XSSFCellStyle headerCellStyle = workbook.createCellStyle();
+        headerCellStyle.setFont(headerFont);
+        headerCellStyle.setAlignment(HorizontalAlignment.CENTER);  // Center alignment
+
+        // Create a cell style for borders and justification
+        XSSFCellStyle borderCellStyle = workbook.createCellStyle();
+        borderCellStyle.setBorderTop(BorderStyle.THIN);
+        borderCellStyle.setBorderBottom(BorderStyle.THIN);
+        borderCellStyle.setBorderLeft(BorderStyle.THIN);
+        borderCellStyle.setBorderRight(BorderStyle.THIN);
+        borderCellStyle.setAlignment(HorizontalAlignment.LEFT); // Left alignment for data cells
+
         // Set headers
-        String[] headers = {"ID", "Amount", "Date Created", "ETIMS Number", "INVOICE Number", "TAX"};
+        String[] headers = {"ID", "Amount", "Date Created", "INVOICE Number", "TAX"};
         for (int i = 0; i < headers.length; i++) {
-            headerRow.createCell(i).setCellValue(headers[i]);
+            XSSFCell cell = headerRow.createCell(i);
+            cell.setCellValue(headers[i]);
+            cell.setCellStyle(headerCellStyle);
         }
 
         int rowIndex = 1;
         for (Transaction transaction : transactions) {
             XSSFRow dataRow = sheet.createRow(rowIndex++);
-            setCellData(dataRow, 0, transaction.getId());
-            setCellData(dataRow, 1, transaction.getAmount());
-            setCellData(dataRow, 2, String.valueOf(transaction.getDateCreated()));
-            setCellData(dataRow, 3, transaction.getInvoiceNumber());
-            setCellData(dataRow, 4, transaction.getTax());
+            setCellData(dataRow, 0, transaction.getId(), borderCellStyle);
+            setCellData(dataRow, 1, transaction.getAmount(), borderCellStyle);
+            setCellData(dataRow, 2, String.valueOf(transaction.getDateCreated()), borderCellStyle);
+            setCellData(dataRow, 3, transaction.getInvoiceNumber(), borderCellStyle);
+            setCellData(dataRow, 4, transaction.getTax(), borderCellStyle);
+        }
+
+        // Autosize columns to fit the content
+        for (int i = 0; i < headers.length; i++) {
+            sheet.autoSizeColumn(i);
         }
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -134,7 +165,7 @@ public class TransactionService {
         return outputStream.toByteArray();
     }
 
-    private void setCellData(XSSFRow row, int column, Object value) {
+    private void setCellData(XSSFRow row, int column, Object value, XSSFCellStyle borderCellStyle) {
         if (value!= null) {
             CellStyle style = row.getRowStyle(); // Get the default style for the row
             if (value instanceof Date) { // Check if the value is a Date object
