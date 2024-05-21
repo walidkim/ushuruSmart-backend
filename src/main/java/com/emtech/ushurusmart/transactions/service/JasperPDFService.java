@@ -32,7 +32,7 @@ import java.sql.SQLException;
 public class JasperPDFService {
     private static final String REPORT_TEMPLATE = "ETR-Reciept.jrxml";
     private static final String ASSISTANT_REPORT_TEMPLATE = "Assistant-ETR-Receipt.jrxml";
-    private static final String CURRENCY = "Kshs";
+    private static final String CURRENCY = "KSHS";
     private static final int COUNTER = 1; // renamed to follow Java naming conventions
 
     @Autowired
