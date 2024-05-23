@@ -21,7 +21,6 @@ public class Transaction {
     private Double amount;
 
 
-
     @Column(nullable = false)
     private String buyerPin;
     private String invoiceNumber;

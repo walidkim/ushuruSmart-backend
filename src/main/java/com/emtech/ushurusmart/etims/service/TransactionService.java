@@ -23,11 +23,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.poi.xssf.usermodel.*;
 
@@ -114,6 +117,19 @@ public class TransactionService {
         LocalDateTime startDateTime = startDate.atStartOfDay();
         LocalDateTime endDateTime = endDate.plusDays(1).atStartOfDay();
         return transactionRepository.findByTransactionDateBetween(startDate, endDate);
+    }
+
+    public Double getCurrentDayTransactionSum() {
+        LocalDate today = LocalDate.now();
+        List<Transaction> transactions = transactionRepository.findByTransactionDate(today);
+
+        if (!transactions.isEmpty()) {
+            return transactions.stream()
+                    .map(Transaction::getAmount)
+                    .reduce(0.0, Double::sum);
+        } else {
+            return 0.0;
+        }
     }
 
     public byte[] generateExcel() throws IOException {
