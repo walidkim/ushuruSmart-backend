@@ -1,5 +1,6 @@
 package com.emtech.ushurusmart.payments.entity;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.emtech.ushurusmart.usermanagement.model.Owner;
@@ -46,5 +47,6 @@ public class PaymentEntity {
     private String paidBy;
     @Column(name = "transaction_date")
     private LocalDateTime transactionDate;
+    private LocalDate dateTransaction;
 
 }
