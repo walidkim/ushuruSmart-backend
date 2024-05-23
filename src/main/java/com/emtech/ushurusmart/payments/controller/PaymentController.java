@@ -35,10 +35,10 @@ public class PaymentController {
 
     }
 
-    @PostMapping("/sendPush")
+    @PostMapping("/makePayment")
     public ResponseEntity<String> sendSTK(@RequestBody sendPushRequest request) {
         try {
-            return paymentImpl.sendSTK(request.getPhoneNo(), request.getAmount(), request.getEslipNo());
+            return paymentImpl.sendSTKPush(request.getPhoneNo(), request.getAmount(), request.getEslipNo());
         } catch (Exception e) {
             log.error("Error occured: " + e);
             return ResponseEntity.badRequest().body("Error occurred! Try later.");
