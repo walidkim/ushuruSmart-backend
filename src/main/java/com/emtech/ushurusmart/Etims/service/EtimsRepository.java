@@ -1,4 +1,4 @@
-package com.emtech.ushurusmart.Etims.service;
+package com.emtech.ushurusmart.etims.service;
 
 public interface EtimsRepository {
 }

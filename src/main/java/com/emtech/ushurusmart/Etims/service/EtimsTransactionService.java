@@ -1,3 +1,4 @@
+package com.emtech.ushurusmart.etims.service;
 //package com.emtech.ushurusmart.Etims.service;
 //
 //import static com.emtech.ushurusmart.utils.service.GeneratorService.*;

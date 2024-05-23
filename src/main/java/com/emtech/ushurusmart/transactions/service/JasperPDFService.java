@@ -41,33 +41,30 @@ public class JasperPDFService {
     @Autowired
     private AssistantService assistantService;
 
-    public ByteArrayOutputStream exportJasperReport(EtimsResponses.TransactionResponse.TransactionData transactionData, TransactionRequest request) throws JRException, IOException, SQLException {
+    public ByteArrayOutputStream exportJasperReport(EtimsResponses.TransactionResponse.TransactionData transactionData,
+            TransactionRequest request) throws JRException, IOException, SQLException {
         Map<String, Object> parameters = new HashMap<>();
 
         List<EtimsResponses.TransactionResponse.Sale> etimsSales = transactionData.getSales();
-
-        for (TransactionProduct sale : request.getSales()) {
-            Product product = productService.findById(sale.getProductId());
+        parameters.put("buyerKRAPin", transactionData.getBuyerPin());
+        parameters.put("businessPin", transactionData.getEtims().getBusinessKRAPin());
+        parameters.put("ownerPin", transactionData.getEtims().getBusinessOwnerKRAPin());
+        parameters.put("etimsNumber", transactionData.getEtims().getEtimsCode());
+        parameters.put("invoiceNumber", transactionData.getInvoiceNumber());
+        parameters.put("amount", request.getSalesAmount());
+        parameters.put("currency", CURRENCY);
+        for (EtimsResponses.TransactionResponse.Sale sale : transactionData.getSales()) {
+            System.out.println(sale);
+            Product product = productService.findByName(sale.getName());
             EtimsResponses.TransactionResponse.Sale etimsSale = findSaleByName(etimsSales, product.getName());
-
-            parameters.put("buyerKRAPin", transactionData.getBuyerPin());
-            parameters.put("businessPin", transactionData.getEtims().getBusinessKRAPin());
-            parameters.put("ownerPin", transactionData.getEtims().getBusinessOwnerKRAPin());
-            parameters.put("etimsNumber", transactionData.getEtims().getEtimsCode());
-            parameters.put("invoiceNumber", transactionData.getInvoiceNumber());
-            parameters.put("amount", request.getSalesAmount());
-            parameters.put("currency", CURRENCY);
             parameters.put("unitPrice", product.getUnitPrice());
-            parameters.put("quantity", sale.getQuantity());
             parameters.put("tax", etimsSale.getTax());
             parameters.put("counter", COUNTER);
             parameters.put("unitOfMeasure", product.getUnitOfMeasure());
             parameters.put("name", etimsSale.getName());
-            parameters.put("taxable", etimsSale.isTaxable()? "Taxable" : "Tax Exempted");
+            parameters.put("taxable", etimsSale.isTaxable() ? "Taxable" : "Tax Exempted");
 
         }
-
-
 
         File reportTemplate = ResourceUtils.getFile("classpath:" + REPORT_TEMPLATE);
         JasperReport jasperReport = JasperCompileManager.compileReport(reportTemplate.getAbsolutePath());
@@ -84,22 +81,24 @@ public class JasperPDFService {
         return byteArrayOutputStream;
     }
 
-
-    public static EtimsResponses.TransactionResponse.Sale findSaleByName(List<EtimsResponses.TransactionResponse.Sale> sales, String name) {
+    public static EtimsResponses.TransactionResponse.Sale findSaleByName(
+            List<EtimsResponses.TransactionResponse.Sale> sales, String name) {
         return sales.stream()
                 .filter(element -> element.getName().equals(name))
                 .findFirst().orElse(null);
     }
 
-
-    public ByteArrayOutputStream assistantGenerateReport(EtimsResponses.TransactionResponse.TransactionData transactionAssistantData, TransactionRequest assistantRequest) throws JRException, IOException, SQLException {
+    public ByteArrayOutputStream assistantGenerateReport(
+            EtimsResponses.TransactionResponse.TransactionData transactionAssistantData,
+            TransactionRequest assistantRequest) throws JRException, IOException, SQLException {
         Map<String, Object> parameters = new HashMap<>();
 
         List<EtimsResponses.TransactionResponse.Sale> etimsSales = transactionAssistantData.getSales();
 
         for (TransactionProduct assistantSale : assistantRequest.getSales()) {
             Product assistantProduct = productService.findById(assistantSale.getProductId());
-            EtimsResponses.TransactionResponse.Sale etimsAssistantSale = findSaleByName(etimsSales, assistantProduct.getName());
+            EtimsResponses.TransactionResponse.Sale etimsAssistantSale = findSaleByName(etimsSales,
+                    assistantProduct.getName());
             EtimsResponses.TransactionResponse.EtimsData assistantEtimsData = new EtimsData();
 
             String email = AuthUtils.getCurrentlyLoggedInPerson();
@@ -107,12 +106,13 @@ public class JasperPDFService {
 
             parameters.put("buyerKRAPin", transactionAssistantData.getBuyerPin());
             parameters.put("etimsNumber", transactionAssistantData.getEtims().getBusinessOwnerKRAPin());
-//            parameters.put("businessPin", transactionAssistantData.getEtims().getBusinessKRAPin());
+            // parameters.put("businessPin",
+            // transactionAssistantData.getEtims().getBusinessKRAPin());
             parameters.put("invoiceNumber", transactionAssistantData.getEtims().getEtimsCode());
             parameters.put("counter", COUNTER);
             parameters.put("tax", etimsAssistantSale.getTax());
             parameters.put("currency", CURRENCY);
-            parameters.put("taxable", etimsAssistantSale.isTaxable()? "Taxable" : "Tax Exemptet");
+            parameters.put("taxable", etimsAssistantSale.isTaxable() ? "Taxable" : "Tax Exemptet");
             parameters.put("amount", assistantRequest.getSalesAmount());
             parameters.put("quantity", assistantSale.getQuantity());
             parameters.put("unitOfMeasure", assistantProduct.getUnitOfMeasure());
@@ -123,7 +123,6 @@ public class JasperPDFService {
             parameters.put("assistantName", assistant.getBranch());
             parameters.put("ownerPin", transactionAssistantData.getEtims().getBusinessOwnerKRAPin());
         }
-
 
         File reportFile = ResourceUtils.getFile("classpath:" + ASSISTANT_REPORT_TEMPLATE);
         JasperReport jasperReport = JasperCompileManager.compileReport(reportFile.getAbsolutePath());

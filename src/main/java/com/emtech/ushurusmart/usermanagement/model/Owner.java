@@ -20,7 +20,7 @@ import java.util.List;
 public class Owner extends BaseAuth implements Serializable {
     private String businessKRAPin;
     private String KRAPin;
-    private String phoneNumber;
+
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<Assistant> assistants;
