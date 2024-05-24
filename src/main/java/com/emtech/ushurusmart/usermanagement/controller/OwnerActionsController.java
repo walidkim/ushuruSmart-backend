@@ -2,6 +2,7 @@ package com.emtech.ushurusmart.usermanagement.controller;
 
 
 import com.emtech.ushurusmart.usermanagement.Dtos.entity.AssistantDto;
+import com.emtech.ushurusmart.usermanagement.TrackingEntity.LoginLogoutListener;
 import com.emtech.ushurusmart.usermanagement.factory.EntityFactory;
 import com.emtech.ushurusmart.usermanagement.model.Assistant;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
@@ -35,6 +36,8 @@ public class OwnerActionsController {
 
     @Autowired
     private Responses responses;
+    @Autowired
+    private LoginLogoutListener loginLogoutListener;
 
     @PostMapping(value = "/update-details")
     public ResponseEntity<?> updatedDetails(@RequestBody Owner newOwner) {
@@ -143,11 +146,20 @@ public class OwnerActionsController {
 
     }
 
-   @GetMapping("/owner/assistants")
-   public int getLoggedInAssistantsCount() {
-       return ownerService.countLoggedInAssistants();
+    @Autowired
+    public OwnerActionsController(LoginLogoutListener loginLogoutListener) {
+        this.loginLogoutListener = loginLogoutListener;
+    }
 
+
+
+    @GetMapping("/owner/assistants")
+   public ResponseEntity<Integer> getLoggedInAssistantsCount() {
+       int count = loginLogoutListener.getLoggedInAssistantsCount();
+       return ResponseEntity.ok(count);
    }
+
+
 }
 
 
