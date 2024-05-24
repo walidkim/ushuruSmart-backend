@@ -1,9 +1,15 @@
 package com.emtech.ushurusmart.config;
 
+import com.emtech.ushurusmart.payments.entity.PaymentEntity;
+import com.emtech.ushurusmart.payments.service.TaxCalculationService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @NoArgsConstructor
 @Component
@@ -21,5 +27,15 @@ public class PaymentConfig {
     public String stkPushURL;
     @Value("${app.mpesa.callbackURL}")
     public String callBackURL;
+
+    @Bean
+    public TaxCalculationService taxCalculationService() {
+        return new TaxCalculationService() {
+            @Override
+            public List<PaymentEntity> getPaymentsByDateRange(LocalDate startDate, LocalDate endDate) {
+                return List.of();
+            }
+        };
+    }
 
 }

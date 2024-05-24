@@ -1,20 +1,19 @@
 package com.emtech.ushurusmart.payments.controller;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.emtech.ushurusmart.payments.dtos.taxDue;
+import com.emtech.ushurusmart.payments.service.PaymentService;
+import com.emtech.ushurusmart.payments.service.TaxCalculationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.emtech.ushurusmart.payments.dtos.sendPushRequest;
 import com.emtech.ushurusmart.payments.dtos.callback.StkCallbackRequest;
@@ -29,6 +28,8 @@ public class PaymentController {
     private final PaymentImpl paymentImpl;
     @Autowired
     private PaymentHistService paymentHistService;
+    @Autowired
+    private TaxCalculationService taxCalculationService;
 
     public PaymentController(PaymentImpl paymentImpl) {
         this.paymentImpl = paymentImpl;
@@ -45,9 +46,17 @@ public class PaymentController {
         }
     }
 
-    @PostMapping({ "/callback" })
-    public void callback(@RequestBody StkCallbackRequest stkCallbackRequest) throws Exception {
-        paymentImpl.callback(stkCallbackRequest);
+
+    @GetMapping("/taxDue")
+    public String calculateTax(@ModelAttribute taxDue request) {
+        try {
+            LocalDate start = request.getStartDate();
+            LocalDate end = request.getEndDate();
+            double totalTax = taxCalculationService.calculateTotalTax(start, end);
+            return "Total Tax: " + totalTax;
+        } catch (Exception e) {
+            return "Error: " + e.getMessage();
+        }
     }
 
     @GetMapping({ "/payment-report" })
