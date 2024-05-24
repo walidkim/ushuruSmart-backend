@@ -1,6 +1,7 @@
 package com.emtech.ushurusmart.usermanagement.controller;
 
 
+import com.emtech.ushurusmart.usermanagement.Dtos.controller.ResetPasswordRequest;
 import com.emtech.ushurusmart.usermanagement.Dtos.entity.AssistantDto;
 import com.emtech.ushurusmart.usermanagement.TrackingEntity.LoginLogoutListener;
 import com.emtech.ushurusmart.usermanagement.factory.EntityFactory;
@@ -8,6 +9,7 @@ import com.emtech.ushurusmart.usermanagement.model.Assistant;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
 import com.emtech.ushurusmart.usermanagement.service.AssistantService;
 import com.emtech.ushurusmart.usermanagement.service.OwnerService;
+import com.emtech.ushurusmart.usermanagement.service.resetpassword.ResetPasswordService;
 import com.emtech.ushurusmart.usermanagement.utils.AuthUtils;
 import com.emtech.ushurusmart.utils.EmailService;
 import com.emtech.ushurusmart.utils.controller.ResContructor;
@@ -16,6 +18,8 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
@@ -34,10 +38,15 @@ public class OwnerActionsController {
     private AssistantService assistantService;
 
 
+
     @Autowired
     private Responses responses;
     @Autowired
+
+    private ResetPasswordService resetPasswordService;
+
     private LoginLogoutListener loginLogoutListener;
+
 
     @PostMapping(value = "/update-details")
     public ResponseEntity<?> updatedDetails(@RequestBody Owner newOwner) {
@@ -159,7 +168,20 @@ public class OwnerActionsController {
        return ResponseEntity.ok(count);
    }
 
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetOwnerPassword(@RequestBody ResetPasswordRequest resetPasswordRequest) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email = userDetails.getUsername();
+
+        resetPasswordService.changePassword(email, resetPasswordRequest, "Owner");
+
+        return ResponseEntity.status(HttpStatus.OK).body("Password successfully changed for owner.");
+    }
+
+
 
 }
+
+
 
 
