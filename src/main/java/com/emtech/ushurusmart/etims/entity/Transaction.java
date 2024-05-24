@@ -22,7 +22,6 @@ public class Transaction {
 
     private LocalDate date;
 
-
     @Column(nullable = false)
     private String buyerPin;
     private String invoiceNumber;
