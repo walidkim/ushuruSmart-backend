@@ -3,6 +3,7 @@ package com.emtech.ushurusmart.usermanagement.controller;
 
 import com.emtech.ushurusmart.usermanagement.Dtos.controller.ResetPasswordRequest;
 import com.emtech.ushurusmart.usermanagement.Dtos.entity.AssistantDto;
+import com.emtech.ushurusmart.usermanagement.TrackingEntity.LoginLogoutListener;
 import com.emtech.ushurusmart.usermanagement.factory.EntityFactory;
 import com.emtech.ushurusmart.usermanagement.model.Assistant;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
@@ -41,7 +42,11 @@ public class OwnerActionsController {
     @Autowired
     private Responses responses;
     @Autowired
+
     private ResetPasswordService resetPasswordService;
+
+    private LoginLogoutListener loginLogoutListener;
+
 
     @PostMapping(value = "/update-details")
     public ResponseEntity<?> updatedDetails(@RequestBody Owner newOwner) {
@@ -150,11 +155,19 @@ public class OwnerActionsController {
 
     }
 
-   @GetMapping("/owner/assistants")
-   public int getLoggedInAssistantsCount() {
-       return ownerService.countLoggedInAssistants();
+    @Autowired
+    public OwnerActionsController(LoginLogoutListener loginLogoutListener) {
+        this.loginLogoutListener = loginLogoutListener;
+    }
 
+
+
+    @GetMapping("/owner/assistants")
+   public ResponseEntity<Integer> getLoggedInAssistantsCount() {
+       int count = loginLogoutListener.getLoggedInAssistantsCount();
+       return ResponseEntity.ok(count);
    }
+
     @PostMapping("/reset-password")
     public ResponseEntity<String> resetOwnerPassword(@RequestBody ResetPasswordRequest resetPasswordRequest) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -164,6 +177,7 @@ public class OwnerActionsController {
 
         return ResponseEntity.status(HttpStatus.OK).body("Password successfully changed for owner.");
     }
+
 
 
 }
