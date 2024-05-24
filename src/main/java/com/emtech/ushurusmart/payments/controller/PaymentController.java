@@ -1,6 +1,9 @@
 package com.emtech.ushurusmart.payments.controller;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -8,13 +11,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.emtech.ushurusmart.payments.dtos.sendPushRequest;
 import com.emtech.ushurusmart.payments.dtos.callback.StkCallbackRequest;
@@ -45,16 +44,24 @@ public class PaymentController {
         }
     }
 
-    @PostMapping({ "/callback" })
+    @PostMapping({"/callback"})
     public void callback(@RequestBody StkCallbackRequest stkCallbackRequest) throws Exception {
         paymentImpl.callback(stkCallbackRequest);
     }
 
-    @GetMapping({ "/payment-report" })
+    @GetMapping({"/payment-report"})
     public ResponseEntity<List<PaymentEntity>> getPaymentsBetweenDates(
-            @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDateTime startDate,
-            @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDateTime endDate) {
-        List<PaymentEntity> payment = this.paymentHistService.getPaymentsBetweenDates(startDate, endDate);
+            @RequestParam @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate startDate,
+            @RequestParam @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate endDate) {
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atStartOfDay().plusDays(1).minusNanos(1);
+        List<PaymentEntity> payment = this.paymentHistService.getPaymentsBetweenDates(startDateTime, endDateTime);
         return ResponseEntity.ok(payment);
+    }
+
+    @ExceptionHandler(DateTimeParseException.class)
+    public ResponseEntity<String> handleDateTimeParseException(DateTimeParseException ex) {
+        String message = "Incorrect date format.Enter (dd/MM/yyyy)";
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
     }
 }
