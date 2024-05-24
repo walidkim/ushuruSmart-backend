@@ -5,6 +5,7 @@ import com.emtech.ushurusmart.etims.entity.Etims;
 import com.emtech.ushurusmart.etims.entity.Transaction;
 import com.emtech.ushurusmart.etims.service.EtimsOwnerService;
 import com.emtech.ushurusmart.etims.service.TransactionService;
+import com.emtech.ushurusmart.transactions.Dto.EtimsResponses;
 import com.emtech.ushurusmart.utils.controller.ResContructor;
 import com.emtech.ushurusmart.utils.controller.Responses;
 import jakarta.servlet.http.HttpServletResponse;
@@ -93,6 +94,12 @@ public class TransactionController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         return transactionService.getTransactionsMonthly(startDate, endDate);
+    }
+
+    @GetMapping("/get-current-day-transaction-sum")
+    public ResponseEntity<Double> getCurrentDayTransactionSum() {
+        Double transactionSum = transactionService.getCurrentDayTransactionSum();
+        return ResponseEntity.ok(transactionSum);
     }
 
 }
