@@ -28,8 +28,7 @@ public class PaymentController {
     private final PaymentImpl paymentImpl;
     @Autowired
     private PaymentHistService paymentHistService;
-    @Autowired
-    private TaxCalculationService taxCalculationService;
+
 
     public PaymentController(PaymentImpl paymentImpl) {
         this.paymentImpl = paymentImpl;
@@ -52,8 +51,8 @@ public class PaymentController {
         try {
             LocalDate start = request.getStartDate();
             LocalDate end = request.getEndDate();
-            double totalTax = taxCalculationService.calculateTotalTax(start, end);
-            return "Total Tax: " + totalTax;
+            return "This";
+
         } catch (Exception e) {
             return "Error: " + e.getMessage();
         }
