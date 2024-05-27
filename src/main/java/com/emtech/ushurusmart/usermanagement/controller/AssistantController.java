@@ -3,7 +3,6 @@ package com.emtech.ushurusmart.usermanagement.controller;
 import com.emtech.ushurusmart.usermanagement.Dtos.controller.ResetPasswordRequest;
 import com.emtech.ushurusmart.usermanagement.service.resetpassword.ResetPasswordService;
 import com.emtech.ushurusmart.utils.AuthUtils;
-import com.emtech.ushurusmart.utils.controller.Responses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
