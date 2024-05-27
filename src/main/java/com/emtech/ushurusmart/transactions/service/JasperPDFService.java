@@ -9,9 +9,8 @@ import com.emtech.ushurusmart.usermanagement.model.Assistant;
 import com.emtech.ushurusmart.usermanagement.service.AssistantService;
 import com.emtech.ushurusmart.usermanagement.utils.AuthUtils;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.export.JRPdfExporter;
 import net.sf.jasperreports.export.SimpleExporterInput;
 import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
@@ -23,6 +22,7 @@ import org.springframework.util.ResourceUtils;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +33,7 @@ public class JasperPDFService {
     private static final String REPORT_TEMPLATE = "ETR-Reciept.jrxml";
     private static final String ASSISTANT_REPORT_TEMPLATE = "Assistant-ETR-Receipt.jrxml";
     private static final String CURRENCY = "KSHS";
-    private static final int COUNTER = 1; // renamed to follow Java naming conventions
+    private static int COUNTER = 1; // renamed to follow Java naming conventions
 
     @Autowired
     private ProductService productService;
@@ -44,7 +44,8 @@ public class JasperPDFService {
     public ByteArrayOutputStream exportJasperReport(EtimsResponses.TransactionResponse.TransactionData transactionData,
             TransactionRequest request) throws JRException, IOException, SQLException {
         Map<String, Object> parameters = new HashMap<>();
-
+        
+        List<Map<String, Object>> saleDataList = new ArrayList<>();
         List<EtimsResponses.TransactionResponse.Sale> etimsSales = transactionData.getSales();
         parameters.put("buyerKRAPin", transactionData.getBuyerPin());
         parameters.put("businessPin", transactionData.getEtims().getBusinessKRAPin());
@@ -53,22 +54,29 @@ public class JasperPDFService {
         parameters.put("invoiceNumber", transactionData.getInvoiceNumber());
         parameters.put("amount", request.getSalesAmount());
         parameters.put("currency", CURRENCY);
-        for (EtimsResponses.TransactionResponse.Sale sale : transactionData.getSales()) {
-            System.out.println(sale);
+        parameters.put("amount", request.getSalesAmount());
+        for (EtimsResponses.TransactionResponse.Sale sale : etimsSales) {
+            Map<String, Object> saleData = new HashMap<>();
             Product product = productService.findByName(sale.getName());
             EtimsResponses.TransactionResponse.Sale etimsSale = findSaleByName(etimsSales, product.getName());
-            parameters.put("unitPrice", product.getUnitPrice());
-            parameters.put("tax", etimsSale.getTax());
-            parameters.put("counter", COUNTER);
-            parameters.put("unitOfMeasure", product.getUnitOfMeasure());
-            parameters.put("name", etimsSale.getName());
-            parameters.put("taxable", etimsSale.isTaxable() ? "Taxable" : "Tax Exempted");
-
+            saleData.put("unitPrice", product.getUnitPrice());
+            saleData.put("tax", etimsSale.getTax());
+            saleData.put("counter", COUNTER);
+            saleData.put("unitOfMeasure", product.getUnitOfMeasure());
+            saleData.put("name", etimsSale.getName());
+            saleData.put("taxable", etimsSale.isTaxable() ? "Taxable" : "Tax Exempted");            
+            saleDataList.add(saleData);
+            COUNTER++;
+            System.out.println("this is the sales Data: " + saleDataList);
         }
+        
+
 
         File reportTemplate = ResourceUtils.getFile("classpath:" + REPORT_TEMPLATE);
         JasperReport jasperReport = JasperCompileManager.compileReport(reportTemplate.getAbsolutePath());
-        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource());
+        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(saleDataList);
+        System.out.println("this is the datasource output: " + dataSource);
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         JRPdfExporter exporter = new JRPdfExporter();
@@ -102,7 +110,8 @@ public class JasperPDFService {
             EtimsResponses.TransactionResponse.EtimsData assistantEtimsData = new EtimsData();
 
             String email = AuthUtils.getCurrentlyLoggedInPerson();
-            Assistant assistant = assistantService.findByEmail(email);
+            Assistant assistant = assistantService.findByEmail(email)
+;
 
             parameters.put("buyerKRAPin", transactionAssistantData.getBuyerPin());
             parameters.put("etimsNumber", transactionAssistantData.getEtims().getBusinessOwnerKRAPin());

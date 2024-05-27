@@ -1,4 +1,4 @@
-package com.emtech.ushurusmart.Etims.controller;
+package com.emtech.ushurusmart.etims.controller;
 
 import com.emtech.ushurusmart.etims.Dtos.controller.TransactionDto;
 import com.emtech.ushurusmart.etims.entity.Etims;
