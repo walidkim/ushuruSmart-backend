@@ -27,11 +27,12 @@ public class Etims {
     private String businessName;
 
     @OneToMany(cascade = CascadeType.ALL)
-    private List<Transaction> transactions = new ArrayList<>();
+    private List<com.emtech.ushurusmart.etims.entity.Transaction> transactions;
 
     public Etims(String businessKRAPin, String businessOwnerKRAPin, String name) {
         this.businessKRAPin = businessKRAPin;
         this.businessOwnerKRAPin = businessOwnerKRAPin;
         this.name = name;
+        transactions = new ArrayList<>();
     }
 }

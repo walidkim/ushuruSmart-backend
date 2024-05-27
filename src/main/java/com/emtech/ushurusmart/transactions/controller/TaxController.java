@@ -6,6 +6,7 @@ import com.emtech.ushurusmart.etims_middleware.TransactionMiddleware;
 import com.emtech.ushurusmart.transactions.Dto.*;
 import com.emtech.ushurusmart.transactions.entity.Product;
 import com.emtech.ushurusmart.transactions.service.InvoiceService;
+import com.emtech.ushurusmart.transactions.service.JasperPDFService;
 import com.emtech.ushurusmart.transactions.service.ProductService;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
 import com.emtech.ushurusmart.usermanagement.service.AssistantService;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -50,12 +52,44 @@ public class TaxController  extends LoggerSingleton {
     @Autowired
     private ProductService productService;
 
-//    @Autowired
-//    private JasperPDFService jasperPDFService;
+    @Autowired
+    private JasperPDFService jasperPDFService;
+
+    @PostMapping("/make-jasperPdf-transaction")
+    public ResponseEntity<?> makeJasperTransaction(@RequestBody TransactionRequest request, HttpServletResponse responses) throws IOException, JRException, SQLException {
+        String email = AuthUtils.getCurrentlyLoggedInPerson();
+        Owner owner = ownerService.findByEmail(email);
+        if (owner == null){
+            owner = assistantService.findByEmail(email).getOwner();
+        }
+        EtimsTransactionDto etimsTransactionDto = generateEtimsRequest(request, owner);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonString = objectMapper.writeValueAsString(etimsTransactionDto);
+
+        ResponseEntity<?> response = transactionMiddleware.makeTransaction(jsonString);
+        logger.info(response.toString());
+
+        if (response.getStatusCode().value() == HttpStatus.CREATED.value()) {
+            System.out.println(response);
+            EtimsResponses.TransactionResponse transactionResponse = EtimsResponses.parseMakeTransactionResponse(Objects.requireNonNull(response.getBody()).toString());
+            byte[] reportArrayOutputStream = jasperPDFService.exportJasperReport(transactionResponse.getData(), request).toByteArray();
+            HttpHeaders header = new HttpHeaders();
+            header.setContentType(MediaType.APPLICATION_PDF);
+            header.setContentDispositionFormData("attachment", "receipt.pdf");
+            HttpHeaders responseHeaders = new HttpHeaders();
+            responseHeaders.setContentType(MediaType.APPLICATION_PDF);
+            responseHeaders.setContentLength(reportArrayOutputStream.length);
+            responseHeaders.setContentDispositionFormData("attachment", "receipt.pdf");
+            return new ResponseEntity<>(reportArrayOutputStream, responseHeaders, HttpStatus.CREATED);
+        }
+        else {
+            return response;
+        }
+    }
 
 
     @PostMapping("/make-transaction")
-    public ResponseEntity<?> makeTransaction(@RequestBody TransactionRequest request, HttpServletResponse responses) throws IOException, JRException {
+    public ResponseEntity<?> makeTransaction(@RequestBody TransactionRequest request, HttpServletResponse responses) throws IOException {
 
         String email= AuthUtils.getCurrentlyLoggedInPerson();
         Owner owner= ownerService.findByEmail(email);
@@ -83,9 +117,6 @@ public class TaxController  extends LoggerSingleton {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
             headers.setContentDispositionFormData("attachment", "invoice.pdf");
-
-            //jasperPDFService.exportJasperReport(request, transactionResponse.getData());
-
             HttpHeaders responseHeaders = new HttpHeaders();
             responseHeaders.setContentType(MediaType.APPLICATION_PDF);
             responseHeaders.setContentLength(reportArrayOutputStream.length);
@@ -94,39 +125,44 @@ public class TaxController  extends LoggerSingleton {
 
         }
         else{
-          return response;
+            return response;
         }
-
-
-//        if(response.getStatusCode()==HttpStatus.NOT_FOUND){
-//            return response;
-//        }
-//        TransactionData parsed= new TransactionData(Objects.requireNonNull(response.getBody()).getData().toString());
-//
-//
-//
-
-//        TransactionResponse transactionResponse = objectMapper.readValue(response.getBody().toString(), TransactionResponse.class);
-//        System.out.println(transactionResponse.toString());
-//
-//
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.setContentType(MediaType.APPLICATION_PDF);
-//        headers.setContentDispositionFormData("attachment", "invoice.pdf");
-//        System.out.println("Generated PDF");
-//
-//        ByteArrayOutputStream reportArrayOutputStream = jasperPDFService.exportJasperReport(responses, request.getBuyerKRAPin(), reportProducts, null);
-//        System.out.println("Generated output Stream");
-//        byte[] reportBytes = reportArrayOutputStream.toByteArray();
-//        reportArrayOutputStream.close();
-//
-//        HttpHeaders responseHeaders = new HttpHeaders();
-//        responseHeaders.setContentType(MediaType.APPLICATION_PDF);
-//        responseHeaders.setContentLength(reportBytes.length);
-//        responseHeaders.setContentDispositionFormData("attachment", "receipt.pdf");
-
-
     }
+
+    @PostMapping("/assistant-make-transaction")
+    public ResponseEntity<?> assistantMakeTransaction(@RequestBody TransactionRequest request, HttpServletResponse responses) throws IOException, JRException, SQLException {
+        String email = AuthUtils.getCurrentlyLoggedInPerson();
+        Owner assistant = assistantService.findByEmail(email).getOwner();
+
+        EtimsTransactionDto etimsTransactionDto = generateEtimsRequest(request, assistant);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonString = objectMapper.writeValueAsString(etimsTransactionDto);
+
+        ResponseEntity<?> response = transactionMiddleware.makeTransaction(jsonString);
+        logger.info(response.toString());
+
+        if (response.getStatusCode().value() == HttpStatus.CREATED.value()) {
+            System.out.println(response);
+            EtimsResponses.TransactionResponse transactionResponse = EtimsResponses.parseMakeTransactionResponse(Objects.requireNonNull(response.getBody()).toString());
+            byte[] reportArrayOutputStream = jasperPDFService.assistantGenerateReport(transactionResponse.getData(), request).toByteArray();
+
+            HttpHeaders header = new HttpHeaders();
+            header.setContentType(MediaType.APPLICATION_PDF);
+            header.setContentDispositionFormData("attachment", "Assistant-receipt.pdf");
+
+            HttpHeaders responseHeaders = new HttpHeaders();
+            responseHeaders.setContentType(MediaType.APPLICATION_PDF);
+            responseHeaders.setContentLength(reportArrayOutputStream.length);
+            responseHeaders.setContentDispositionFormData("attachment", "Assistant-receipt.pdf");
+
+            return new ResponseEntity<>(reportArrayOutputStream, responseHeaders, HttpStatus.CREATED);
+
+        } else {
+            return response;
+        }
+    }
+
+
 
     @NotNull
     private EtimsTransactionDto generateEtimsRequest(TransactionRequest request, Owner owner) {
@@ -149,7 +185,5 @@ public class TaxController  extends LoggerSingleton {
         etimReq.setSales(etimsSales);
         return etimReq;
     }
-
-
 
 }

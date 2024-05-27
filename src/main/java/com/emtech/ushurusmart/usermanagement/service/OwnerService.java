@@ -25,6 +25,7 @@ import com.emtech.ushurusmart.usermanagement.controller.HelperUtil;
 import com.emtech.ushurusmart.usermanagement.factory.EntityFactory;
 import com.emtech.ushurusmart.usermanagement.factory.ResponseFactory;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
+import com.emtech.ushurusmart.usermanagement.repository.AssistantRepository;
 import com.emtech.ushurusmart.usermanagement.repository.OwnerRepository;
 import com.emtech.ushurusmart.utils.controller.ResContructor;
 import com.emtech.ushurusmart.utils.otp.OTPService;
@@ -36,6 +37,9 @@ public class OwnerService extends LoggerSingleton {
 
     @Autowired
     private EtimsMiddleware etimsMiddleware;
+
+    @Autowired
+    private AssistantRepository userRepository;
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -115,4 +119,10 @@ public class OwnerService extends LoggerSingleton {
 
         return null;
     }
+
+    public int countLoggedInAssistants() {
+        // Assistant Repository has a method to find logged-in users
+        return userRepository.countByLoggedInStatus(true);
+    }
+
 }

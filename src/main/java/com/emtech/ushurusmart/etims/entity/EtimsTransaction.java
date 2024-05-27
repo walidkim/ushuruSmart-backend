@@ -1,3 +1,4 @@
+package com.emtech.ushurusmart.etims.entity;
 //package com.emtech.ushurusmart.Etims.entity;
 //
 //import java.io.Serializable;

@@ -5,11 +5,13 @@ import com.emtech.ushurusmart.etims.entity.Etims;
 import com.emtech.ushurusmart.etims.entity.Transaction;
 import com.emtech.ushurusmart.etims.service.EtimsOwnerService;
 import com.emtech.ushurusmart.etims.service.TransactionService;
+import com.emtech.ushurusmart.transactions.Dto.EtimsResponses;
 import com.emtech.ushurusmart.utils.controller.ResContructor;
 import com.emtech.ushurusmart.utils.controller.Responses;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -51,20 +53,28 @@ public class TransactionController {
         }
     }
 
-    @GetMapping("/generate-TransactionXLS-report")
-    public void generateExcelReport(HttpServletResponse response) throws IOException {
-
-        response.setContentType("application/octet-stream");
-
-        String headerKey = "Content-Disposition";
-        String headerValue = "attachment; filename = transactionReport.xls";
-        response.setHeader(headerKey, headerValue);
-        transactionService.generateExcel(response);
+    @GetMapping("/generate-excel-monthly-transactions")
+    public ResponseEntity<byte[]> downloadExcelReport(HttpServletResponse response) throws IOException {
+        byte[] excelData = transactionService.generateExcel();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=transaction_report.xlsx");
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(excelData);
+    }
+    @GetMapping("/transactions/count")
+    public Long getTransactionCount() {
+        return transactionService.getTransactionCount();
     }
 
-    @GetMapping("transaction-amount-history")
+    @GetMapping("get-total-amount-transacted")
     public ResponseEntity<Double> getTransactionAmountTotal() {
         Double total = transactionService.getTransactionHistory();
+        return ResponseEntity.ok(total);
+    }
+    @GetMapping("get-total-tax-transacted")
+    public ResponseEntity<Double> getTransactionTaxTotal() {
+        Double total = transactionService.getTaxHistory();
         return ResponseEntity.ok(total);
     }
 
@@ -79,11 +89,17 @@ public class TransactionController {
         return transactionService.getTransactionsDaily(date);
     }
 
-    @GetMapping("/monthly")
+    @GetMapping("/get-monthly-transaction-by-date")
     public List<Transaction> getTransactionsMonthly(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         return transactionService.getTransactionsMonthly(startDate, endDate);
+    }
+
+    @GetMapping("/get-current-day-transaction-sum")
+    public ResponseEntity<Double> getCurrentDayTransactionSum() {
+        Double transactionSum = transactionService.getCurrentDayTransactionSum();
+        return ResponseEntity.ok(transactionSum);
     }
 
 }

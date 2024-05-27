@@ -10,6 +10,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -44,4 +45,11 @@ public class Product implements Serializable {
     @ManyToOne(fetch = FetchType.EAGER)
     @JsonBackReference
     private Owner owner;
+
+    @UpdateTimestamp
+    private LocalDate saleDate;
+
+    public double getPrice() {
+        return 0;
+    }
 }

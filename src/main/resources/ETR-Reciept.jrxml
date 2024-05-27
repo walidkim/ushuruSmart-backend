@@ -5,18 +5,21 @@
 	<subDataset name="InvoiceDataset" uuid="e1702635-5fa1-43ab-8298-ebd40eaeb889"/>
 	<parameter name="buyerKRAPin" class="java.lang.String"/>
 	<parameter name="invoiceDataset" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
-	<parameter name="ownerPin" class="java.lang.String"/>
 	<parameter name="etimsNumber" class="java.lang.String"/>
 	<parameter name="invoiceNumber" class="java.lang.String"/>
-	<parameter name="name" class="java.lang.String"/>
-	<parameter name="unitPrice" class="java.lang.Double"/>
-	<parameter name="unitOfMeasure" class="java.lang.String"/>
-	<parameter name="quantity" class="java.lang.Integer"/>
-	<parameter name="taxable" class="java.lang.String"/>
-	<parameter name="currency" class="java.lang.String"/>
-	<parameter name="tax" class="java.lang.Double"/>
 	<parameter name="counter" class="java.lang.Integer"/>
+	<parameter name="tax" class="java.lang.Double"/>
+	<parameter name="currency" class="java.lang.String"/>
+	<parameter name="taxable" class="java.lang.String"/>
 	<parameter name="amount" class="java.lang.Double"/>
+	<parameter name="quantity" class="java.lang.Integer"/>
+	<parameter name="unitOfMeasure" class="java.lang.String"/>
+	<parameter name="unitPrice" class="java.lang.Double"/>
+	<parameter name="name" class="java.lang.String"/>
+	<parameter name="branch" class="java.lang.String"/>
+	<parameter name="businessPin" class="java.lang.String"/>
+	<parameter name="assistantName" class="java.lang.String"/>
+	<parameter name="ownerPin" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[]]>
 	</queryString>
@@ -87,16 +90,9 @@
 		</band>
 	</pageHeader>
 	<detail>
-		<band height="395" splitType="Stretch">
+		<band height="394" splitType="Stretch">
 			<frame>
 				<reportElement mode="Opaque" x="0" y="240" width="555" height="150" backcolor="#FAFEFF" uuid="c462f7d8-52bb-4646-9bcf-a9438482289a"/>
-				<textField>
-					<reportElement x="0" y="0" width="555" height="50" uuid="1ef24c6f-fb3a-489f-aad1-9b7d2bcbe7d7"/>
-					<textElement textAlignment="Left" verticalAlignment="Middle">
-						<font size="14" isBold="true"/>
-					</textElement>
-					<textFieldExpression><![CDATA["Owner KRA PIN: "+ " " + $P{ownerPin}]]></textFieldExpression>
-				</textField>
 				<textField>
 					<reportElement x="0" y="52" width="555" height="48" uuid="1a17c393-038a-4431-a56e-283dd59facef"/>
 					<textElement textAlignment="Left" verticalAlignment="Middle">
@@ -110,6 +106,13 @@
 						<font size="14" isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA["Invoice Number: "+ " "+ $P{invoiceNumber}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="0" width="555" height="50" uuid="df5bc2ce-4922-4b67-97fb-3b428886cc07"/>
+					<textElement>
+						<font size="14" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Business KRA PIN: " +" "+ $P{businessPin}]]></textFieldExpression>
 				</textField>
 			</frame>
 			<frame>
@@ -143,7 +146,7 @@
 					<text><![CDATA[Quantity]]></text>
 				</staticText>
 				<staticText>
-					<reportElement mode="Opaque" x="383" y="120" width="87" height="30" backcolor="#BAD8DB" uuid="58c7be0f-2c73-4e54-9f47-dcdfad062c3a"/>
+					<reportElement mode="Opaque" x="382" y="120" width="88" height="30" backcolor="#BAD8DB" uuid="58c7be0f-2c73-4e54-9f47-dcdfad062c3a"/>
 					<textElement>
 						<font isBold="true"/>
 					</textElement>
@@ -201,7 +204,7 @@
 					</reportElement>
 				</line>
 				<textField>
-					<reportElement x="471" y="120" width="81" height="30" uuid="cd46e009-a16a-46c2-81ea-d297c79fac02"/>
+					<reportElement x="471" y="120" width="80" height="30" uuid="cd46e009-a16a-46c2-81ea-d297c79fac02"/>
 					<textFieldExpression><![CDATA[$P{currency}+" "+(($P{unitPrice}*$P{quantity})+$P{tax})]]></textFieldExpression>
 				</textField>
 				<textField>
@@ -233,7 +236,7 @@
 					<textFieldExpression><![CDATA[$P{currency}+" "+$P{tax}]]></textFieldExpression>
 				</textField>
 				<line>
-					<reportElement x="385" y="120" width="167" height="1" uuid="0066de67-3cfa-49d1-ae57-60e9e9185706">
+					<reportElement x="382" y="120" width="171" height="1" uuid="0066de67-3cfa-49d1-ae57-60e9e9185706">
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>
 				</line>
@@ -243,35 +246,34 @@
 					</reportElement>
 				</line>
 				<staticText>
-					<reportElement mode="Opaque" x="382" y="160" width="88" height="30" backcolor="#2287BD" uuid="8e5fe0b7-a1f6-4564-9791-0a74c7985461"/>
+					<reportElement mode="Opaque" x="383" y="160" width="86" height="30" backcolor="#79DBAF" uuid="a5a54511-c2a7-4b6c-8242-36c83d891e08"/>
 					<textElement>
 						<font size="12" isBold="true"/>
 					</textElement>
 					<text><![CDATA[Total Paid]]></text>
 				</staticText>
 				<textField>
-					<reportElement x="470" y="160" width="82" height="30" uuid="4493319c-21c8-4890-84fd-3afac13f3249"/>
+					<reportElement x="470" y="160" width="82" height="30" uuid="2a524f2e-4489-4abd-9c70-70566ba5d09d"/>
 					<textFieldExpression><![CDATA[$P{amount}]]></textFieldExpression>
 				</textField>
 				<line>
-					<reportElement x="383" y="160" width="169" height="1" uuid="4f476d63-3d1c-4aeb-a59e-8bca39992935">
-						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<reportElement x="383" y="160" width="167" height="1" uuid="dcc8190a-8f17-4bcf-8212-6a6d0f237510">
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>
 				</line>
 				<staticText>
-					<reportElement mode="Opaque" x="383" y="200" width="87" height="30" backcolor="#BAD8DB" uuid="9c52cb05-e6d7-4f5b-a695-53440732e8bb"/>
+					<reportElement mode="Opaque" x="382" y="200" width="88" height="30" backcolor="#BAD8DB" uuid="db089779-6900-4455-9914-04d856d12ffe"/>
 					<textElement>
 						<font size="12" isBold="true"/>
 					</textElement>
 					<text><![CDATA[Balance]]></text>
 				</staticText>
 				<textField>
-					<reportElement x="470" y="200" width="82" height="30" uuid="d648c224-21b0-4270-9f35-5dc2f6ea4dc5"/>
+					<reportElement x="471" y="200" width="80" height="30" uuid="f8509189-8b6c-42d9-b826-acfe1046c24b"/>
 					<textFieldExpression><![CDATA[($P{currency}+($P{amount}-(($P{unitPrice}*$P{quantity})+$P{tax})))]]></textFieldExpression>
 				</textField>
 				<line>
-					<reportElement x="382" y="198" width="170" height="1" uuid="6e84b90d-51ae-4dac-9336-8ce30e8531c4">
+					<reportElement x="382" y="200" width="169" height="1" uuid="758c6aea-0354-4c14-938a-0f57221731dd">
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>
 				</line>
@@ -281,7 +283,7 @@
 	<pageFooter>
 		<band height="58" splitType="Stretch">
 			<frame>
-				<reportElement x="0" y="0" width="555" height="50" uuid="37928d4f-e918-46b7-8436-19e54329949c"/>
+				<reportElement x="0" y="0" width="555" height="58" uuid="37928d4f-e918-46b7-8436-19e54329949c"/>
 				<textField>
 					<reportElement x="200" y="20" width="100" height="30" uuid="98fc4193-7bcb-4745-8589-e81e7078758b"/>
 					<textElement textAlignment="Right"/>

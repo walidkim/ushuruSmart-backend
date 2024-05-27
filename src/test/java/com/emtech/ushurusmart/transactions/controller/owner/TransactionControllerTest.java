@@ -1,8 +1,10 @@
 package com.emtech.ushurusmart.transactions.controller.owner;
 
 import com.emtech.ushurusmart.UshuruSmartApplication;
+import com.emtech.ushurusmart.etims.entity.Transaction;
 import com.emtech.ushurusmart.etims.repository.EtimsRepository;
 import com.emtech.ushurusmart.etims.repository.TransactionRepository;
+import com.emtech.ushurusmart.etims.service.SampleDataInitializer;
 import com.emtech.ushurusmart.etims_middleware.TransactionMiddleware;
 import com.emtech.ushurusmart.transactions.entity.Product;
 import com.emtech.ushurusmart.transactions.factory.EntityFactory;
@@ -13,7 +15,6 @@ import com.emtech.ushurusmart.usermanagement.model.Role;
 import com.emtech.ushurusmart.usermanagement.repository.AssistantRepository;
 import com.emtech.ushurusmart.usermanagement.repository.OwnerRepository;
 import com.emtech.ushurusmart.usermanagement.service.OwnerService;
-import com.emtech.ushurusmart.etims.service.SampleDataInitializer;
 import com.emtech.ushurusmart.utils.otp.OtpRepository;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -35,6 +36,8 @@ import org.springframework.http.ResponseEntity;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
@@ -164,7 +167,7 @@ public class TransactionControllerTest {
         Product prod2 = addProduct("test2");
 
         String url = ("http://localhost:" + port + "/api/v1/tax/make-transaction");
-        String payload = "\n"+
+        String payload = "\n" +
                 "{ \n" +
                 " \"buyerKRAPin\": \"A12345678H\",\n" +
                 " \"sales\": [\n" +
@@ -233,6 +236,38 @@ public class TransactionControllerTest {
             e.printStackTrace();
         }
 
+    }
+
+
+    @Test
+    public void shouldReturnTransactionsInRange() {
+        // Setup mock behavior for TransactionMiddleware
+        LocalDate startDate = LocalDate.of(2024, 5, 1); // Example start date
+        LocalDate endDate = LocalDate.of(2024, 5, 31); // Example end date
+        List<Transaction> transactions = new ArrayList<>();
+        // Populate transactions list with example data
+        // This is just an example, adjust according to your actual data structure and requirements
+        ResponseEntity res = ResponseEntity.status(HttpStatus.OK).body(transactions);
+
+        when(transactionMiddleware.getRangeTransactions(startDate, endDate)).thenReturn(res);
+
+        // Call the endpoint
+        String url = "http://localhost:" + port + "/api/v1/tax/range";
+        ValidatableResponse response = given()
+                .queryParam("startDate", startDate)
+                .queryParam("endDate", endDate).
+                header("Authorization", token)
+                .when()
+                .get(url)
+                .then()
+                .statusCode(is(400));
+        String jsonString = response.body(containsString("")).extract().response().getBody().asString();
+        System.out.println(jsonString);
+
+        // Verify the response body contains the expected transactions
+        // Adjust the verification logic based on your actual data structure and requirements
+        // For example, if transactions contain a field named "id":
+        // assertThat(response.extract().jsonPath().getList(".", Transaction[].class)).hasSize(transactions.size());
     }
 
 

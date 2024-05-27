@@ -5,12 +5,15 @@ import com.emtech.ushurusmart.usermanagement.Dtos.LoginRequest;
 import com.emtech.ushurusmart.usermanagement.Dtos.OwnerDto;
 import com.emtech.ushurusmart.usermanagement.Dtos.auth.OtpDataDto;
 import com.emtech.ushurusmart.usermanagement.Dtos.controller.RequestDtos;
+import com.emtech.ushurusmart.usermanagement.Dtos.controller.ResetPasswordRequest;
 import com.emtech.ushurusmart.usermanagement.factory.ResponseFactory;
 import com.emtech.ushurusmart.usermanagement.model.Assistant;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
 import com.emtech.ushurusmart.usermanagement.service.AssistantService;
 import com.emtech.ushurusmart.usermanagement.service.OwnerService;
 import com.emtech.ushurusmart.usermanagement.service.jwtServices.JwtTokenUtil;
+import com.emtech.ushurusmart.usermanagement.service.resetpassword.ResetPasswordService;
+import com.emtech.ushurusmart.utils.AuthUtils;
 import com.emtech.ushurusmart.utils.controller.ResContructor;
 import com.emtech.ushurusmart.utils.controller.Responses;
 import com.emtech.ushurusmart.utils.otp.OTPService;
@@ -20,6 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -49,6 +54,9 @@ public class AuthController {
     private Responses responses;
     @Autowired
     private JwtTokenUtil jwtUtil;
+
+    @Autowired
+    private ResetPasswordService resetPasswordService;
 
     @PostMapping(value = "/sign-up")
     public ResponseEntity<?> signUp(@RequestParam(name = "type", required = true) String type, @Valid
@@ -141,8 +149,7 @@ public class AuthController {
                     }
 
 
-                    String token = "weresdfd";
-                    //jwtUtil.createToken(assistant);
+                    String token = jwtUtil.createToken(assistant);
                     Map<String, Object> responseData = new HashMap<>();
                     RequestDtos.UserResponse resData = ResponseFactory.createAssistantResponse(assistant);
                     responseData.put("user", resData);
@@ -167,5 +174,6 @@ public class AuthController {
             return responses.create500Response(e);
         }
     }
+
 
 }

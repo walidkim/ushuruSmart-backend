@@ -1,12 +1,15 @@
 package com.emtech.ushurusmart.usermanagement.controller;
 
 
+import com.emtech.ushurusmart.usermanagement.Dtos.controller.ResetPasswordRequest;
 import com.emtech.ushurusmart.usermanagement.Dtos.entity.AssistantDto;
+import com.emtech.ushurusmart.usermanagement.TrackingEntity.LoginLogoutListener;
 import com.emtech.ushurusmart.usermanagement.factory.EntityFactory;
 import com.emtech.ushurusmart.usermanagement.model.Assistant;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
 import com.emtech.ushurusmart.usermanagement.service.AssistantService;
 import com.emtech.ushurusmart.usermanagement.service.OwnerService;
+import com.emtech.ushurusmart.usermanagement.service.resetpassword.ResetPasswordService;
 import com.emtech.ushurusmart.usermanagement.utils.AuthUtils;
 import com.emtech.ushurusmart.utils.EmailService;
 import com.emtech.ushurusmart.utils.controller.ResContructor;
@@ -15,6 +18,8 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
@@ -33,8 +38,15 @@ public class OwnerActionsController {
     private AssistantService assistantService;
 
 
+
     @Autowired
     private Responses responses;
+    @Autowired
+
+    private ResetPasswordService resetPasswordService;
+
+    private LoginLogoutListener loginLogoutListener;
+
 
     @PostMapping(value = "/update-details")
     public ResponseEntity<?> updatedDetails(@RequestBody Owner newOwner) {
@@ -72,6 +84,20 @@ public class OwnerActionsController {
             return ResponseEntity.status(HttpStatus.CREATED).body(res);
         }catch ( Exception e){
            return responses.create500Response(e);
+        }
+    }
+
+    @GetMapping(value = "/assistant-count")
+    public ResponseEntity<?> assistantsCount() {
+        ResContructor res = new ResContructor();
+        try {
+            String ownerEmail= AuthUtils.getCurrentlyLoggedInPerson();
+            Owner owner = ownerService.findByEmail(ownerEmail);
+            res.setMessage("Assistant count fetched successfully!");
+            res.setData(owner.getAssistants().size());
+            return ResponseEntity.status(HttpStatus.OK).body(res);
+        }catch ( Exception e){
+            return responses.create500Response(e);
         }
     }
 
@@ -118,7 +144,9 @@ public class OwnerActionsController {
     }
     @GetMapping(value = "/assistants")
     public ResponseEntity<?> getAllAssistants() {
-        String ownerEmail = AuthUtils.getCurrentlyLoggedInPerson();
+        String ownerEmail = AuthUtils.getCurrentlyLoggedInPerson(
+
+        );
         Owner owner = ownerService.findByEmail(ownerEmail);
         ResContructor res = new ResContructor();
         res.setData(owner.getAssistants());
@@ -126,4 +154,34 @@ public class OwnerActionsController {
 
 
     }
+
+    @Autowired
+    public OwnerActionsController(LoginLogoutListener loginLogoutListener) {
+        this.loginLogoutListener = loginLogoutListener;
+    }
+
+
+
+    @GetMapping("/owner/assistants")
+   public ResponseEntity<Integer> getLoggedInAssistantsCount() {
+       int count = loginLogoutListener.getLoggedInAssistantsCount();
+       return ResponseEntity.ok(count);
+   }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetOwnerPassword(@RequestBody ResetPasswordRequest resetPasswordRequest) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email = userDetails.getUsername();
+
+        resetPasswordService.changePassword(email, resetPasswordRequest, "Owner");
+
+        return ResponseEntity.status(HttpStatus.OK).body("Password successfully changed for owner.");
+    }
+
+
+
 }
+
+
+
+

@@ -12,4 +12,6 @@ public class TaxCalculator implements TaxCalculatortInt {
     private double getTaxPercentage(boolean isTaxable) {
         return isTaxable? 0.16 : 0.0;
     }
+
+
 }

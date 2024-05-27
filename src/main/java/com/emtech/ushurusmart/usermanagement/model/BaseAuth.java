@@ -27,7 +27,9 @@ public abstract class BaseAuth implements UserDetails {
     @Column(nullable = false, unique = true)
     private String email;
 
-
+    @Column(nullable = false)
     private Role role;
+    @Column(nullable = false, unique = true)
+    private String phoneNumber;
 
 }

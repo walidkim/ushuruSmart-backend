@@ -20,11 +20,7 @@ import java.util.Collection;
 @Table(name = "assistants")
 
 public class Assistant extends BaseAuth implements Serializable {
-        private String phoneNumber;
-
         private String branch;
-
-        private boolean verified;
         @ManyToOne(fetch = FetchType.EAGER)
         @JoinColumn( nullable = false)
         @JsonBackReference
@@ -59,4 +55,6 @@ public class Assistant extends BaseAuth implements Serializable {
         public boolean isEnabled() {
                 return true;
         }
+
+        private boolean loggedInStatus;
 }

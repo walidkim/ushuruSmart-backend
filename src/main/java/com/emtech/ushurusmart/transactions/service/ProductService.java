@@ -29,7 +29,7 @@ public class ProductService {
     }
 
     public void delete(long id) {
-          productsRepository.deleteById(id);
+        productsRepository.deleteById(id);
     }
 
     public List<Product> findAllByOwnerId(long id) {
@@ -38,5 +38,9 @@ public class ProductService {
 
     public Product findById(long productId) {
         return productsRepository.findById(productId).orElse(null);
+    }
+
+    public Product findByName(String name) {
+        return productsRepository.findByName(name);
     }
 }
