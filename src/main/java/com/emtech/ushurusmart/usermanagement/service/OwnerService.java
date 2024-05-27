@@ -1,5 +1,20 @@
 package com.emtech.ushurusmart.usermanagement.service;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
 import com.emtech.ushurusmart.config.LoggerSingleton;
 import com.emtech.ushurusmart.etims_middleware.EtimsMiddleware;
 import com.emtech.ushurusmart.usermanagement.Dtos.LoginRequest;
@@ -14,30 +29,14 @@ import com.emtech.ushurusmart.usermanagement.repository.AssistantRepository;
 import com.emtech.ushurusmart.usermanagement.repository.OwnerRepository;
 import com.emtech.ushurusmart.utils.controller.ResContructor;
 import com.emtech.ushurusmart.utils.otp.OTPService;
-import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 @Service
 public class OwnerService extends LoggerSingleton {
     @Autowired
     private OwnerRepository ownerRepository;
 
-
     @Autowired
     private EtimsMiddleware etimsMiddleware;
-
 
     @Autowired
     private AssistantRepository userRepository;
@@ -45,10 +44,8 @@ public class OwnerService extends LoggerSingleton {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-
     @Autowired
     private PasswordEncoder passwordEncoder;
-
 
     @Autowired
     private OTPService otpService;
@@ -61,7 +58,6 @@ public class OwnerService extends LoggerSingleton {
         owner.setPassword(passwordEncoder.encode(owner.getPassword()));
         return ownerRepository.save(owner);
     }
-
 
     public ResponseEntity<ResContructor> validateAndCreateOwner(String type, OwnerDto data, ResContructor res) {
         if (findByEmail(data.getEmail()) != null) {
@@ -80,13 +76,14 @@ public class OwnerService extends LoggerSingleton {
             return ResponseEntity.status(HttpStatus.CREATED).body(res);
         } else {
 
-            res.setMessage(HelperUtil.capitalizeFirst(type) + " can not be onboarded. Business is not registered by KRA!");
+            res.setMessage(
+                    HelperUtil.capitalizeFirst(type) + " can not be onboarded. Business is not registered by KRA!");
             return ResponseEntity.status(HttpStatus.UNAVAILABLE_FOR_LEGAL_REASONS).body(res);
         }
     }
 
-
-    public ResponseEntity<ResContructor> loginOwner(@NotNull String type, LoginRequest loginReq, ResContructor res) throws Exception {
+    public ResponseEntity<ResContructor> loginOwner(@NotNull String type, LoginRequest loginReq, ResContructor res)
+            throws Exception {
         try {
             Owner owner = findByEmail(loginReq.getEmail());
             if (owner == null) {
@@ -95,8 +92,9 @@ public class OwnerService extends LoggerSingleton {
 
             Authentication authentication = authenticationManager
                     .authenticate(new UsernamePasswordAuthenticationToken(loginReq.getEmail(),
-                            loginReq.getPassword(), owner.getAuthorities() != null ? owner.getAuthorities() : Collections.emptyList()));
-            otpService.sendOTP(owner.getPhoneNumber());
+                            loginReq.getPassword(),
+                            owner.getAuthorities() != null ? owner.getAuthorities() : Collections.emptyList()));
+            otpService.sendOTP(owner.getPhoneNumber(), owner.getName(), owner.getEmail());
             res.setMessage("A short code has been sent to your phone for verification");
             Map<String, String> resBody = new HashMap<>();
             resBody.put("type", type);
@@ -116,7 +114,6 @@ public class OwnerService extends LoggerSingleton {
     public Owner findByPhoneNumber(String phoneNumber) {
         return ownerRepository.findByPhoneNumber(phoneNumber);
     }
-
 
     public ResponseEntity<ResContructor> changePassword(String type, PasswordChange request, ResContructor res) {
 
