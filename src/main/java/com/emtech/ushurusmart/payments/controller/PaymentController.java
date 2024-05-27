@@ -6,6 +6,9 @@ import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 
+import com.emtech.ushurusmart.payments.dtos.taxDue;
+import com.emtech.ushurusmart.payments.service.PaymentService;
+import com.emtech.ushurusmart.payments.service.TaxCalculationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,24 +32,39 @@ public class PaymentController {
     @Autowired
     private PaymentHistService paymentHistService;
 
+
     public PaymentController(PaymentImpl paymentImpl) {
         this.paymentImpl = paymentImpl;
 
     }
 
-    @PostMapping("/sendPush")
+    @PostMapping("/makePayment")
     public ResponseEntity<String> sendSTK(@RequestBody sendPushRequest request) {
         try {
-            return paymentImpl.sendSTK(request.getPhoneNo(), request.getAmount(), request.getEslipNo());
+            return paymentImpl.sendSTKPush(request.getPhoneNo(), request.getAmount(), request.getEslipNo());
         } catch (Exception e) {
             log.error("Error occured: " + e);
             return ResponseEntity.badRequest().body("Error occurred! Try later.");
         }
     }
 
+
     @PostMapping({"/callback"})
     public void callback(@RequestBody StkCallbackRequest stkCallbackRequest) throws Exception {
         paymentImpl.callback(stkCallbackRequest);
+    }
+
+    @GetMapping("/taxDue")
+    public String calculateTax(@ModelAttribute taxDue request) {
+        try {
+            LocalDate start = request.getStartDate();
+            LocalDate end = request.getEndDate();
+            return "This";
+
+        } catch (Exception e) {
+            return "Error: " + e.getMessage();
+        }
+
     }
 
     @GetMapping({"/payment-report"})

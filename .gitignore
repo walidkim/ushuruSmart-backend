@@ -50,3 +50,4 @@ application.properties
 .DS_Store
 # Ignore application.properties file
 
+src/main/resources/application.properties

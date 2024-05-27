@@ -22,18 +22,28 @@ public class Transaction {
 
     private LocalDate date;
 
-
     @Column(nullable = false)
     private String buyerPin;
     private String invoiceNumber;
 
     private double tax;
+    public Transaction(double tax) {
+        this.tax = tax;
+    }
+    public double getTax() {
+        return tax;
+    }
+
+    public void setTax(double tax) {
+        this.tax = tax;
+    }
     @CreationTimestamp
     private LocalDate dateCreated;
+    private LocalDateTime transactionDate;
 
     @OneToMany(fetch = FetchType.LAZY)
-    private List<Sale> sales;
+    private List<com.emtech.ushurusmart.etims.entity.Sale> sales;
 
     @ManyToOne
-    private Etims etims;
+    private com.emtech.ushurusmart.etims.entity.Etims etims;
 }
