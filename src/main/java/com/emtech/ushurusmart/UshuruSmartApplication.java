@@ -10,7 +10,6 @@ import org.springframework.context.ApplicationContext;
 public class  UshuruSmartApplication  extends LoggerSingleton {
 	public static  void main(String[] args) {
 		ApplicationContext context = SpringApplication.run(UshuruSmartApplication.class, args);
-
 		// Now context is properly initialized, and you can use it to retrieve beans
 		SampleDataInitializer sampleDataInitializer = context.getBean(SampleDataInitializer.class);
 		sampleDataInitializer.initSampleData();

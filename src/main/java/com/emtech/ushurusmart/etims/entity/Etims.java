@@ -18,11 +18,14 @@ public class Etims {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
+    @Column(unique = true)
     private String businessKRAPin;
 
     private String businessOwnerKRAPin;
     private String name;
 
+    @Column(unique = true)
     private String etimsCode;
     private String businessName;
 
