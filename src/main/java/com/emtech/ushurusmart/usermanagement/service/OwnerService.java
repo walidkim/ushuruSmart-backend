@@ -124,6 +124,8 @@ public class OwnerService extends LoggerSingleton {
         return null;
     }
 
+
+
  public int countLoggedInAssistants() {
         // Assistant Repository has a method to find logged-in users
          return userRepository.countByLoggedInStatus(true);
