@@ -149,5 +149,60 @@ public class JasperPDFService {
         exporter.exportReport();
         return byteArrayOutputStream;
     }
+    public ByteArrayOutputStream ownermakeGenerateReport(
+        EtimsResponses.TransactionResponse.TransactionData transactionAssistantData,
+            TransactionRequest assistantRequest) throws JRException, IOException, SQLException {
+        Map<String, Object> parameters = new HashMap<>();
+
+        List<EtimsResponses.TransactionResponse.Sale> etimsSales = transactionAssistantData.getSales();
+
+        for (TransactionProduct assistantSale : assistantRequest.getSales()) {
+            Product assistantProduct = productService.findById(assistantSale.getProductId());
+            EtimsResponses.TransactionResponse.Sale etimsAssistantSale = findSaleByName(etimsSales,
+                    assistantProduct.getName());
+            EtimsResponses.TransactionResponse.EtimsData assistantEtimsData = new EtimsData();
+
+            // String email = AuthUtils.getCurrentlyLoggedInPerson();
+            // Owner owner = ownerService.findByEmail(email);
+            // Assistant assistant = assistantService.findByEmail(email)
+;
+
+            parameters.put("buyerKRAPin", transactionAssistantData.getBuyerPin());
+            parameters.put("etimsNumber", transactionAssistantData.getEtims().getBusinessOwnerKRAPin());
+            // parameters.put("businessPin",
+            // transactionAssistantData.getEtims().getBusinessKRAPin());
+            parameters.put("invoiceNumber", transactionAssistantData.getEtims().getEtimsCode());
+            parameters.put("counter", COUNTER);
+            parameters.put("tax", etimsAssistantSale.getTax());
+            parameters.put("currency", CURRENCY);
+            parameters.put("taxable", etimsAssistantSale.isTaxable() ? "Taxable" : "Tax Exemptet");
+            parameters.put("amount", assistantRequest.getSalesAmount());
+            parameters.put("quantity", assistantSale.getQuantity());
+            parameters.put("unitOfMeasure", assistantProduct.getUnitOfMeasure());
+            parameters.put("unitPrice", assistantProduct.getUnitPrice());
+            parameters.put("name", etimsAssistantSale.getName());
+            // parameters.put("branch", assistant);
+            parameters.put("businessPin", assistantEtimsData.getBusinessKRAPin());
+            // parameters.put("assistantName", assistant.getBranch());
+            parameters.put("ownerPin", transactionAssistantData.getEtims().getBusinessOwnerKRAPin());
+        }
+
+        File reportFile = ResourceUtils.getFile("classpath:" + REPORT_TEMPLATE);
+        JasperReport jasperReport = JasperCompileManager.compileReport(reportFile.getAbsolutePath());
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource());
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        JRPdfExporter exporter = new JRPdfExporter();
+        SimplePdfExporterConfiguration configuration = new SimplePdfExporterConfiguration();
+        configuration.setMetadataAuthor("Assistant");
+        configuration.setMetadataCreator("Assistant");
+        configuration.setCompressed(true);
+        exporter.setConfiguration(configuration);
+        exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
+        exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(byteArrayOutputStream));
+        exporter.exportReport();
+        return byteArrayOutputStream;
+    }
+
 
 }

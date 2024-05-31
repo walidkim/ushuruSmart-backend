@@ -11,11 +11,11 @@ import com.emtech.ushurusmart.payments.entity.PaymentEntity;
 
 @Repository
 public interface PaymentRepository extends JpaRepository<PaymentEntity, Long> {
-    List<PaymentEntity> findByTransactionDateBetween(LocalDateTime startDate, LocalDateTime endDate);
+    List<PaymentEntity> findByTransactionDateBetween(LocalDate startDate, LocalDate endDate);
 
     PaymentEntity findByCheckoutRequestID(String checkoutRequestID);
 
-    List<PaymentEntity> findByTransactionDateBetween(LocalDate startDate, LocalDate endDate);
+    // List<PaymentEntity> findByTransactionDateBetween(LocalDate startDate, LocalDate endDate);
 
     List<com.emtech.ushurusmart.etims.entity.Transaction> findByDateTransactionBetween(LocalDate startDate, LocalDate endDate);
 }

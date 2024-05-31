@@ -60,9 +60,10 @@ public class PaymentController {
 
     @GetMapping({ "/payment-report" })
     public ResponseEntity<List<PaymentEntity>> getPaymentsBetweenDates(
-            @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDateTime startDate,
-            @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDateTime endDate) {
+            @RequestParam LocalDate startDate,
+            @RequestParam LocalDate endDate) {
         List<PaymentEntity> payment = this.paymentHistService.getPaymentsBetweenDates(startDate, endDate);
         return ResponseEntity.ok(payment);
     }
+
 }

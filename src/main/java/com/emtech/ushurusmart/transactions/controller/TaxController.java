@@ -72,7 +72,7 @@ public class TaxController  extends LoggerSingleton {
         if (response.getStatusCode().value() == HttpStatus.CREATED.value()) {
             System.out.println(response);
             EtimsResponses.TransactionResponse transactionResponse = EtimsResponses.parseMakeTransactionResponse(Objects.requireNonNull(response.getBody()).toString());
-            byte[] reportArrayOutputStream = jasperPDFService.exportJasperReport(transactionResponse.getData(), request).toByteArray();
+            byte[] reportArrayOutputStream = jasperPDFService.ownermakeGenerateReport(transactionResponse.getData(), request).toByteArray();
             HttpHeaders header = new HttpHeaders();
             header.setContentType(MediaType.APPLICATION_PDF);
             header.setContentDispositionFormData("attachment", "receipt.pdf");

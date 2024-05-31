@@ -27,9 +27,9 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     List<Transaction> findByTransactionDate(@Param("date") LocalDate date);
 
     @Query("SELECT t FROM Transaction t WHERE t.dateCreated BETWEEN CAST(:startDate AS TIMESTAMP) AND CAST(:endDate AS TIMESTAMP)")
-    List<Transaction> findByTransactionDateBetween(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+    List<Transaction> findByTransactionDateBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
-   List<Transaction> findByTransactionDateBetween(@Param("startDate") LocalDate startDate,@Param("endDate") LocalDate endDate);
+//    List<Transaction> findByTransactionDateBetween(@Param("startDate") LocalDate startDate,@Param("endDate") LocalDate endDate);
 
 
 //    @Query("SELECT t FROM Transaction t WHERE t.dateCreated BETWEEN :startDate AND :endDate")

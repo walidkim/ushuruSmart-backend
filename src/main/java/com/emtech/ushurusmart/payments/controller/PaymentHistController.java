@@ -13,8 +13,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 
-@RestController
-@RequestMapping("/Payment_History")
+@RestController@RequestMapping("/Payment_History")
 public class PaymentHistController {
     @Autowired
     private PaymentHistService paymentHistService;
@@ -22,9 +21,9 @@ public class PaymentHistController {
     public ResponseEntity<List<PaymentEntity>> getPaymentsBetweenDates(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-    LocalDateTime startDateTime = startDate.atStartOfDay();
-    LocalDateTime endDateTime = endDate.atStartOfDay().plusDays(1).minusNanos(1);
-        List<PaymentEntity> payment = paymentHistService.getPaymentsBetweenDates(startDateTime,endDateTime);
+    // LocalDateTime startDateTime = startDate.atStartOfDay();
+    // LocalDateTime endDateTime = endDate.atStartOfDay().plusDays(1).minusNanos(1);
+        List<PaymentEntity> payment = paymentHistService.getPaymentsBetweenDates(startDate,endDate);
         return ResponseEntity.ok(payment);
     }
     @ExceptionHandler(DateTimeParseException.class)
@@ -32,6 +31,7 @@ public class PaymentHistController {
     String message= "Incorrect date format.Enter (yy-mm-dd)";
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message) ;
     }
+
 }
 
 
