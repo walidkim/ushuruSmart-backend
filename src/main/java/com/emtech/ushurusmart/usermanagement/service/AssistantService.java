@@ -147,4 +147,15 @@ public class AssistantService {
     public Assistant findByPhoneNumber(String phoneNumber) {
         return assistantRepository.findByPhoneNumber(phoneNumber);
     }
+
+    public void saveAssistant(Assistant assistant) {
+    }
+
+    public Assistant getAssistantById(Long assistantId) {
+        return null;
+    }
+
+    public Object getAllAssistants() {
+        return null;
+    }
 }
