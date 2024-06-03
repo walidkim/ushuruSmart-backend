@@ -17,10 +17,7 @@ public class EtimsOwnerService {
 
     public Etims findByBusinessKRAPin(String businessKRAPin) {
         Optional<Etims> etims = etimsRepository.findByBusinessKRAPin(businessKRAPin);
-        if (etims.isPresent()) {
-            return etims.get();
-        } else
-            return null;
+        return etims.orElse(null);
     }
 
 

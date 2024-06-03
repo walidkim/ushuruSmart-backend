@@ -114,8 +114,8 @@ public class TransactionService {
 
     @Transactional
     public List<Transaction> getTransactionsMonthly(LocalDate startDate, LocalDate endDate) {
-        LocalDateTime startDateTime = startDate.atStartOfDay();
-        LocalDateTime endDateTime = endDate.plusDays(1).atStartOfDay();
+        // LocalDate startDate = startDate.atStartOfDay();
+        // LocalDate endDate = endDate.plusDays(1).atStartOfDay();
         return transactionRepository.findByTransactionDateBetween(startDate, endDate);
     }
 
