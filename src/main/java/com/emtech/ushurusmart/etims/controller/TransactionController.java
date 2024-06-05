@@ -69,7 +69,7 @@ public class TransactionController {
 
     @GetMapping("get-total-amount-transacted")
     public ResponseEntity<Double> getTransactionAmountTotal() {
-        Double total = transactionService.getTransactionHistory();
+        Double total = transactionService.getTransactionCurrentMonthHistory();
         return ResponseEntity.ok(total);
     }
     @GetMapping("get-total-tax-transacted")

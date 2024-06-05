@@ -12,10 +12,6 @@ import jakarta.transaction.Transactional;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -82,20 +78,30 @@ public class TransactionService {
         return transactionRepository.save(transaction);
     }
 
-    public Double getTransactionHistory() {
-        List<Transaction> transactions = transactionRepository.findAll();
+    public Double getTransactionCurrentMonthHistory(){
+        LocalDate currentDate = LocalDate.now();
+        LocalDate startOfMonth = currentDate.withDayOfMonth(1);
+        LocalDate endOfMonth = currentDate.plusMonths(1).withDayOfMonth(1).minusDays(1);
+
+        List<Transaction> transactions = transactionRepository.findByTransactionDateBetween(startOfMonth, endOfMonth);
         return transactions.stream()
                 .map(Transaction::getAmount)
                 .reduce(0.0, Double::sum);
     }
 
     public Double getTaxHistory() {
-        List<Transaction> transactions = transactionRepository.findAll();
-        double sum = transactions.stream()
+            LocalDate currentDate = LocalDate.now();
+            LocalDate startOfMonth = currentDate.withDayOfMonth(1);
+            LocalDate endOfMonth = currentDate.plusMonths(1).withDayOfMonth(1).minusDays(1);
+        
+            List<Transaction> transactions = transactionRepository.findByTransactionDateBetween(startOfMonth, endOfMonth);
+            double sum = transactions.stream()
                 .map(Transaction::getTax)
                 .reduce(0.0, Double::sum);
-        return Math.round(sum * 100.0) / 100.0;
-    }
+
+            return Math.round(sum * 100.0) / 100.0;
+        }
+
     public Long getTransactionCount() {
         List<Transaction> transactions = transactionRepository.findAll();
         return (long) transactions.size();
