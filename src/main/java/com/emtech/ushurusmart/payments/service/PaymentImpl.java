@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.emtech.ushurusmart.config.PaymentConfig;
 import com.emtech.ushurusmart.payments.Utils.HelperUtility;
 import com.emtech.ushurusmart.payments.dtos.AccessTokenResponse;
+import com.emtech.ushurusmart.payments.dtos.ApiResponse;
 import com.emtech.ushurusmart.payments.dtos.errorPushResponse;
 import com.emtech.ushurusmart.payments.dtos.okPushResponse;
 import com.emtech.ushurusmart.payments.dtos.callback.CallbackMetadata;
@@ -24,6 +25,7 @@ import com.emtech.ushurusmart.payments.repository.PaymentRepository;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
 import com.emtech.ushurusmart.usermanagement.repository.OwnerRepository;
 import com.emtech.ushurusmart.usermanagement.utils.AuthUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import okhttp3.MediaType;
@@ -38,7 +40,7 @@ public class PaymentImpl {
     private final OkHttpClient okHttpClient = new OkHttpClient();
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final PaymentRepository paymentRepo;
-
+    private ApiResponse apiResponse;
     private final PaymentConfig paymentConfig;
     @Autowired
     private OwnerRepository ownerRepository;
@@ -61,10 +63,11 @@ public class PaymentImpl {
             AccessTokenResponse accessTokenResponse = (AccessTokenResponse) this.objectMapper
                     .readValue(response.body().string(), AccessTokenResponse.class);
             return accessTokenResponse.getAccessToken();
-        } catch (Exception var5) {
-            log.error(String.format("Could not get access token. -> %s", var5.getLocalizedMessage()));
-            System.out.println("Could not get access token: " + String.valueOf(var5));
-            return null;
+        } catch (Exception e) {
+            log.error(String.format("Could not get access token. -> %s", e));
+            System.out.println("Could not get access token: " + String.valueOf(e));
+            apiResponse = new ApiResponse(false, "Please try Later!", null);
+            return apiResponse.toString();
         }
     }
 
@@ -73,20 +76,23 @@ public class PaymentImpl {
     private static final Pattern amountPattern = Pattern.compile("^[0-9]{1,6}$");
     private static final Pattern eslipPattern = Pattern.compile("^[0-9]{6}$");
 
-    public ResponseEntity<String> sendSTK(String phonenumber, String amount, String eslipNo) {
+    public ResponseEntity<String> sendSTKPush(String phonenumber, String amount, String eslipNo)
+            throws JsonProcessingException {
         try {
             String phoneNo = "254" + phonenumber.trim();
             String eslipNoTrimmed = eslipNo.trim();
             String amountTrimmed = amount.trim();
 
             if (!validateInput(phoneNo, amountTrimmed, eslipNoTrimmed)) {
-                return ResponseEntity.badRequest().body("Provide valid phone number and amount.");
+                apiResponse = new ApiResponse(false, "Provide valid phone number and amount.", null);
+                return ResponseEntity.badRequest().body(objectMapper.writeValueAsString(apiResponse));
             }
 
             int parsedAmount = Integer.parseInt(amountTrimmed);
             if (parsedAmount <= 0 || parsedAmount > 150000) {
-                return ResponseEntity.badRequest()
-                        .body("Invalid Phone Number or Amount, Amount should be less than KES150,000");
+                apiResponse = new ApiResponse(false,
+                        "Invalid Phone Number or Amount, Amount should be less than KES150,000", null);
+                return ResponseEntity.badRequest().body(objectMapper.writeValueAsString(apiResponse));
             }
 
             String authHeader = "Bearer " + getAccessToken();
@@ -105,23 +111,33 @@ public class PaymentImpl {
             try (Response response = client.newCall(request).execute()) {
                 String responseBody = response.body().string();
                 if (response.isSuccessful()) {
+
                     okPushResponse okPushResponse = objectMapper.readValue(responseBody, okPushResponse.class);
                     if ("0".equals(okPushResponse.getResponseCode())) {
                         PaymentEntity paymentEntity = initPayment(okPushResponse, parsedAmount, phoneNo,
                                 eslipNoTrimmed);
                         paymentRepo.save(paymentEntity);
-                        return ResponseEntity.ok().body("STK Push successful: " + okPushResponse.toString());
+                        apiResponse = new ApiResponse(true, "STK Push successful", null);
+                        return ResponseEntity.ok().body(objectMapper.writeValueAsString(apiResponse));
                     } else {
-                        return ResponseEntity.ok().body("Payment failed, please try again!");
+                        apiResponse = new ApiResponse(false, "Payment failed, please try again!", null);
+                        return ResponseEntity.ok().body(objectMapper.writeValueAsString(apiResponse));
                     }
+
                 } else {
-                    errorPushResponse errorPushResponse = objectMapper.readValue(responseBody, errorPushResponse.class);
-                    return ResponseEntity.ok().body("STK Push failed: " + errorPushResponse.toString());
+                    // Check if response is JSON
+
+                    errorPushResponse errorPushResponse = objectMapper.readValue(responseBody,
+                            errorPushResponse.class);
+                    apiResponse = new ApiResponse(false, "STK Push failed", null);
+                    return ResponseEntity.ok().body(objectMapper.writeValueAsString(apiResponse));
+
                 }
             }
         } catch (IOException e) {
             logger.error("Error occurred: ", e);
-            return ResponseEntity.badRequest().body("Error occurred, try again later");
+            apiResponse = new ApiResponse(false, "Error occurred, try again later", null);
+            return ResponseEntity.badRequest().body(objectMapper.writeValueAsString(apiResponse));
         }
     }
 
@@ -159,7 +175,7 @@ public class PaymentImpl {
         String OwnerEmail = AuthUtils.getCurrentlyLoggedInPerson();
         Owner owner = this.ownerRepository.findByEmail(OwnerEmail);
         String businesskra = owner.getBusinessKRAPin();
-        System.out.println(OwnerEmail + ":" + businesskra);
+        // System.out.println(OwnerEmail + ":" + businesskra);
         PaymentEntity payEntity = new PaymentEntity();
         payEntity.setAmount(amount);
         payEntity.setPayerEmail(OwnerEmail);
@@ -171,7 +187,6 @@ public class PaymentImpl {
         payEntity.setDate_initiated(LocalDateTime.now());
         payEntity.setOwner(owner);
         payEntity.setPaidBy(owner.getEmail());
-        System.out.println(payEntity.getMpesa_receipt());
         return payEntity;
     }
 

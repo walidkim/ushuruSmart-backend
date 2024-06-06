@@ -21,10 +21,10 @@ public class EmailService extends LoggerSingleton {
         try {
             MimeMessage message = emailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true); // true indicates multipart message
-            helper.setFrom("samuelmaynaw@gmail.com"); // Use the email configured in spring.mail.username
+            helper.setFrom("samuelmaynaw@gmail.com");
             helper.setTo(to);
             helper.setSubject(subject);
-            helper.setText(text, true); // true indicates the text is HTML
+            helper.setText(text, true);
             emailSender.send(message);
         } catch (Exception e) {
             logger.error(e.getMessage());

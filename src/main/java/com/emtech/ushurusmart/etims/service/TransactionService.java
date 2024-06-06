@@ -12,10 +12,6 @@ import jakarta.transaction.Transactional;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,11 +19,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.poi.xssf.usermodel.*;
 
@@ -79,20 +78,30 @@ public class TransactionService {
         return transactionRepository.save(transaction);
     }
 
-    public Double getTransactionHistory() {
-        List<Transaction> transactions = transactionRepository.findAll();
+    public Double getTransactionCurrentMonthHistory(){
+        LocalDate currentDate = LocalDate.now();
+        LocalDate startOfMonth = currentDate.withDayOfMonth(1);
+        LocalDate endOfMonth = currentDate.plusMonths(1).withDayOfMonth(1).minusDays(1);
+
+        List<Transaction> transactions = transactionRepository.findByTransactionDateBetween(startOfMonth, endOfMonth);
         return transactions.stream()
                 .map(Transaction::getAmount)
                 .reduce(0.0, Double::sum);
     }
 
     public Double getTaxHistory() {
-        List<Transaction> transactions = transactionRepository.findAll();
-        double sum = transactions.stream()
+            LocalDate currentDate = LocalDate.now();
+            LocalDate startOfMonth = currentDate.withDayOfMonth(1);
+            LocalDate endOfMonth = currentDate.plusMonths(1).withDayOfMonth(1).minusDays(1);
+        
+            List<Transaction> transactions = transactionRepository.findByTransactionDateBetween(startOfMonth, endOfMonth);
+            double sum = transactions.stream()
                 .map(Transaction::getTax)
                 .reduce(0.0, Double::sum);
-        return Math.round(sum * 100.0) / 100.0;
-    }
+
+            return Math.round(sum * 100.0) / 100.0;
+        }
+
     public Long getTransactionCount() {
         List<Transaction> transactions = transactionRepository.findAll();
         return (long) transactions.size();
@@ -111,9 +120,22 @@ public class TransactionService {
 
     @Transactional
     public List<Transaction> getTransactionsMonthly(LocalDate startDate, LocalDate endDate) {
-        LocalDateTime startDateTime = startDate.atStartOfDay();
-        LocalDateTime endDateTime = endDate.plusDays(1).atStartOfDay();
+        // LocalDate startDate = startDate.atStartOfDay();
+        // LocalDate endDate = endDate.plusDays(1).atStartOfDay();
         return transactionRepository.findByTransactionDateBetween(startDate, endDate);
+    }
+
+    public Double getCurrentDayTransactionSum() {
+        LocalDate today = LocalDate.now();
+        List<Transaction> transactions = transactionRepository.findByTransactionDate(today);
+
+        if (!transactions.isEmpty()) {
+            return transactions.stream()
+                    .map(Transaction::getAmount)
+                    .reduce(0.0, Double::sum);
+        } else {
+            return 0.0;
+        }
     }
 
     public byte[] generateExcel() throws IOException {

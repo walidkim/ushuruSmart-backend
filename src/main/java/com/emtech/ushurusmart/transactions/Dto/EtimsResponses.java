@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
+import java.time.LocalDate;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,6 +29,9 @@ public class EtimsResponses {
 
             @JsonProperty("id")
             private int id;
+
+            @JsonProperty("transactionDate")
+            private LocalDate transactionDate;
 
             @JsonProperty("amount")
             private double amount;

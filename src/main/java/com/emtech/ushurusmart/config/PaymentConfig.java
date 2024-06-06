@@ -28,14 +28,5 @@ public class PaymentConfig {
     @Value("${app.mpesa.callbackURL}")
     public String callBackURL;
 
-    @Bean
-    public TaxCalculationService taxCalculationService() {
-        return new TaxCalculationService() {
-            @Override
-            public List<PaymentEntity> getPaymentsByDateRange(LocalDate startDate, LocalDate endDate) {
-                return List.of();
-            }
-        };
-    }
 
 }

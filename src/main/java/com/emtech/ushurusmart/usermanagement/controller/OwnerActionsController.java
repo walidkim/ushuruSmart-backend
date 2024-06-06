@@ -1,12 +1,19 @@
 package com.emtech.ushurusmart.usermanagement.controller;
 
-
+import org.springframework.ui.Model;
+//import ch.qos.logback.core.model.Model;
+import com.emtech.ushurusmart.usermanagement.Dtos.controller.ResetPasswordRequest;
 import com.emtech.ushurusmart.usermanagement.Dtos.entity.AssistantDto;
+import com.emtech.ushurusmart.usermanagement.Dtos.entity.BranchDto;
+import com.emtech.ushurusmart.usermanagement.TrackingEntity.LoginLogoutListener;
 import com.emtech.ushurusmart.usermanagement.factory.EntityFactory;
 import com.emtech.ushurusmart.usermanagement.model.Assistant;
+import com.emtech.ushurusmart.usermanagement.model.Branch;
 import com.emtech.ushurusmart.usermanagement.model.Owner;
 import com.emtech.ushurusmart.usermanagement.service.AssistantService;
+import com.emtech.ushurusmart.usermanagement.service.BranchService;
 import com.emtech.ushurusmart.usermanagement.service.OwnerService;
+import com.emtech.ushurusmart.usermanagement.service.resetpassword.ResetPasswordService;
 import com.emtech.ushurusmart.usermanagement.utils.AuthUtils;
 import com.emtech.ushurusmart.utils.EmailService;
 import com.emtech.ushurusmart.utils.controller.ResContructor;
@@ -15,9 +22,13 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/owner")
@@ -33,8 +44,16 @@ public class OwnerActionsController {
     private AssistantService assistantService;
 
 
+
     @Autowired
     private Responses responses;
+    @Autowired
+
+    private ResetPasswordService resetPasswordService;
+    @Autowired
+    private LoginLogoutListener loginLogoutListener;
+
+
 
     @PostMapping(value = "/update-details")
     public ResponseEntity<?> updatedDetails(@RequestBody Owner newOwner) {
@@ -143,11 +162,90 @@ public class OwnerActionsController {
 
     }
 
-   @GetMapping("/owner/assistants")
-   public int getLoggedInAssistantsCount() {
-       return ownerService.countLoggedInAssistants();
+    @Autowired
+    public OwnerActionsController(LoginLogoutListener loginLogoutListener) {
+        this.loginLogoutListener = loginLogoutListener;
+    }
 
-   }
+
+
+    @GetMapping("/owner/assistants")
+   public ResponseEntity<Integer> getLoggedInAssistantsCount() {
+        int count = loginLogoutListener.getLoggedInAssistantsCount();
+        return ResponseEntity.ok(count);
+    }
+
+
+    @Autowired
+    private BranchService branchService;
+
+
+    public OwnerActionsController(BranchService branchService) {
+        this.branchService = branchService;
+    }
+
+    @GetMapping("/count-branches")
+    public ResponseEntity<List<BranchDto>> getAllBranches() {
+        List<BranchDto> branches = branchService.getAllBranches();
+        return new ResponseEntity<>(branches, HttpStatus.OK);
+    }
+
+    @GetMapping("/branches/{id}")
+    public ResponseEntity<BranchDto> getBranchById(@PathVariable("id") Long id) {
+        return branchService.getBranchById(id)
+                .map(branchDto -> new ResponseEntity<>(branchDto, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    @PostMapping("/create-branches")
+    public ResponseEntity<BranchDto> createBranch(@RequestBody BranchDto branchDto) {
+        BranchDto createdBranch = branchService.createBranch(branchDto);
+        return new ResponseEntity<>(createdBranch, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/update-branches/{id}")
+    public ResponseEntity<BranchDto> updateBranch(@PathVariable("id") Long id, @RequestBody BranchDto branchDto) {
+        BranchDto updatedBranch = branchService.updateBranch(id, branchDto);
+        return new ResponseEntity<>(updatedBranch, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/delete-branches/{id}")
+    public ResponseEntity<Void> deleteBranch(@PathVariable("id") Long id) {
+        branchService.deleteBranch(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetOwnerPassword(@RequestBody ResetPasswordRequest resetPasswordRequest) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email = userDetails.getUsername();
+
+        resetPasswordService.changePassword(email, resetPasswordRequest, "Owner");
+
+        return ResponseEntity.status(HttpStatus.OK).body("Password successfully changed for owner.");
+    }
+
+
+    @GetMapping("/assign-branch-form")
+    public String showAssignBranchForm(Model model) {
+        model.addAttribute("branches", branchService.getAllBranches());
+        model.addAttribute("assistants", assistantService.getAllAssistants());
+        return "assign-branch-form";
+    }
+
+    @PostMapping("/assign-branch")
+    public String assignBranchToAssistant(@RequestParam Long branchId, @RequestParam Long assistantId) {
+        Optional<BranchDto> branch = branchService.getBranchById(branchId);
+        Assistant assistant = assistantService.getAssistantById(assistantId);
+        if (branch.isPresent() && assistant != null) {
+            assistant.setBranch(String.valueOf(branch));
+            assistantService.saveAssistant(assistant);
+       }
+          return "redirect:/assign-branch";
+    }
+
 }
+
+
 
 
