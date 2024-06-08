@@ -15,6 +15,7 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, Long> {
 
     PaymentEntity findByCheckoutRequestID(String checkoutRequestID);
 
+
     // List<PaymentEntity> findByTransactionDateBetween(LocalDate startDate, LocalDate endDate);
 
    // List<com.emtech.ushurusmart.etims.entity.Transaction> findByDateTransactionBetween(LocalDate startDate, LocalDate endDate);

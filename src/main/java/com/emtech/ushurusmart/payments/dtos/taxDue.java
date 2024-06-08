@@ -9,13 +9,13 @@ public class taxDue {
 
     private LocalDate startDate;
     private LocalDate endDate;
-    private String amount;
+
 
 
 
     public taxDue(LocalDate transactionDate, String amount) {
         this.endDate = endDate;
-        this.amount = amount;
+
     }
 
 }

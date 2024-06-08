@@ -16,7 +16,6 @@ public class BranchService {
     @Autowired
 
 
-
     private BranchRepository branchRepository;
 
     public List<BranchDto> getAllBranches() {

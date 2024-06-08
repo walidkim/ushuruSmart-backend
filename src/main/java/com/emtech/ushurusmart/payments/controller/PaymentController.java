@@ -2,6 +2,10 @@ package com.emtech.ushurusmart.payments.controller;
 
 
 
+import com.emtech.ushurusmart.payments.Utils.DateUtils;
+import com.emtech.ushurusmart.payments.service.EslipService;
+import com.emtech.ushurusmart.payments.service.PaymentService;
+import com.emtech.ushurusmart.payments.service.TaxCalculationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +25,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.emtech.ushurusmart.payments.dtos.PaymentDTO;
-import com.emtech.ushurusmart.payments.dtos.taxDue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -35,16 +38,24 @@ import com.emtech.ushurusmart.payments.service.PaymentImpl;
 @RequestMapping("/api/v1/payment/")
 public class PaymentController {
     private static final Logger log = LoggerFactory.getLogger(PaymentController.class);
+
+    @Autowired
     private final PaymentImpl paymentImpl;
     @Autowired
     private PaymentRepository paymentRepository;
     @Autowired
     PaymentMapper paymentMapper;
 
+    @Autowired
+    private final TaxCalculationService taxCalculationService;
+    private final EslipService eslipService;
 
-    public PaymentController(PaymentImpl paymentImpl) {
+    @Autowired
+    public PaymentController(PaymentImpl paymentImpl, TaxCalculationService taxCalculationService, EslipService eslipService) {
         this.paymentImpl = paymentImpl;
 
+        this.taxCalculationService = taxCalculationService;
+        this.eslipService = eslipService;
     }
 
     @PostMapping("/makePayment")
@@ -63,30 +74,27 @@ public class PaymentController {
         paymentImpl.callback(stkCallbackRequest);
     }
 
-    @GetMapping("/taxDue")
-    public String calculateTax(@ModelAttribute taxDue request) {
-        try {
-            LocalDate start = request.getStartDate();
-            LocalDate end = request.getEndDate();
-            return "This";
-
-        } catch (Exception e) {
-            return "Error: " + e.getMessage();
-        }
+    @GetMapping("/generateESlip")
+    public ResponseEntity<String> generateESlip() {
+        String eslip = eslipService.createESlipFromDB();
+        return ResponseEntity.ok(eslip);
     }
 
-//    @GetMapping({"/payment-report"})
-//    public ResponseEntity<List<PaymentEntity>> getPaymentsBetweenDates(
-//            @RequestParam @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate startDate,
-//            @RequestParam @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate endDate) {
-//        LocalDateTime startDateTime = startDate.atStartOfDay();
-//        LocalDateTime endDateTime = endDate.atStartOfDay().plusDays(1).minusNanos(1);
-//       // List<PaymentEntity> payment = this.paymentHistService.getPaymentsBetweenDates(startDate,endDate);
-//        List<PaymentEntity> payment = paymentRepository.findAll();
-//        log.info(payment.toString());
-//        return ResponseEntity.ok(payment);
-//    }
-@GetMapping({"/payment-report"})
+    @GetMapping("/taxDue")
+    public ResponseEntity<String> getTaxDue(
+            @RequestParam("startDate") String startDateStr,
+            @RequestParam("endDate") String endDateStr) {
+
+        LocalDate startDate = DateUtils.parseDate(startDateStr);
+        LocalDate endDate = DateUtils.parseDate(endDateStr);
+
+        double totalTax = taxCalculationService.calculateTotalTax(startDate, endDate);
+        String responseMessage = "Total tax due from " + startDate + " to " + endDate + " is: " + totalTax;
+
+        return ResponseEntity.ok(responseMessage);
+    }
+
+    @GetMapping("/payment-report")
     public ResponseEntity<List<PaymentDTO>> getPaymentsBetweenDates(
             @RequestParam @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate startDate,
             @RequestParam @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate endDate) {
@@ -108,5 +116,7 @@ public class PaymentController {
         String message = "Incorrect date format.Enter (dd/MM/yyyy)";
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
     }
+
+
 
 }
