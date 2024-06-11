@@ -20,6 +20,10 @@ import java.util.List;
 public class Owner extends BaseAuth implements Serializable {
     private String businessKRAPin;
     private String KRAPin;
+    private String name;
+    @Lob
+    @Column(name = "profile_photo", columnDefinition = "MEDIUMBLOB")
+    private  byte[] profilePhoto;
 
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference

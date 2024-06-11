@@ -1,5 +1,8 @@
 package com.emtech.ushurusmart.usermanagement.controller;
 
+import com.emtech.ushurusmart.usermanagement.Dtos.controller.UpdateProfileDto;
+import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.ui.Model;
 //import ch.qos.logback.core.model.Model;
 import com.emtech.ushurusmart.usermanagement.Dtos.controller.ResetPasswordRequest;
@@ -25,6 +28,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Objects;
@@ -242,6 +246,29 @@ public class OwnerActionsController {
             assistantService.saveAssistant(assistant);
        }
           return "redirect:/assign-branch";
+    }
+
+    @PutMapping(value="/update_profile",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> updateProfile(@RequestPart("name")String name,
+                                           @RequestPart("email")String email,
+                                           @RequestPart("profilePhoto") MultipartFile profilePhoto
+                                           ){
+        try {
+            byte[] photoBytes = profilePhoto.getBytes();
+
+            UpdateProfileDto request = new UpdateProfileDto();
+            request.setName(name);
+            request.setEmail(email);
+            request.setProfilePhoto(photoBytes);
+
+            ownerService.updateProfile(request);
+            return ResponseEntity.ok("profile Updated Successfully");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while updating the profile"+ e.getMessage());
+        }
     }
 
 }
