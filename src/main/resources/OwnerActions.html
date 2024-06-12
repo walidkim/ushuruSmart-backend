@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Owner Actions</title>
+</head>
+<body>
+<h1>Owner Dashboard</h1>
+<h2>Logged-in Assistants</h2>
+<ul>
+    <li th:each="assistant : ${loggedInAssistants}" th:text="${assistant}"></li>
+</ul>
+
+</body>
+</html>
