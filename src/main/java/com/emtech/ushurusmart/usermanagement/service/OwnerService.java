@@ -1,9 +1,11 @@
 package com.emtech.ushurusmart.usermanagement.service;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.emtech.ushurusmart.usermanagement.Dtos.controller.UpdateProfileDto;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,6 +14,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -123,6 +127,28 @@ public class OwnerService extends LoggerSingleton {
     public int countLoggedInAssistants() {
         // Assistant Repository has a method to find logged-in users
         return userRepository.countByLoggedInStatus(true);
+    }
+
+    public  Owner updateProfile(UpdateProfileDto request) throws IOException {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String ownerEmail;
+        if (principal instanceof UserDetails) {
+            ownerEmail = ((UserDetails) principal).getUsername();
+        } else {
+            throw new IllegalArgumentException("Principal is not an instance of UserDetails");
+        }
+
+        Owner owner = ownerRepository.findByEmail(ownerEmail);
+
+        if(owner != null){
+            owner.setName(request.getName());
+            owner.setEmail(request.getEmail());
+            owner.setProfilePhoto(request.getProfilePhoto());
+            ownerRepository.save(owner);
+            return owner;
+        } else {
+            throw new IllegalArgumentException("owner not found");
+        }
     }
 
 }

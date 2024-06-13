@@ -9,4 +9,8 @@ public interface PaymentService {
 
     List<PaymentEntity> getPaymentsByDateRange(LocalDate startDate, LocalDate endDate);
     double calculateTotalTax(LocalDate start, LocalDate end);
+
+    interface ESlipService {
+        String createESlipFromDB(Integer rawAmount);
+    }
 }

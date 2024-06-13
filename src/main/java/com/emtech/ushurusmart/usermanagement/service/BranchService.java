@@ -14,6 +14,8 @@ import java.util.stream.Collectors;
 public class BranchService {
 
     @Autowired
+
+
     private BranchRepository branchRepository;
 
     public List<BranchDto> getAllBranches() {
@@ -37,6 +39,7 @@ public class BranchService {
                 .orElseThrow(() -> new RuntimeException("Branch not found with id " + id));
         branch.setName(branchDto.getName());
         branch.setLocation(branchDto.getLocation());
+        branch.setSupervisor(branchDto.getSupervisor());
         Branch updatedBranch = branchRepository.save(branch);
         return convertToDto(updatedBranch);
     }
@@ -48,17 +51,14 @@ public class BranchService {
     }
 
     private BranchDto convertToDto(Branch branch) {
-        return new BranchDto(branch.getName(), branch.getLocation());
+        return new BranchDto(branch.getName(), branch.getLocation(), branch.getSupervisor());
     }
 
     private Branch convertToEntity(BranchDto branchDto) {
         Branch branch = new Branch();
         branch.setName(branchDto.getName());
         branch.setLocation(branchDto.getLocation());
+        branch.setSupervisor(branchDto.getSupervisor());
         return branch;
-    }
-
-    public BranchDto createBranch(Branch branch) {
-        return null;
     }
 }
