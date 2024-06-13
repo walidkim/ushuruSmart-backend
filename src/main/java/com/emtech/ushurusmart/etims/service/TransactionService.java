@@ -19,15 +19,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import org.apache.poi.xssf.usermodel.*;
 
 import static com.emtech.ushurusmart.utils.service.GeneratorService.generateRandomString;
