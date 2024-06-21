@@ -39,6 +39,13 @@ stages:
       displayName: 'Maven Package'
       inputs:
         mavenPomFile: 'pom.xml'
+        options: '-Dmaven.test.skip=true -Dmaven.compile.fork=true'
+        publishJUnitResults: false
+        javaHomeOption: 'JDKVersion'
+        mavenVersionOption: 'Default'
+        mavenAuthenticateFeed: false
+        effectivePomSkip: false
+        sonarQubeRunAnalysis: false
 
     - task: CopyFiles@2
       displayName: 'Copy Files to artifact staging directory'
