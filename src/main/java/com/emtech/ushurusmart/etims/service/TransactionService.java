@@ -1,5 +1,23 @@
 package com.emtech.ushurusmart.etims.service;
 
+import static com.emtech.ushurusmart.utils.service.GeneratorService.*;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.xssf.usermodel.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.emtech.ushurusmart.etims.Dtos.controller.SaleDto;
 import com.emtech.ushurusmart.etims.Dtos.controller.TransactionDto;
 import com.emtech.ushurusmart.etims.entity.Etims;
@@ -8,29 +26,8 @@ import com.emtech.ushurusmart.etims.entity.Transaction;
 import com.emtech.ushurusmart.etims.repository.EtimsRepository;
 import com.emtech.ushurusmart.etims.repository.SalesRepository;
 import com.emtech.ushurusmart.etims.repository.TransactionRepository;
+
 import jakarta.transaction.Transactional;
-import org.apache.poi.ss.usermodel.BorderStyle;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.apache.poi.xssf.usermodel.*;
-
-import static com.emtech.ushurusmart.utils.service.GeneratorService.generateRandomString;
 
 @Service
 public class TransactionService {
@@ -78,7 +75,7 @@ public class TransactionService {
         return transactionRepository.save(transaction);
     }
 
-    public Double getTransactionCurrentMonthHistory(){
+    public Double getTransactionCurrentMonthHistory() {
         LocalDate currentDate = LocalDate.now();
         LocalDate startOfMonth = currentDate.withDayOfMonth(1);
         LocalDate endOfMonth = currentDate.plusMonths(1).withDayOfMonth(1).minusDays(1);
@@ -90,17 +87,17 @@ public class TransactionService {
     }
 
     public Double getTaxHistory() {
-            LocalDate currentDate = LocalDate.now();
-            LocalDate startOfMonth = currentDate.withDayOfMonth(1);
-            LocalDate endOfMonth = currentDate.plusMonths(1).withDayOfMonth(1).minusDays(1);
-        
-            List<Transaction> transactions = transactionRepository.findByTransactionDateBetween(startOfMonth, endOfMonth);
-            double sum = transactions.stream()
+        LocalDate currentDate = LocalDate.now();
+        LocalDate startOfMonth = currentDate.withDayOfMonth(1);
+        LocalDate endOfMonth = currentDate.plusMonths(1).withDayOfMonth(1).minusDays(1);
+
+        List<Transaction> transactions = transactionRepository.findByTransactionDateBetween(startOfMonth, endOfMonth);
+        double sum = transactions.stream()
                 .map(Transaction::getTax)
                 .reduce(0.0, Double::sum);
 
-            return Math.round(sum * 100.0) / 100.0;
-        }
+        return Math.round(sum * 100.0) / 100.0;
+    }
 
     public Long getTransactionCount() {
         List<Transaction> transactions = transactionRepository.findAll();
@@ -149,7 +146,7 @@ public class TransactionService {
         headerFont.setBold(true);
         XSSFCellStyle headerCellStyle = workbook.createCellStyle();
         headerCellStyle.setFont(headerFont);
-        headerCellStyle.setAlignment(HorizontalAlignment.CENTER);  // Center alignment
+        headerCellStyle.setAlignment(HorizontalAlignment.CENTER); // Center alignment
 
         // Create a cell style for borders and justification
         XSSFCellStyle borderCellStyle = workbook.createCellStyle();
@@ -160,7 +157,7 @@ public class TransactionService {
         borderCellStyle.setAlignment(HorizontalAlignment.LEFT); // Left alignment for data cells
 
         // Set headers
-        String[] headers = {"ID", "Amount", "Date Created", "INVOICE Number", "TAX"};
+        String[] headers = { "ID", "Amount", "Date Created", "INVOICE Number", "TAX" };
         for (int i = 0; i < headers.length; i++) {
             XSSFCell cell = headerRow.createCell(i);
             cell.setCellValue(headers[i]);
@@ -189,7 +186,7 @@ public class TransactionService {
     }
 
     private void setCellData(XSSFRow row, int column, Object value, XSSFCellStyle borderCellStyle) {
-        if (value!= null) {
+        if (value != null) {
             CellStyle style = row.getRowStyle(); // Get the default style for the row
             if (value instanceof Date) { // Check if the value is a Date object
                 SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy"); // Define the date format
