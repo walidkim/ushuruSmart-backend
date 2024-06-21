@@ -13,7 +13,9 @@ import com.emtech.ushurusmart.payments.repository.PaymentRepository;
 @Service
 public class EslipService {
 
+    @SuppressWarnings("unused")
     private static final Logger logger = org.slf4j.LoggerFactory.getLogger(EslipService.class);
+    @SuppressWarnings("unused")
     @Autowired
     private PaymentRepository eSlipRepository; // Assuming there is a repository for ESLIP related operations
     @Autowired
