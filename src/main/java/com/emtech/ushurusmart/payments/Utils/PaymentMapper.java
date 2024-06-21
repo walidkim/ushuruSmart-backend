@@ -26,7 +26,6 @@ public class PaymentMapper {
         dto.setPayerEmail(entity.getPayerEmail());
         dto.setPhoneNumber(entity.getPhoneNumber());
         dto.setMpesaReceipt(entity.getMpesa_receipt());
-        dto.setDateInitiated(entity.getDate_initiated());
         dto.setIsPaid(entity.getIsPaid());
         dto.setPaidBy(entity.getPaidBy());
         dto.setTransactionDate(entity.getTransactionDate());
@@ -44,7 +43,6 @@ public class PaymentMapper {
         entity.setPayerEmail(dto.getPayerEmail());
         entity.setPhoneNumber(dto.getPhoneNumber());
         entity.setMpesa_receipt(dto.getMpesaReceipt());
-        entity.setDate_initiated(dto.getDateInitiated());
         entity.setIsPaid(dto.getIsPaid());
         entity.setPaidBy(dto.getPaidBy());
         entity.setTransactionDate(dto.getTransactionDate());
