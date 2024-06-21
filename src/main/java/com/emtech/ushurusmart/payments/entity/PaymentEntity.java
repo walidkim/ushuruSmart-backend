@@ -38,13 +38,13 @@ public class PaymentEntity {
     private String phoneNumber;
     @Column(name = "mpesa_receipt")
     private String mpesa_receipt;
-    @Column(name = "date_Initiated", nullable = false)
-    private LocalDateTime date_initiated;
     @Column(name = "is_paid", nullable = false)
     private Boolean isPaid;
     @Column(name = "paid_by")
     private String paidBy;
     @Column(name = "transaction_date")
+    private LocalDateTime transaction_Date;
+    @Column(name = "transactiondate")
     private LocalDateTime transactionDate;
 
 }

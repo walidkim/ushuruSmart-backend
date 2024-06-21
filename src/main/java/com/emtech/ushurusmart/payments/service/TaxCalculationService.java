@@ -1,22 +1,20 @@
 package com.emtech.ushurusmart.payments.service;
 
-import com.emtech.ushurusmart.etims.entity.Transaction;
-import com.emtech.ushurusmart.etims.repository.TransactionRepository;
-import com.emtech.ushurusmart.payments.repository.PaymentRepository;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
+import com.emtech.ushurusmart.etims.entity.Transaction;
+import com.emtech.ushurusmart.etims.repository.TransactionRepository;
 
 @Component
 @Service
 public abstract class TaxCalculationService implements PaymentService {
-    @Autowired
-    private PaymentRepository paymentRepository;
 
     @Autowired
     private TransactionRepository transactionRepository;

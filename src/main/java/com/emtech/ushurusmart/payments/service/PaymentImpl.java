@@ -15,7 +15,6 @@ import com.emtech.ushurusmart.config.PaymentConfig;
 import com.emtech.ushurusmart.payments.Utils.HelperUtility;
 import com.emtech.ushurusmart.payments.dtos.AccessTokenResponse;
 import com.emtech.ushurusmart.payments.dtos.ApiResponse;
-import com.emtech.ushurusmart.payments.dtos.errorPushResponse;
 import com.emtech.ushurusmart.payments.dtos.okPushResponse;
 import com.emtech.ushurusmart.payments.dtos.callback.CallbackMetadata;
 import com.emtech.ushurusmart.payments.dtos.callback.StkCallBack;
@@ -50,6 +49,7 @@ public class PaymentImpl {
         this.paymentConfig = paymentConfig;
     }
 
+    @SuppressWarnings("resource")
     public String getAccessToken() {
         String authheader = "Basic " + HelperUtility.toBase64String(paymentConfig.keySecret);
         Request request = (new Request.Builder()).url(PaymentConfig.authURL).get()
@@ -127,8 +127,8 @@ public class PaymentImpl {
                 } else {
                     // Check if response is JSON
 
-                    errorPushResponse errorPushResponse = objectMapper.readValue(responseBody,
-                            errorPushResponse.class);
+                    // errorPushResponse errorPushResponse =
+                    // objectMapper.readValue(responseBody,errorPushResponse.class);
                     apiResponse = new ApiResponse(false, "STK Push failed", null);
                     return ResponseEntity.ok().body(objectMapper.writeValueAsString(apiResponse));
 
@@ -184,7 +184,7 @@ public class PaymentImpl {
         payEntity.setPhoneNumber(phoneno);
         payEntity.setCheckoutRequestID(okPushResponse.getCheckoutRequestID());
         payEntity.setBusiness_krapin(businesskra);
-        payEntity.setDate_initiated(LocalDateTime.now());
+        payEntity.setTransactionDate(LocalDateTime.now());
         payEntity.setOwner(owner);
         payEntity.setPaidBy(owner.getEmail());
         return payEntity;

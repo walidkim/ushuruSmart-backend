@@ -1,11 +1,10 @@
 package com.emtech.ushurusmart.payments.Utils;
+
+import org.springframework.stereotype.Component;
+
 import com.emtech.ushurusmart.payments.dtos.PaymentDTO;
 import com.emtech.ushurusmart.payments.entity.PaymentEntity;
 import com.emtech.ushurusmart.usermanagement.repository.OwnerRepository;
-import org.springframework.stereotype.Component;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @Component
 public class PaymentMapper {
