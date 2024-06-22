@@ -7,6 +7,7 @@ trigger:
 - main
 
 variables:
+  isPublic: true
 
   # Azure Resource Manager connection created during pipeline creation
   azureSubscription: 'f4ff1291-a4cb-447c-bd0a-e082838e125c'
